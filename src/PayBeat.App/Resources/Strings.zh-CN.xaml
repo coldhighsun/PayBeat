@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Context menu -->
+    <sys:String x:Key="Menu.DisplayMode">显示模式</sys:String>
+    <sys:String x:Key="Menu.Normal">标准</sys:String>
+    <sys:String x:Key="Menu.Compact">紧凑</sys:String>
+    <sys:String x:Key="Menu.Mini">迷你</sys:String>
+    <sys:String x:Key="Menu.Settings">设置</sys:String>
+    <sys:String x:Key="Menu.About">关于</sys:String>
+    <sys:String x:Key="Menu.Exit">退出</sys:String>
+
+    <!-- Normal view labels -->
+    <sys:String x:Key="View.WorkStart">上班 </sys:String>
+    <sys:String x:Key="View.WorkEnd">下班 </sys:String>
+    <sys:String x:Key="View.DailySalary">日薪</sys:String>
+
+    <!-- Settings window -->
+    <sys:String x:Key="Settings.WindowTitle">PayBeat 设置</sys:String>
+    <sys:String x:Key="Settings.Title">设置</sys:String>
+    <sys:String x:Key="Settings.Cancel">取消</sys:String>
+    <sys:String x:Key="Settings.Save">保存</sys:String>
+
+    <!-- Salary tab -->
+    <sys:String x:Key="Settings.Tab.Salary">薪资计算</sys:String>
+    <sys:String x:Key="Settings.DailySalary">日薪</sys:String>
+    <sys:String x:Key="Settings.WorkStart">上班时间</sys:String>
+    <sys:String x:Key="Settings.WorkEnd">下班时间</sys:String>
+    <sys:String x:Key="Settings.RefreshInterval">刷新间隔</sys:String>
+    <sys:String x:Key="Settings.Seconds"> 秒</sys:String>
+
+    <!-- Display tab -->
+    <sys:String x:Key="Settings.Tab.Display">显示</sys:String>
+    <sys:String x:Key="Settings.DisplayMode">显示方式</sys:String>
+    <sys:String x:Key="Settings.Normal">标准</sys:String>
+    <sys:String x:Key="Settings.Compact">紧凑</sys:String>
+    <sys:String x:Key="Settings.Mini">迷你</sys:String>
+    <sys:String x:Key="Settings.Opacity">透明度</sys:String>
+    <sys:String x:Key="Settings.AlwaysOnTop">窗口始终置顶</sys:String>
+
+    <!-- System tab -->
+    <sys:String x:Key="Settings.Tab.System">系统</sys:String>
+    <sys:String x:Key="Settings.RunAtStartup">开机自动启动</sys:String>
+    <sys:String x:Key="Settings.Language">语言</sys:String>
+    <sys:String x:Key="Settings.LanguageAuto">自动</sys:String>
+    <sys:String x:Key="Settings.Hotkey">显示/隐藏快捷键</sys:String>
+    <sys:String x:Key="Settings.HotkeyHint">点击后输入快捷键组合</sys:String>
+    <sys:String x:Key="Settings.HotkeyCapturing">请输入快捷键组合...</sys:String>
+
+    <!-- About window -->
+    <sys:String x:Key="About.WindowTitle">关于 PayBeat</sys:String>
+    <sys:String x:Key="About.Description">一款轻量悬浮组件，实时显示你的当日薪资进度。</sys:String>
+    <sys:String x:Key="About.Author">作者</sys:String>
+    <sys:String x:Key="About.License">许可证</sys:String>
+    <sys:String x:Key="About.GitHub">GitHub</sys:String>
+    <sys:String x:Key="About.Close">关闭</sys:String>
+
+    <!-- Validation errors -->
+    <sys:String x:Key="Error.SalaryPositive">日薪须大于 0</sys:String>
+    <sys:String x:Key="Error.WorkEndAfterStart">下班时间须晚于上班时间</sys:String>
+
+</ResourceDictionary>

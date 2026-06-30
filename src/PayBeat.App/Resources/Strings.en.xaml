@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Context menu -->
+    <sys:String x:Key="Menu.DisplayMode">Display Mode</sys:String>
+    <sys:String x:Key="Menu.Normal">Normal</sys:String>
+    <sys:String x:Key="Menu.Compact">Compact</sys:String>
+    <sys:String x:Key="Menu.Mini">Mini</sys:String>
+    <sys:String x:Key="Menu.Settings">Settings</sys:String>
+    <sys:String x:Key="Menu.About">About</sys:String>
+    <sys:String x:Key="Menu.Exit">Exit</sys:String>
+
+    <!-- Normal view labels -->
+    <sys:String x:Key="View.WorkStart">Start </sys:String>
+    <sys:String x:Key="View.WorkEnd">End </sys:String>
+    <sys:String x:Key="View.DailySalary">Daily</sys:String>
+
+    <!-- Settings window -->
+    <sys:String x:Key="Settings.WindowTitle">PayBeat Settings</sys:String>
+    <sys:String x:Key="Settings.Title">Settings</sys:String>
+    <sys:String x:Key="Settings.Cancel">Cancel</sys:String>
+    <sys:String x:Key="Settings.Save">Save</sys:String>
+
+    <!-- Salary tab -->
+    <sys:String x:Key="Settings.Tab.Salary">Salary</sys:String>
+    <sys:String x:Key="Settings.DailySalary">Daily Salary</sys:String>
+    <sys:String x:Key="Settings.WorkStart">Work Start</sys:String>
+    <sys:String x:Key="Settings.WorkEnd">Work End</sys:String>
+    <sys:String x:Key="Settings.RefreshInterval">Refresh Interval</sys:String>
+    <sys:String x:Key="Settings.Seconds"> s</sys:String>
+
+    <!-- Display tab -->
+    <sys:String x:Key="Settings.Tab.Display">Display</sys:String>
+    <sys:String x:Key="Settings.DisplayMode">Display Mode</sys:String>
+    <sys:String x:Key="Settings.Normal">Normal</sys:String>
+    <sys:String x:Key="Settings.Compact">Compact</sys:String>
+    <sys:String x:Key="Settings.Mini">Mini</sys:String>
+    <sys:String x:Key="Settings.Opacity">Opacity</sys:String>
+    <sys:String x:Key="Settings.AlwaysOnTop">Always on Top</sys:String>
+
+    <!-- System tab -->
+    <sys:String x:Key="Settings.Tab.System">System</sys:String>
+    <sys:String x:Key="Settings.RunAtStartup">Run at Startup</sys:String>
+    <sys:String x:Key="Settings.Language">Language</sys:String>
+    <sys:String x:Key="Settings.LanguageAuto">Auto</sys:String>
+    <sys:String x:Key="Settings.Hotkey">Toggle Visibility Hotkey</sys:String>
+    <sys:String x:Key="Settings.HotkeyHint">Click, then press a key combination</sys:String>
+    <sys:String x:Key="Settings.HotkeyCapturing">Press a key combination...</sys:String>
+
+    <!-- About window -->
+    <sys:String x:Key="About.WindowTitle">About PayBeat</sys:String>
+    <sys:String x:Key="About.Description">A lightweight floating widget that shows your real-time earnings as the workday ticks by.</sys:String>
+    <sys:String x:Key="About.Author">Author</sys:String>
+    <sys:String x:Key="About.License">License</sys:String>
+    <sys:String x:Key="About.GitHub">GitHub</sys:String>
+    <sys:String x:Key="About.Close">Close</sys:String>
+
+    <!-- Validation errors -->
+    <sys:String x:Key="Error.SalaryPositive">Daily salary must be greater than 0</sys:String>
+    <sys:String x:Key="Error.WorkEndAfterStart">Work end must be later than work start</sys:String>
+
+</ResourceDictionary>

@@ -1,0 +1,97 @@
+<UserControl x:Class="PayBeat.App.Views.NormalView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border Background="#1E1E2E"
+            CornerRadius="12"
+            Width="300"
+            Padding="20,18"
+            BorderBrush="#45475A"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.4" BlurRadius="20" ShadowDepth="0"/>
+        </Border.Effect>
+
+        <StackPanel>
+
+            <!-- Header -->
+            <TextBlock Text="PayBeat"
+                       Foreground="#9399B2"
+                       FontFamily="Segoe UI"
+                       FontSize="12"
+                       FontWeight="SemiBold"/>
+
+            <!-- Earned amount -->
+            <TextBlock Text="{Binding EarnedFormatted}"
+                       Foreground="#A6E3A1"
+                       FontFamily="Segoe UI"
+                       FontSize="40"
+                       FontWeight="Bold"
+                       Margin="0,6,0,0"/>
+
+            <!-- Progress bar -->
+            <ProgressBar Value="{Binding Progress, Mode=OneWay}"
+                         Minimum="0" Maximum="1"
+                         Height="5"
+                         Margin="0,14,0,8"
+                         Background="#313244"
+                         Foreground="#89B4FA"
+                         BorderThickness="0"/>
+
+            <!-- Time range -->
+            <Grid Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="{DynamicResource View.WorkStart}"
+                               Foreground="#9399B2"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                    <TextBlock Text="{Binding WorkStart, StringFormat=HH:mm, Mode=OneWay}"
+                               Foreground="#9399B2"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="{DynamicResource View.WorkEnd}"
+                               Foreground="#9399B2"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                    <TextBlock Text="{Binding WorkEnd, StringFormat=HH:mm, Mode=OneWay}"
+                               Foreground="#9399B2"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Separator -->
+            <Border Height="1" Background="#313244" Margin="0,4,0,10"/>
+
+            <!-- Daily total -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource View.DailySalary}"
+                           Foreground="#6C7086"
+                           FontFamily="Segoe UI"
+                           FontSize="11"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="{Binding Currency, Mode=OneWay}"
+                               Foreground="#6C7086"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                    <TextBlock Text="{Binding DailySalary, StringFormat=N2, Mode=OneWay}"
+                               Foreground="#6C7086"
+                               FontFamily="Segoe UI"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</UserControl>

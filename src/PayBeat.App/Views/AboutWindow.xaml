@@ -1,0 +1,184 @@
+<Window x:Class="PayBeat.App.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource About.WindowTitle}"
+        Icon="pack://application:,,,/Resources/Icons/PayBeat.ico"
+        Width="340"
+        SizeToContent="Height"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        FontFamily="Segoe UI"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <Border Background="#1E1E2E"
+            CornerRadius="12"
+            BorderBrush="#45475A"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="24" ShadowDepth="0"/>
+        </Border.Effect>
+
+        <DockPanel Margin="28,24">
+
+            <!-- Close button -->
+            <Button DockPanel.Dock="Top"
+                    HorizontalAlignment="Right"
+                    Width="28" Height="28"
+                    Content="✕"
+                    FontSize="12"
+                    Background="Transparent"
+                    Foreground="#6C7086"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="CloseButton_Click"
+                    Margin="0,0,-4,0">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#313244"/>
+                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <!-- App icon + name -->
+            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0,8,0,20">
+                <Image Source="pack://application:,,,/Resources/Icons/PayBeat.ico"
+                       Width="56" Height="56"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="PayBeat"
+                           Foreground="#CDD6F4"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock x:Name="VersionText"
+                           Foreground="#6C7086"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Description -->
+            <TextBlock DockPanel.Dock="Top"
+                       Text="{DynamicResource About.Description}"
+                       Foreground="#9399B2"
+                       FontSize="13"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
+
+            <!-- Separator -->
+            <Border DockPanel.Dock="Top"
+                    Height="1"
+                    Background="#313244"
+                    Margin="0,0,0,16"/>
+
+            <!-- Author row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.Author}"
+                           Foreground="#6C7086"
+                           FontSize="12"/>
+                <TextBlock Grid.Column="1"
+                           Text="coldhighsun"
+                           Foreground="#CDD6F4"
+                           FontSize="12"/>
+            </Grid>
+
+            <!-- License row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.License}"
+                           Foreground="#6C7086"
+                           FontSize="12"/>
+                <TextBlock Grid.Column="1"
+                           Text="MIT"
+                           Foreground="#CDD6F4"
+                           FontSize="12"/>
+            </Grid>
+
+            <!-- GitHub row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.GitHub}"
+                           Foreground="#6C7086"
+                           FontSize="12"/>
+                <TextBlock Grid.Column="1" FontSize="12">
+                    <Hyperlink x:Name="GitHubLink"
+                               Foreground="#89B4FA"
+                               TextDecorations="None"
+                               RequestNavigate="GitHubLink_RequestNavigate"
+                               NavigateUri="https://github.com/coldhighsun/PayBeat">
+                        github.com/coldhighsun/PayBeat
+                    </Hyperlink>
+                </TextBlock>
+            </Grid>
+
+            <!-- Close button -->
+            <Button DockPanel.Dock="Top"
+                    Content="{DynamicResource About.Close}"
+                    HorizontalAlignment="Center"
+                    Padding="32,10"
+                    Background="#313244"
+                    Foreground="#CDD6F4"
+                    BorderThickness="0"
+                    FontSize="13"
+                    Cursor="Hand"
+                    Click="CloseButton_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#313244"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="8"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#45475A"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+        </DockPanel>
+    </Border>
+</Window>
