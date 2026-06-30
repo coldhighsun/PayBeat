@@ -18,6 +18,7 @@ public partial class App
     private MainViewModel? _mainVm;
     private MainWindow? _mainWindow;
     private SettingsService? _settingsService;
+    private Mutex? _singleInstanceMutex;
     private bool _windowsHidden;
 
     /// <summary>Resumes the global hotkey after it was suspended by the settings window.</summary>
@@ -46,6 +47,8 @@ public partial class App
 
         _hotkeyService?.Dispose();
         _mainVm?.Dispose();
+        _singleInstanceMutex?.ReleaseMutex();
+        _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
 
@@ -57,6 +60,18 @@ public partial class App
         _settingsService = new SettingsService();
         var settings = _settingsService.Load();
         LocalizationService.Apply(settings.Language);
+
+        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out bool createdNew);
+        if (!createdNew)
+        {
+            MessageBox.Show(
+                (string)FindResource("Error.AlreadyRunning"),
+                "PayBeat",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            Shutdown();
+            return;
+        }
         _mainVm = new MainViewModel(_settingsService);
         _mainVm.HotkeySettingsChanged += OnHotkeySettingsChanged;
 

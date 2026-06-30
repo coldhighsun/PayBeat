@@ -59,5 +59,6 @@
     <!-- Validation errors -->
     <sys:String x:Key="Error.SalaryPositive">日薪须大于 0</sys:String>
     <sys:String x:Key="Error.WorkEndAfterStart">下班时间须晚于上班时间</sys:String>
+    <sys:String x:Key="Error.AlreadyRunning">PayBeat 已在运行中。</sys:String>
 
 </ResourceDictionary>
