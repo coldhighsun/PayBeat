@@ -67,13 +67,13 @@ public sealed class HotkeyService : IDisposable
     /// <param name="window">The window whose message loop will receive the hotkey notification.</param>
     /// <param name="modifiers">Win32 modifier flags.</param>
     /// <param name="virtualKey">Virtual-key code.</param>
-    public void Register(Window window, int modifiers, int virtualKey)
+    public bool Register(Window window, int modifiers, int virtualKey)
     {
         var helper = new WindowInteropHelper(window);
         _hwnd = helper.Handle;
         _source = HwndSource.FromHwnd(_hwnd);
         _source?.AddHook(WndProc);
-        RegisterHotKey(_hwnd, Id, (uint)modifiers, (uint)virtualKey);
+        return RegisterHotKey(_hwnd, Id, (uint)modifiers, (uint)virtualKey);
     }
 
     /// <summary>Resumes firing <see cref="Triggered"/> after a prior <see cref="Suspend"/> call.</summary>
@@ -87,14 +87,14 @@ public sealed class HotkeyService : IDisposable
     /// </summary>
     /// <param name="modifiers">New Win32 modifier flags.</param>
     /// <param name="virtualKey">New virtual-key code.</param>
-    public void Update(int modifiers, int virtualKey)
+    public bool Update(int modifiers, int virtualKey)
     {
         if (_hwnd == IntPtr.Zero)
         {
-            return;
+            return false;
         }
         UnregisterHotKey(_hwnd, Id);
-        RegisterHotKey(_hwnd, Id, (uint)modifiers, (uint)virtualKey);
+        return RegisterHotKey(_hwnd, Id, (uint)modifiers, (uint)virtualKey);
     }
 
     [DllImport("user32.dll")]
