@@ -24,7 +24,19 @@ public partial class AboutWindow
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion
             ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3);
-        return version is null ? string.Empty : $"v{version}";
+
+        if (version is null)
+        {
+            return string.Empty;
+        }
+
+        var plus = version.IndexOf('+');
+        if (plus >= 0)
+        {
+            version = version[..plus];
+        }
+
+        return $"v{version}";
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
