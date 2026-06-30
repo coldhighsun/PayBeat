@@ -16,6 +16,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     private decimal _earned;
     private double _progress;
     private SalarySettings _settings;
+    private DispatcherTimer? _wakeTimer;
 
     /// <summary>
     /// Initializes a new instance of <see cref="MainViewModel"/>, loads settings, starts the refresh timer,
@@ -135,6 +136,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
+        _wakeTimer?.Stop();
         _timer.Stop();
     }
 
@@ -157,6 +159,12 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(IsCompactMode));
         OnPropertyChanged(nameof(IsMiniMode));
         _timer.Interval = TimeSpan.FromSeconds(_settings.RefreshInterval);
+        _wakeTimer?.Stop();
+        _wakeTimer = null;
+        if (!_timer.IsEnabled)
+        {
+            _timer.Start();
+        }
         HotkeySettingsChanged?.Invoke();
         Refresh();
     }
@@ -198,6 +206,34 @@ public class MainViewModel : ViewModelBase, IDisposable
         var now = DateTime.Now;
         Earned = EarningsCalculator.Calculate(_settings, now);
         Progress = EarningsCalculator.WorkdayProgress(_settings, now);
+
+        var current = TimeOnly.FromDateTime(now);
+        if (current <= _settings.WorkStart || current >= _settings.WorkEnd)
+        {
+            _timer.Stop();
+            ScheduleWakeTimer(now);
+        }
+    }
+
+    private void ScheduleWakeTimer(DateTime now)
+    {
+        _wakeTimer?.Stop();
+
+        var current = TimeOnly.FromDateTime(now);
+        var nextStart = current < _settings.WorkStart
+            ? now.Date + _settings.WorkStart.ToTimeSpan()
+            : now.Date.AddDays(1) + _settings.WorkStart.ToTimeSpan();
+
+        var delay = nextStart - now;
+        _wakeTimer = new DispatcherTimer { Interval = delay };
+        _wakeTimer.Tick += (_, _) =>
+        {
+            _wakeTimer!.Stop();
+            _wakeTimer = null;
+            _timer.Start();
+            Refresh();
+        };
+        _wakeTimer.Start();
     }
 
     private void SetDisplayMode(DisplayMode mode)
