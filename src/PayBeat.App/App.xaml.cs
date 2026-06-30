@@ -80,7 +80,16 @@ public partial class App
         {
             var s = _settingsService.Load();
             _hotkeyService = new HotkeyService();
-            _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
+            bool registered = _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
+            if (!registered)
+            {
+                var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
+                MessageBox.Show(
+                    string.Format((string)FindResource("Error.HotkeyConflict"), key),
+                    "PayBeat",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
             _hotkeyService.Triggered += ToggleWindowVisibility;
         };
         _mainWindow.Show();
@@ -111,7 +120,19 @@ public partial class App
     private void OnHotkeySettingsChanged()
     {
         var s = _settingsService!.Load();
-        _hotkeyService?.Update(s.HotkeyModifiers, s.HotkeyVirtualKey);
+        if (_hotkeyService != null)
+        {
+            bool registered = _hotkeyService.Update(s.HotkeyModifiers, s.HotkeyVirtualKey);
+            if (!registered)
+            {
+                var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
+                MessageBox.Show(
+                    string.Format((string)FindResource("Error.HotkeyConflict"), key),
+                    "PayBeat",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
     }
 
     private void ToggleWindowVisibility()
