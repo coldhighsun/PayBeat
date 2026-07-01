@@ -97,7 +97,6 @@ public partial class TimePickerControl
         UpdateBoxes(SelectedTime);
     }
 
-    // --- Keyboard: arrow keys ---
     private void Minute_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Up)
@@ -131,7 +130,6 @@ public partial class TimePickerControl
         UpdateBoxes(SelectedTime);
     }
 
-    // --- Up/Down buttons ---
     private void MinuteUp_Click(object sender, RoutedEventArgs e)
     {
         SelectedTime = SelectedTime.AddMinutes(1);
@@ -153,7 +151,4 @@ public partial class TimePickerControl
         HourBox.Text = time.Hour.ToString("D2");
         MinuteBox.Text = time.Minute.ToString("D2");
     }
-
-    // --- Input validation: digits only ---
-    // --- Focus / LostFocus ---
 }

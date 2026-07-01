@@ -9,6 +9,8 @@ namespace PayBeat.App.Views;
 /// </summary>
 public partial class MainWindow
 {
+    private readonly ForegroundWatcher _foregroundWatcher;
+
     /// <summary>
     /// Initializes the window and wires up mouse and data-context event handlers.
     /// </summary>
@@ -21,6 +23,8 @@ public partial class MainWindow
         MouseEnter += (_, _) => Opacity = 1.0;
         MouseLeave += (_, _) => RestoreOpacity();
         MouseLeftButtonDown += (_, _) => DragMove();
+        _foregroundWatcher = new ForegroundWatcher(ReassertTopmost);
+        Closed += (_, _) => _foregroundWatcher.Dispose();
     }
 
     /// <summary>
@@ -86,6 +90,17 @@ public partial class MainWindow
         if (e.PropertyName == nameof(ViewModels.MainViewModel.Opacity) && !IsMouseOver)
         {
             RestoreOpacity(sender as ViewModels.MainViewModel);
+        }
+    }
+
+    // explorer.exe re-asserts the taskbar's own HWND_TOPMOST position whenever it becomes
+    // foreground (e.g. on click), which can push our window behind it even though WPF's
+    // Topmost flag is still true. React only to foreground changes rather than polling.
+    private void ReassertTopmost()
+    {
+        if (Topmost)
+        {
+            TopmostHelper.ForceTopmost(this);
         }
     }
 
