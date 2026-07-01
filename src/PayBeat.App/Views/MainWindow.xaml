@@ -9,7 +9,12 @@
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStartupLocation="Manual"
-        Topmost="{Binding AlwaysOnTop}">
+        Topmost="{Binding AlwaysOnTop}"
+        RenderTransformOrigin="0.5,0.5">
+
+    <Window.RenderTransform>
+        <ScaleTransform/>
+    </Window.RenderTransform>
 
     <Window.ContextMenu>
         <ContextMenu>

@@ -1,3 +1,5 @@
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using PayBeat.App.Helpers;
 
 namespace PayBeat.App.Views;
@@ -49,6 +51,41 @@ public partial class MainWindow
 
         Left = Math.Clamp(Left, workArea.Left, workArea.Right - ActualWidth);
         Top = Math.Clamp(Top, workArea.Top, workArea.Bottom - ActualHeight);
+    }
+
+    /// <summary>
+    /// Briefly scales up and dims the window as a click-feedback cue, e.g. when the user activates
+    /// it from the tray icon while it is already visible and in the foreground.
+    /// </summary>
+    public void PlayAttentionAnimation()
+    {
+        var scale = (ScaleTransform)RenderTransform;
+        var scaleAnimation = new DoubleAnimation
+        {
+            From = 1.0,
+            To = 1.15,
+            Duration = TimeSpan.FromMilliseconds(140),
+            AutoReverse = true,
+            EasingFunction = new QuadraticEase()
+        };
+        scaleAnimation.Completed += (_, _) =>
+        {
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            BeginAnimation(OpacityProperty, null);
+            RestoreOpacity();
+        };
+        scale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnimation);
+        scale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
+
+        var opacityAnimation = new DoubleAnimation
+        {
+            From = Opacity,
+            To = 0.6,
+            Duration = TimeSpan.FromMilliseconds(140),
+            AutoReverse = true
+        };
+        BeginAnimation(OpacityProperty, opacityAnimation);
     }
 
     private void ContentControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)

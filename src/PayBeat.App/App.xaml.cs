@@ -19,6 +19,7 @@ public partial class App
     private MainWindow? _mainWindow;
     private SettingsService? _settingsService;
     private Mutex? _singleInstanceMutex;
+    private TrayIconService? _trayIconService;
     private bool _windowsHidden;
 
     /// <summary>Resumes the global hotkey after it was suspended by the settings window.</summary>
@@ -45,6 +46,7 @@ public partial class App
             _settingsService.Save(updated);
         }
 
+        _trayIconService?.Dispose();
         _hotkeyService?.Dispose();
         _mainVm?.Dispose();
         _singleInstanceMutex?.ReleaseMutex();
@@ -93,6 +95,7 @@ public partial class App
             _hotkeyService.Triggered += ToggleWindowVisibility;
         };
         _mainWindow.Show();
+        _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
 
         var pos = GetSavedPosition(settings, settings.DisplayMode);
         if (pos != null)
@@ -116,6 +119,19 @@ public partial class App
             DisplayMode.Mini => settings.MiniPosition,
             _ => null
         };
+
+    private void ActivateMainWindow()
+    {
+        if (_mainWindow == null)
+        {
+            return;
+        }
+
+        _mainWindow.Show();
+        _mainWindow.WindowState = WindowState.Normal;
+        _mainWindow.Activate();
+        _mainWindow.PlayAttentionAnimation();
+    }
 
     private void OnHotkeySettingsChanged()
     {
