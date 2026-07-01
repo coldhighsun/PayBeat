@@ -58,3 +58,9 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 | `nuget.config` | Restricts package sources to nuget.org only (`<clear/>` overrides global config) |
 
 Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layout via `UseArtifactsOutput=true`).
+
+## CI / Release
+
+`.github/workflows/ci.yml` builds on every push (Windows runner, .NET 10). On a `v*` tag push, it additionally publishes a self-contained-false `win-x64` build, zips it, and creates a GitHub Release via `softprops/action-gh-release`. Versioning is derived from git tags (MinVer needs `fetch-depth: 0`).
+
+There is no test project in this repository yet.

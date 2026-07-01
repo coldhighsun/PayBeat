@@ -243,6 +243,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             return;
         }
+
         _settingsService.Save(current with
         {
             DisplayMode = mode

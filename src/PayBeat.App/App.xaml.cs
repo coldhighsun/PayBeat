@@ -61,7 +61,7 @@ public partial class App
         var settings = _settingsService.Load();
         LocalizationService.Apply(settings.Language);
 
-        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out bool createdNew);
+        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
         if (!createdNew)
         {
             MessageBox.Show(
@@ -80,7 +80,7 @@ public partial class App
         {
             var s = _settingsService.Load();
             _hotkeyService = new HotkeyService();
-            bool registered = _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
+            var registered = _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
             if (!registered)
             {
                 var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
@@ -122,7 +122,7 @@ public partial class App
         var s = _settingsService!.Load();
         if (_hotkeyService != null)
         {
-            bool registered = _hotkeyService.Update(s.HotkeyModifiers, s.HotkeyVirtualKey);
+            var registered = _hotkeyService.Update(s.HotkeyModifiers, s.HotkeyVirtualKey);
             if (!registered)
             {
                 var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);

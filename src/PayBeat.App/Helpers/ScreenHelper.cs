@@ -74,7 +74,7 @@ internal static class ScreenHelper
 
     private static IntPtr FindMonitorByDeviceName(string deviceName)
     {
-        IntPtr result = IntPtr.Zero;
+        var result = IntPtr.Zero;
         EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
             (hMon, _, ref _, _) =>
             {
