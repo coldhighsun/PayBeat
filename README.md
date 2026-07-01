@@ -18,6 +18,7 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 - Linearly calculates earnings per second from your daily salary and work hours
 - Three display modes (Normal / Compact / Mini) — double-click to open Settings
 - Each mode remembers its last position independently, with multi-monitor support
+- System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
 - Global hotkey to show / hide all windows (default `Ctrl+Alt+X`)
 - English and Simplified Chinese UI, auto-detected from the OS locale
 - Configurable opacity, refresh interval, and currency symbol
@@ -49,7 +50,8 @@ Output goes to `artifacts/bin/PayBeat.App/release/`.
 2. **Double-click** the widget to open Settings
 3. **Drag** the widget anywhere; position is saved on exit
 4. **Right-click** for a context menu with Settings and About
-5. Enter your daily salary, work hours, and currency symbol in Settings — changes apply immediately
+5. Use the **tray icon** for the same menu, plus display mode switching and Exit — left-click it to bring the widget to the front with a brief scale-up flash
+6. Enter your daily salary, work hours, and currency symbol in Settings — changes apply immediately
 
 ## Settings Reference
 
@@ -81,6 +83,7 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - 根据日薪和工作时段，每秒线性计算已赚金额
 - 三种显示模式（Normal / Compact / Mini），双击打开设置
 - 每种模式独立记忆上次所在位置（支持多显示器）
+- 系统托盘图标，右键菜单可切换显示模式、打开设置 / 关于、退出；左键点击会将悬浮窗置于最前并闪烁放大提示
 - 全局热键一键显示 / 隐藏（默认 `Ctrl+Alt+X`）
 - 支持中英文界面，随系统语言自动切换
 - 可设置透明度、刷新间隔、货币符号
@@ -112,7 +115,8 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 2. **双击**窗口打开设置界面
 3. **拖拽**窗口到任意位置，退出时自动保存
 4. **右键**打开菜单，可进入设置或关于页面
-5. 在设置中填写日薪、工作时段、货币符号，保存后立即生效
+5. **托盘图标**提供同样的菜单，另可切换显示模式、退出程序；左键点击会将悬浮窗置于最前并闪烁放大提示
+6. 在设置中填写日薪、工作时段、货币符号，保存后立即生效
 
 ## 设置说明
 

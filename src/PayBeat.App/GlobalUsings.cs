@@ -5,3 +5,7 @@ global using System.Windows.Threading;
 global using System.IO;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+global using TextBox = System.Windows.Controls.TextBox;
+global using Application = System.Windows.Application;
+global using MessageBox = System.Windows.MessageBox;
