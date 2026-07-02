@@ -41,6 +41,8 @@ public partial class App
                 DisplayMode.Normal => settings with { NormalPosition = pos },
                 DisplayMode.Compact => settings with { CompactPosition = pos },
                 DisplayMode.Mini => settings with { MiniPosition = pos },
+                DisplayMode.None => settings,
+                DisplayMode.Flex => settings,
                 _ => settings
             };
             _settingsService.Save(updated);
@@ -67,7 +69,7 @@ public partial class App
         if (!createdNew)
         {
             MessageBox.Show(
-                (string)FindResource("Error.AlreadyRunning"),
+                (string)FindResource("Error.AlreadyRunning")!,
                 "PayBeat",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -87,7 +89,7 @@ public partial class App
             {
                 var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
                 MessageBox.Show(
-                    string.Format((string)FindResource("Error.HotkeyConflict"), key),
+                    string.Format((string)FindResource("Error.HotkeyConflict")!, key),
                     "PayBeat",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -96,6 +98,18 @@ public partial class App
         };
         _mainWindow.Show();
         _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
+
+        if (settings.DisplayMode == DisplayMode.None)
+        {
+            _mainWindow.Hide();
+            return;
+        }
+
+        if (settings.DisplayMode == DisplayMode.Flex)
+        {
+            _mainWindow.ApplyFlexBounds();
+            return;
+        }
 
         var pos = GetSavedPosition(settings, settings.DisplayMode);
         if (pos != null)
@@ -117,12 +131,14 @@ public partial class App
             DisplayMode.Normal => settings.NormalPosition,
             DisplayMode.Compact => settings.CompactPosition,
             DisplayMode.Mini => settings.MiniPosition,
+            DisplayMode.None => null,
+            DisplayMode.Flex => null,
             _ => null
         };
 
     private void ActivateMainWindow()
     {
-        if (_mainWindow == null)
+        if (_mainWindow == null || _mainVm == null || _mainVm.DisplayMode == DisplayMode.None)
         {
             return;
         }
@@ -143,7 +159,7 @@ public partial class App
             {
                 var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
                 MessageBox.Show(
-                    string.Format((string)FindResource("Error.HotkeyConflict"), key),
+                    string.Format((string)FindResource("Error.HotkeyConflict")!, key),
                     "PayBeat",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);

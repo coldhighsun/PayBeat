@@ -1,10 +1,13 @@
 namespace PayBeat.App.Models;
 
 /// <summary>
-/// Represents the three widget display modes, each with its own view template and saved window position.
+/// Represents the widget display modes, each with its own view template and saved window position.
 /// </summary>
 public enum DisplayMode
 {
+    /// <summary>No window is shown; only the tray icon remains.</summary>
+    None = 0,
+
     /// <summary>Full-size view showing earnings, progress bar, and rate.</summary>
     Normal,
 
@@ -13,4 +16,11 @@ public enum DisplayMode
 
     /// <summary>Minimal view showing only the earnings amount.</summary>
     Mini,
+
+    /// <summary>
+    /// Fullscreen "show-off" view occupying the entire screen with a huge earnings figure,
+    /// full stats, and decorative animation. Draggable; fills the current monitor and can be moved
+    /// to another monitor.
+    /// </summary>
+    Flex,
 }

@@ -35,6 +35,26 @@ public static class EarningsCalculator
     }
 
     /// <summary>
+    /// Returns how much of the workday has elapsed as of <paramref name="now"/>, clamped to
+    /// <c>[0, WorkEnd - WorkStart]</c>.
+    /// </summary>
+    /// <param name="s">Current salary settings.</param>
+    /// <param name="now">Point in time to evaluate.</param>
+    public static TimeSpan Elapsed(SalarySettings s, DateTime now)
+    {
+        var current = TimeOnly.FromDateTime(now);
+        if (current <= s.WorkStart)
+        {
+            return TimeSpan.Zero;
+        }
+        if (current >= s.WorkEnd)
+        {
+            return s.WorkEnd - s.WorkStart;
+        }
+        return current - s.WorkStart;
+    }
+
+    /// <summary>
     /// Returns the per-second earnings rate. Returns <c>0</c> when the work window has zero duration.
     /// </summary>
     /// <param name="s">Current salary settings.</param>
@@ -42,6 +62,26 @@ public static class EarningsCalculator
     {
         var totalSeconds = (s.WorkEnd - s.WorkStart).TotalSeconds;
         return totalSeconds > 0 ? s.DailySalary / (decimal)totalSeconds : 0m;
+    }
+
+    /// <summary>
+    /// Returns how much of the workday remains as of <paramref name="now"/>, clamped to
+    /// <c>[0, WorkEnd - WorkStart]</c>.
+    /// </summary>
+    /// <param name="s">Current salary settings.</param>
+    /// <param name="now">Point in time to evaluate.</param>
+    public static TimeSpan Remaining(SalarySettings s, DateTime now)
+    {
+        var current = TimeOnly.FromDateTime(now);
+        if (current <= s.WorkStart)
+        {
+            return s.WorkEnd - s.WorkStart;
+        }
+        if (current >= s.WorkEnd)
+        {
+            return TimeSpan.Zero;
+        }
+        return s.WorkEnd - current;
     }
 
     /// <summary>

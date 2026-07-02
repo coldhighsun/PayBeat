@@ -7,6 +7,8 @@
     <sys:String x:Key="Menu.Normal">标准</sys:String>
     <sys:String x:Key="Menu.Compact">紧凑</sys:String>
     <sys:String x:Key="Menu.Mini">迷你</sys:String>
+    <sys:String x:Key="Menu.None">无</sys:String>
+    <sys:String x:Key="Menu.Flex">显摆</sys:String>
     <sys:String x:Key="Menu.Settings">设置</sys:String>
     <sys:String x:Key="Menu.About">关于</sys:String>
     <sys:String x:Key="Menu.Exit">退出</sys:String>
@@ -15,6 +17,11 @@
     <sys:String x:Key="View.WorkStart">上班 </sys:String>
     <sys:String x:Key="View.WorkEnd">下班 </sys:String>
     <sys:String x:Key="View.DailySalary">日薪</sys:String>
+
+    <!-- Flex view labels -->
+    <sys:String x:Key="View.Elapsed">已工作</sys:String>
+    <sys:String x:Key="View.Remaining">剩余</sys:String>
+    <sys:String x:Key="View.WorkWindow">工作时间</sys:String>
 
     <!-- Settings window -->
     <sys:String x:Key="Settings.WindowTitle">PayBeat 设置</sys:String>
@@ -36,6 +43,8 @@
     <sys:String x:Key="Settings.Normal">标准</sys:String>
     <sys:String x:Key="Settings.Compact">紧凑</sys:String>
     <sys:String x:Key="Settings.Mini">迷你</sys:String>
+    <sys:String x:Key="Settings.None">无</sys:String>
+    <sys:String x:Key="Settings.Flex">显摆</sys:String>
     <sys:String x:Key="Settings.Opacity">透明度</sys:String>
     <sys:String x:Key="Settings.AlwaysOnTop">窗口始终置顶</sys:String>
 

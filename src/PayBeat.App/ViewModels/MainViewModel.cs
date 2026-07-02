@@ -14,7 +14,9 @@ public class MainViewModel : ViewModelBase, IDisposable
     private readonly SettingsService _settingsService;
     private readonly DispatcherTimer _timer;
     private decimal _earned;
+    private TimeSpan _elapsed;
     private double _progress;
+    private TimeSpan _remaining;
     private SalarySettings _settings;
     private DispatcherTimer? _wakeTimer;
 
@@ -34,6 +36,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         SetNormalModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Normal));
         SetCompactModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Compact));
         SetMiniModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Mini));
+        SetNoneModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.None));
+        SetFlexModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Flex));
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(_settings.RefreshInterval) };
         _timer.Tick += (_, _) => Refresh();
@@ -72,6 +76,20 @@ public class MainViewModel : ViewModelBase, IDisposable
     public string EarnedFormatted =>
         $"{_settings.Currency}{Earned:N2}";
 
+    /// <summary>Time elapsed since work start, clamped to the workday window. Setting this also notifies <see cref="ElapsedFormatted"/>.</summary>
+    public TimeSpan Elapsed
+    {
+        get => _elapsed;
+        private set
+        {
+            SetField(ref _elapsed, value);
+            OnPropertyChanged(nameof(ElapsedFormatted));
+        }
+    }
+
+    /// <summary>Elapsed work time formatted as <c>hh:mm:ss</c>.</summary>
+    public string ElapsedFormatted => Elapsed.ToString(@"hh\:mm\:ss");
+
     /// <summary>Shuts down the application.</summary>
     public ICommand ExitCommand
     {
@@ -82,7 +100,13 @@ public class MainViewModel : ViewModelBase, IDisposable
     public bool IsCompactMode => _settings.DisplayMode == DisplayMode.Compact;
 
     /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
+    public bool IsFlexMode => _settings.DisplayMode == DisplayMode.Flex;
+
+    /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
     public bool IsMiniMode => _settings.DisplayMode == DisplayMode.Mini;
+
+    /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
+    public bool IsNoneMode => _settings.DisplayMode == DisplayMode.None;
 
     /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
     public bool IsNormalMode => _settings.DisplayMode == DisplayMode.Normal;
@@ -109,14 +133,40 @@ public class MainViewModel : ViewModelBase, IDisposable
         private set => SetField(ref _progress, value);
     }
 
+    /// <summary>Time remaining until work end, clamped to the workday window. Setting this also notifies <see cref="RemainingFormatted"/>.</summary>
+    public TimeSpan Remaining
+    {
+        get => _remaining;
+        private set
+        {
+            SetField(ref _remaining, value);
+            OnPropertyChanged(nameof(RemainingFormatted));
+        }
+    }
+
+    /// <summary>Remaining work time formatted as <c>hh:mm:ss</c>.</summary>
+    public string RemainingFormatted => Remaining.ToString(@"hh\:mm\:ss");
+
     /// <summary>Switches the widget to <see cref="DisplayMode.Compact"/> and saves the change.</summary>
     public ICommand SetCompactModeCommand
     {
         get;
     }
 
+    /// <summary>Switches the widget to <see cref="DisplayMode.Flex"/> and saves the change.</summary>
+    public ICommand SetFlexModeCommand
+    {
+        get;
+    }
+
     /// <summary>Switches the widget to <see cref="DisplayMode.Mini"/> and saves the change.</summary>
     public ICommand SetMiniModeCommand
+    {
+        get;
+    }
+
+    /// <summary>Switches the widget to <see cref="DisplayMode.None"/> and saves the change.</summary>
+    public ICommand SetNoneModeCommand
     {
         get;
     }
@@ -158,6 +208,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(IsNormalMode));
         OnPropertyChanged(nameof(IsCompactMode));
         OnPropertyChanged(nameof(IsMiniMode));
+        OnPropertyChanged(nameof(IsNoneMode));
+        OnPropertyChanged(nameof(IsFlexMode));
         _timer.Interval = TimeSpan.FromSeconds(_settings.RefreshInterval);
         _wakeTimer?.Stop();
         _wakeTimer = null;
@@ -180,7 +232,9 @@ public class MainViewModel : ViewModelBase, IDisposable
             }
         }
 
-        new AboutWindow().Show();
+        var win = new AboutWindow();
+        ApplyTopmostIfNeeded(win);
+        win.Show();
     }
 
     private void OpenSettings()
@@ -198,7 +252,19 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             DataContext = new SettingsViewModel(_settingsService, this)
         };
+        ApplyTopmostIfNeeded(win);
         win.Show();
+    }
+
+    // MainWindow stays pinned to HWND_TOPMOST while AlwaysOnTop is on (see TopmostHelper),
+    // which would otherwise bury this dialog behind it in fullscreen Flex mode.
+    private static void ApplyTopmostIfNeeded(Window win)
+    {
+        if (Application.Current.MainWindow is { Topmost: true } mainWindow)
+        {
+            win.Owner = mainWindow;
+            win.Topmost = true;
+        }
     }
 
     private void Refresh()
@@ -206,6 +272,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         var now = DateTime.Now;
         Earned = EarningsCalculator.Calculate(_settings, now);
         Progress = EarningsCalculator.WorkdayProgress(_settings, now);
+        Elapsed = EarningsCalculator.Elapsed(_settings, now);
+        Remaining = EarningsCalculator.Remaining(_settings, now);
 
         var current = TimeOnly.FromDateTime(now);
         if (current <= _settings.WorkStart || current >= _settings.WorkEnd)

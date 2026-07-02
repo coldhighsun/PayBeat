@@ -19,6 +19,10 @@
     <Window.ContextMenu>
         <ContextMenu>
             <MenuItem Header="{DynamicResource Menu.DisplayMode}">
+                <MenuItem Header="{DynamicResource Menu.Flex}"
+                          IsCheckable="True"
+                          IsChecked="{Binding IsFlexMode, Mode=OneWay}"
+                          Command="{Binding SetFlexModeCommand}"/>
                 <MenuItem Header="{DynamicResource Menu.Normal}"
                           IsCheckable="True"
                           IsChecked="{Binding IsNormalMode, Mode=OneWay}"
@@ -31,6 +35,10 @@
                           IsCheckable="True"
                           IsChecked="{Binding IsMiniMode, Mode=OneWay}"
                           Command="{Binding SetMiniModeCommand}"/>
+                <MenuItem Header="{DynamicResource Menu.None}"
+                          IsCheckable="True"
+                          IsChecked="{Binding IsNoneMode, Mode=OneWay}"
+                          Command="{Binding SetNoneModeCommand}"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="{DynamicResource Menu.Settings}" Command="{Binding OpenSettingsCommand}"/>
@@ -50,6 +58,9 @@
         <DataTemplate x:Key="MiniTemplate">
             <views:MiniView/>
         </DataTemplate>
+        <DataTemplate x:Key="FlexTemplate">
+            <views:FlexView/>
+        </DataTemplate>
     </Window.Resources>
 
     <ContentControl Content="{Binding}"
@@ -63,6 +74,9 @@
                     </DataTrigger>
                     <DataTrigger Binding="{Binding DisplayMode}" Value="Mini">
                         <Setter Property="ContentTemplate" Value="{StaticResource MiniTemplate}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding DisplayMode}" Value="Flex">
+                        <Setter Property="ContentTemplate" Value="{StaticResource FlexTemplate}"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

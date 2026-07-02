@@ -118,6 +118,8 @@ public class SettingsViewModel : ViewModelBase
                 OnPropertyChanged(nameof(IsNormalMode));
                 OnPropertyChanged(nameof(IsCompactMode));
                 OnPropertyChanged(nameof(IsMiniMode));
+                OnPropertyChanged(nameof(IsNoneMode));
+                OnPropertyChanged(nameof(IsFlexMode));
             }
         }
     }
@@ -175,6 +177,19 @@ public class SettingsViewModel : ViewModelBase
         }
     }
 
+    /// <summary>Proxy property for the Flex radio button; sets <see cref="DisplayMode"/> when assigned <see langword="true"/>.</summary>
+    public bool IsFlexMode
+    {
+        get => _displayMode == DisplayMode.Flex;
+        set
+        {
+            if (value)
+            {
+                DisplayMode = DisplayMode.Flex;
+            }
+        }
+    }
+
     /// <summary>Proxy property for the Mini radio button; sets <see cref="DisplayMode"/> when assigned <see langword="true"/>.</summary>
     public bool IsMiniMode
     {
@@ -184,6 +199,19 @@ public class SettingsViewModel : ViewModelBase
             if (value)
             {
                 DisplayMode = DisplayMode.Mini;
+            }
+        }
+    }
+
+    /// <summary>Proxy property for the None radio button; sets <see cref="DisplayMode"/> when assigned <see langword="true"/>.</summary>
+    public bool IsNoneMode
+    {
+        get => _displayMode == DisplayMode.None;
+        set
+        {
+            if (value)
+            {
+                DisplayMode = DisplayMode.None;
             }
         }
     }

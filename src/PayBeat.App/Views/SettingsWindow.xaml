@@ -229,6 +229,12 @@
                                FontSize="12"
                                Margin="0,0,0,8"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <RadioButton Content="{DynamicResource Settings.Flex}"
+                                     IsChecked="{Binding IsFlexMode}"
+                                     Foreground="#CDD6F4"
+                                     FontSize="13"
+                                     Cursor="Hand"
+                                     Margin="0,0,20,0"/>
                         <RadioButton Content="{DynamicResource Settings.Normal}"
                                      IsChecked="{Binding IsNormalMode}"
                                      Foreground="#CDD6F4"
@@ -243,6 +249,12 @@
                                      Margin="0,0,20,0"/>
                         <RadioButton Content="{DynamicResource Settings.Mini}"
                                      IsChecked="{Binding IsMiniMode}"
+                                     Foreground="#CDD6F4"
+                                     FontSize="13"
+                                     Cursor="Hand"
+                                     Margin="0,0,20,0"/>
+                        <RadioButton Content="{DynamicResource Settings.None}"
+                                     IsChecked="{Binding IsNoneMode}"
                                      Foreground="#CDD6F4"
                                      FontSize="13"
                                      Cursor="Hand"/>
