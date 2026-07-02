@@ -9,7 +9,6 @@ namespace PayBeat.App.Services;
 /// </summary>
 public sealed class TrayIconService : IDisposable
 {
-    private readonly MenuItem _compactMenuItem;
     private readonly MenuItem _flexMenuItem;
     private readonly MenuItem _miniMenuItem;
     private readonly MenuItem _noneMenuItem;
@@ -25,13 +24,12 @@ public sealed class TrayIconService : IDisposable
         _viewModel = viewModel;
 
         _normalMenuItem = new MenuItem(Text("Menu.Normal"), null, (_, _) => _viewModel.SetNormalModeCommand.Execute(null));
-        _compactMenuItem = new MenuItem(Text("Menu.Compact"), null, (_, _) => _viewModel.SetCompactModeCommand.Execute(null));
         _miniMenuItem = new MenuItem(Text("Menu.Mini"), null, (_, _) => _viewModel.SetMiniModeCommand.Execute(null));
         _noneMenuItem = new MenuItem(Text("Menu.None"), null, (_, _) => _viewModel.SetNoneModeCommand.Execute(null));
         _flexMenuItem = new MenuItem(Text("Menu.Flex"), null, (_, _) => _viewModel.SetFlexModeCommand.Execute(null));
 
         var displayModeMenuItem = new MenuItem(Text("Menu.DisplayMode"));
-        displayModeMenuItem.DropDownItems.AddRange([_flexMenuItem, _normalMenuItem, _compactMenuItem, _miniMenuItem, _noneMenuItem]);
+        displayModeMenuItem.DropDownItems.AddRange([_flexMenuItem, _normalMenuItem, _miniMenuItem, _noneMenuItem]);
 
         var contextMenu = new ContextMenuStrip();
         contextMenu.Items.Add(displayModeMenuItem);
@@ -88,7 +86,6 @@ public sealed class TrayIconService : IDisposable
     private void UpdateDisplayModeChecks()
     {
         _normalMenuItem.Checked = _viewModel.IsNormalMode;
-        _compactMenuItem.Checked = _viewModel.IsCompactMode;
         _miniMenuItem.Checked = _viewModel.IsMiniMode;
         _noneMenuItem.Checked = _viewModel.IsNoneMode;
         _flexMenuItem.Checked = _viewModel.IsFlexMode;

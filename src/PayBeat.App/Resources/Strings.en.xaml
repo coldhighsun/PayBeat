@@ -5,7 +5,6 @@
     <!-- Context menu -->
     <sys:String x:Key="Menu.DisplayMode">Display Mode</sys:String>
     <sys:String x:Key="Menu.Normal">Normal</sys:String>
-    <sys:String x:Key="Menu.Compact">Compact</sys:String>
     <sys:String x:Key="Menu.Mini">Mini</sys:String>
     <sys:String x:Key="Menu.None">None</sys:String>
     <sys:String x:Key="Menu.Flex">Flex</sys:String>
@@ -41,7 +40,6 @@
     <sys:String x:Key="Settings.Tab.Display">Display</sys:String>
     <sys:String x:Key="Settings.DisplayMode">Display Mode</sys:String>
     <sys:String x:Key="Settings.Normal">Normal</sys:String>
-    <sys:String x:Key="Settings.Compact">Compact</sys:String>
     <sys:String x:Key="Settings.Mini">Mini</sys:String>
     <sys:String x:Key="Settings.None">None</sys:String>
     <sys:String x:Key="Settings.Flex">Flex</sys:String>

@@ -27,10 +27,6 @@
                           IsCheckable="True"
                           IsChecked="{Binding IsNormalMode, Mode=OneWay}"
                           Command="{Binding SetNormalModeCommand}"/>
-                <MenuItem Header="{DynamicResource Menu.Compact}"
-                          IsCheckable="True"
-                          IsChecked="{Binding IsCompactMode, Mode=OneWay}"
-                          Command="{Binding SetCompactModeCommand}"/>
                 <MenuItem Header="{DynamicResource Menu.Mini}"
                           IsCheckable="True"
                           IsChecked="{Binding IsMiniMode, Mode=OneWay}"
@@ -52,9 +48,6 @@
         <DataTemplate x:Key="FullTemplate">
             <views:NormalView/>
         </DataTemplate>
-        <DataTemplate x:Key="CompactTemplate">
-            <views:CompactView/>
-        </DataTemplate>
         <DataTemplate x:Key="MiniTemplate">
             <views:MiniView/>
         </DataTemplate>
@@ -69,9 +62,6 @@
             <Style TargetType="ContentControl">
                 <Setter Property="ContentTemplate" Value="{StaticResource FullTemplate}"/>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding DisplayMode}" Value="Compact">
-                        <Setter Property="ContentTemplate" Value="{StaticResource CompactTemplate}"/>
-                    </DataTrigger>
                     <DataTrigger Binding="{Binding DisplayMode}" Value="Mini">
                         <Setter Property="ContentTemplate" Value="{StaticResource MiniTemplate}"/>
                     </DataTrigger>

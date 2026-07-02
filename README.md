@@ -16,7 +16,7 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 ## Features
 
 - Linearly calculates earnings per second from your daily salary and work hours
-- Five display modes (None / Normal / Compact / Mini / Flex) — double-click to open Settings
+- Four display modes (None / Normal / Mini / Flex) — double-click to open Settings
 - Flex mode is a fullscreen "show-off" view with a huge earnings figure, full workday stats, and a decorative animated background
 - Each mode remembers its last position independently, with multi-monitor support
 - System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
@@ -24,6 +24,12 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 - English and Simplified Chinese UI, auto-detected from the OS locale
 - Configurable opacity, refresh interval, and currency symbol
 - Optional Windows startup registration
+
+## Screenshots
+
+| Flex | Normal | Mini |
+|------|--------|------|
+| ![Flex](src/PayBeat.App/Resources/Screenshots/flex.png) | ![Normal](src/PayBeat.App/Resources/Screenshots/normal.png) | ![Mini](src/PayBeat.App/Resources/Screenshots/mini.png) |
 
 ## Requirements
 
@@ -62,7 +68,7 @@ Output goes to `artifacts/bin/PayBeat.App/release/`.
 | Work start | 09:00 | Time when earnings begin accruing |
 | Work end | 18:00 | Time when earnings are capped at the daily total |
 | Currency symbol | ¥ | Prefix shown before the amount |
-| Display mode | Normal | Initial widget size (None / Normal / Compact / Mini / Flex) |
+| Display mode | Normal | Initial widget size (None / Normal / Mini / Flex) |
 | Refresh interval | 1 s | UI update frequency (1–60 seconds) |
 | Opacity | 1.0 | Window opacity when the mouse is not hovering (0.1–1.0) |
 | Global hotkey | Ctrl+Alt+X | Toggle visibility of all windows |
@@ -82,7 +88,7 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 ## 功能
 
 - 根据日薪和工作时段，每秒线性计算已赚金额
-- 五种显示模式（None / Normal / Compact / Mini / Flex），双击打开设置
+- 四种显示模式（None / Normal / Mini / Flex），双击打开设置
 - Flex 模式为全屏"炫耀"视图，超大金额数字、完整工时统计，配有动态背景动画
 - 每种模式独立记忆上次所在位置（支持多显示器）
 - 系统托盘图标，右键菜单可切换显示模式、打开设置 / 关于、退出；左键点击会将悬浮窗置于最前并闪烁放大提示
@@ -90,6 +96,12 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - 支持中英文界面，随系统语言自动切换
 - 可设置透明度、刷新间隔、货币符号
 - 支持开机自启
+
+## 界面截图
+
+| Flex | Normal | Mini |
+|------|--------|------|
+| ![Flex](src/PayBeat.App/Resources/Screenshots/flex.png) | ![Normal](src/PayBeat.App/Resources/Screenshots/normal.png) | ![Mini](src/PayBeat.App/Resources/Screenshots/mini.png) |
 
 ## 系统要求
 
@@ -128,7 +140,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 | 上班时间 | 09:00 | 开始计薪的时刻 |
 | 下班时间 | 18:00 | 薪资封顶的时刻 |
 | 货币符号 | ¥ | 显示在金额前的符号 |
-| 显示模式 | Normal | 初始显示模式（None / Normal / Compact / Mini / Flex） |
+| 显示模式 | Normal | 初始显示模式（None / Normal / Mini / Flex） |
 | 刷新间隔 | 1 秒 | 界面更新频率（1–60 秒） |
 | 透明度 | 1.0 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
 | 全局热键 | Ctrl+Alt+X | 显示 / 隐藏全部窗口 |

@@ -1,9 +1,9 @@
-using System.Windows.Interop;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
+using System.Windows.Interop;
 
 namespace PayBeat.App;
 
@@ -43,7 +43,6 @@ public partial class App
             var updated = _mainVm.DisplayMode switch
             {
                 DisplayMode.Normal => settings with { NormalPosition = pos },
-                DisplayMode.Compact => settings with { CompactPosition = pos },
                 DisplayMode.Mini => settings with { MiniPosition = pos },
                 DisplayMode.None => settings,
                 DisplayMode.Flex => settings with { FlexPosition = pos },
@@ -136,7 +135,6 @@ public partial class App
         mode switch
         {
             DisplayMode.Normal => settings.NormalPosition,
-            DisplayMode.Compact => settings.CompactPosition,
             DisplayMode.Mini => settings.MiniPosition,
             DisplayMode.None => null,
             DisplayMode.Flex => null,

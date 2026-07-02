@@ -27,28 +27,18 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 **Data flow:**
 `DispatcherTimer` (configurable interval) → `MainViewModel.Refresh()` → `EarningsCalculator.Calculate()` → bound properties update the active view template.
 
-**Display modes:** `DisplayMode` has `None`, `Normal`, `Compact`, `Mini`, and `Flex`, swapped inside a single `MainWindow` via `DataTemplate` + `DataTrigger` (`None` shows no window; only the tray icon remains). Double-clicking the widget opens the settings window. Each mode saves its last position independently per screen (`NormalPosition`, `CompactPosition`, `MiniPosition`, `FlexPosition` in `SalarySettings`). `Flex` is a fullscreen "show-off" view (`FlexView`) with a huge earnings figure, full workday stats, and a decorative animated background/glow pulse driven by `ColorAnimation`/`DoubleAnimation` started in its code-behind.
+**Display modes:** `DisplayMode` has `None`, `Normal`, `Mini`, and `Flex`, swapped inside a single `MainWindow` via `DataTemplate` + `DataTrigger` (`None` shows no window; only the tray icon remains). Double-clicking the widget opens the settings window. Each mode saves its last position independently per screen (`NormalPosition`, `MiniPosition`, `FlexPosition` in `SalarySettings`). `Flex` is a fullscreen "show-off" view (`FlexView`) with a huge earnings figure, full workday stats, and a decorative animated background/glow pulse driven by `ColorAnimation`/`DoubleAnimation` started in its code-behind.
 
-**Key files:**
-- `src/PayBeat.App/App.xaml.cs` — `OnStartup` creates `MainViewModel`, shows `MainWindow`, restores saved position per display mode, and registers the global hotkey. `OnExit` saves window position back to settings.
-- `src/PayBeat.App/Views/MainWindow.xaml` — borderless `Window` (`WindowStyle="None"`, `AllowsTransparency`, `ShowInTaskbar="False"`); hosts a `ContentControl` that switches between `NormalView`, `CompactView`, `MiniView`, and `FlexView` templates based on `DisplayMode`.
-- `src/PayBeat.App/ViewModels/MainViewModel.cs` — owns the timer and all earnings/display state; `ReloadSettings()` is called by `SettingsViewModel` after save; raises `HotkeySettingsChanged` event when hotkey config changes.
-- `src/PayBeat.App/Services/EarningsCalculator.cs` — pure static calculations: `Calculate()`, `WorkdayProgress()`, `RatePerSecond()`.
-- `src/PayBeat.App/Services/SettingsService.cs` — persists `SalarySettings` to `%APPDATA%\PayBeat\settings.json`; uses a custom `TimeOnlyConverter` for `HH:mm` JSON serialization.
-- `src/PayBeat.App/Services/HotkeyService.cs` — registers a Win32 global hotkey via `RegisterHotKey`/`UnregisterHotKey`; supports `Suspend()`/`Resume()` to suppress firing while the settings window is open. Default: Ctrl+Alt+X.
-- `src/PayBeat.App/Services/LocalizationService.cs` — swaps `Strings.en.xaml` / `Strings.zh-CN.xaml` into `MergedDictionaries` at startup; `"auto"` resolves from `CultureInfo.CurrentUICulture`.
-- `src/PayBeat.App/Services/StartupService.cs` — reads/writes `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` to manage Windows startup registration.
-- `src/PayBeat.App/Helpers/ScreenHelper.cs` — Win32 P/Invoke helpers for multi-monitor position restore (matches by device name, falls back to nearest monitor) and `ClampToWorkArea`/`ClampToCurrentScreen` on `Window`.
-- `src/PayBeat.App/Services/TrayIconService.cs` — `NotifyIcon` + `ContextMenuStrip` (WinForms) with display-mode submenu, Settings/About/Exit; left-click invokes an `onActivate` callback to bring the widget to front.
+**Key entry points:**
+- `App.xaml.cs` — owns the object graph (`SettingsService`, `MainViewModel`, `MainWindow`, `HotkeyService`, `TrayIconService`); enforces single-instance via a named `Mutex`; saves window position on exit.
+- `MainViewModel.cs` — owns the `DispatcherTimer` and all earnings/display state; `ReloadSettings()` is called by `SettingsViewModel` after save.
+- `MainWindow.xaml` — borderless `Window` with a `ContentControl` that switches view templates (`NormalView`, `MiniView`, `FlexView`) via `DataTrigger` on `DisplayMode`.
 
-**Other view models & windows:**
-- `src/PayBeat.App/ViewModels/SettingsViewModel.cs` — validates and saves user preferences; calls `MainViewModel.ReloadSettings()` after save. `HotkeyService` is suspended while the settings window is open to prevent the hotkey from interfering with keyboard capture.
-- `src/PayBeat.App/Views/SettingsWindow.xaml` / `AboutWindow.xaml` — secondary windows; both are draggable via `MouseLeftButtonDown → DragMove()` and styled consistently with the main widget.
-
-**Helpers:**
-- `src/PayBeat.App/ViewModels/ViewModelBase.cs` — `INotifyPropertyChanged` base with `SetField<T>`.
-- `src/PayBeat.App/Helpers/RelayCommand.cs` — minimal `ICommand` with optional `canExecute` and `RaiseCanExecuteChanged()`.
-- `src/PayBeat.App/Views/Controls/TimePickerControl.xaml` — custom `UserControl` with `SelectedTime` dependency property (`TimeOnly`); up/down buttons + text boxes for hour and minute.
+**Important patterns:**
+- The tray icon (`TrayIconService`) uses **WinForms** `NotifyIcon` + `ContextMenuStrip` hosted inside the WPF app — any changes must account for the WinForms/WPF interop boundary.
+- `HotkeyService` uses Win32 `RegisterHotKey`/`UnregisterHotKey` P/Invoke; it supports `Suspend()`/`Resume()` to avoid conflicts while the settings window captures key input.
+- `ScreenHelper` uses Win32 P/Invoke for multi-monitor position restore (matches by device name, falls back to nearest monitor).
+- Localization: `Strings.en.xaml` / `Strings.zh-CN.xaml` are swapped into `MergedDictionaries` at startup; UI strings use `{DynamicResource}`. `"auto"` resolves from `CultureInfo.CurrentUICulture`.
 
 **Models:**
 - `SalarySettings` — immutable `record`; defaults: `DailySalary=500`, `WorkStart=09:00`, `WorkEnd=18:00`, `Currency="¥"`, `DisplayMode=Normal`, `AlwaysOnTop=true`, `Opacity=1.0`, `RefreshInterval=1`, `Language="auto"`, `HotkeyModifiers=0x0003` (Ctrl+Alt), `HotkeyVirtualKey=0x58` (X). `MaxDailySalary` caps input at 99,999,999. Stores per-mode `WindowPosition` (Left, Top, ScreenDeviceName).
@@ -64,6 +54,8 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 | `nuget.config` | Restricts package sources to nuget.org only (`<clear/>` overrides global config) |
 
 Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layout via `UseArtifactsOutput=true`).
+
+`TreatWarningsAsErrors` is enabled globally — all warnings are build errors.
 
 ## CI / Release
 
