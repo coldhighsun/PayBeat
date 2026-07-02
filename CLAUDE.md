@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Prerequisites
+
+- Windows 10/11 x64
+- .NET 10 SDK
+
 ## Build & Run
 
 ```bash
@@ -46,7 +51,7 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 - `src/PayBeat.App/Views/Controls/TimePickerControl.xaml` — custom `UserControl` with `SelectedTime` dependency property (`TimeOnly`); up/down buttons + text boxes for hour and minute.
 
 **Models:**
-- `SalarySettings` — immutable `record`; defaults: `DailySalary=500`, `WorkStart=09:00`, `WorkEnd=18:00`, `Currency="¥"`, `DisplayMode=Normal`, `AlwaysOnTop=true`, `Opacity=1.0`, `RefreshInterval=1`, `Language="auto"`, `HotkeyModifiers=0x0003` (Ctrl+Alt), `HotkeyVirtualKey=0x58` (X). Stores per-mode `WindowPosition` (Left, Top, ScreenDeviceName).
+- `SalarySettings` — immutable `record`; defaults: `DailySalary=500`, `WorkStart=09:00`, `WorkEnd=18:00`, `Currency="¥"`, `DisplayMode=Normal`, `AlwaysOnTop=true`, `Opacity=1.0`, `RefreshInterval=1`, `Language="auto"`, `HotkeyModifiers=0x0003` (Ctrl+Alt), `HotkeyVirtualKey=0x58` (X). `MaxDailySalary` caps input at 99,999,999. Stores per-mode `WindowPosition` (Left, Top, ScreenDeviceName).
 
 **UI theme:** Catppuccin Mocha dark palette (background `#1E1E2E`, surface `#313244`, text `#CDD6F4`, green accent `#A6E3A1`, blue accent `#89B4FA`). Styles live in `src/PayBeat.App/Resources/Styles.xaml`. UI strings live in `Strings.en.xaml` / `Strings.zh-CN.xaml` and are accessed via `{DynamicResource}`.
 
@@ -62,6 +67,8 @@ Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layou
 
 ## CI / Release
 
-`.github/workflows/ci.yml` builds on every push (Windows runner, .NET 10). On a `v*` tag push, it additionally publishes a self-contained-false `win-x64` build, zips it, and creates a GitHub Release via `softprops/action-gh-release`. Versioning is derived from git tags (MinVer needs `fetch-depth: 0`).
+`.github/workflows/ci.yml` builds on every push (Windows runner, .NET 10). On a `v*` tag push, it additionally publishes a self-contained-false `win-x64` build, zips it, and creates a GitHub Release via `softprops/action-gh-release`. Versioning is derived from git tags via MinVer (e.g. `v1.2.0`); locally, ensure the tag is reachable from HEAD for a meaningful version.
+
+User settings are persisted to `%APPDATA%\PayBeat\settings.json`.
 
 There is no test project in this repository yet.

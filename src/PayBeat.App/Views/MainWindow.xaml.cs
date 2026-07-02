@@ -18,6 +18,14 @@ public partial class MainWindow
     private Rect? _pendingCenterScreen;
 
     /// <summary>
+    /// The window's device name and position captured while its HWND was still alive. WPF closes
+    /// windows (destroying the HWND) before <see cref="System.Windows.Application.Exit"/> fires, so
+    /// <c>App.OnExit</c> can no longer resolve the current monitor by then - it must use this cached
+    /// snapshot, taken in the <see cref="Window.Closing"/> handler, instead.
+    /// </summary>
+    public Models.WindowPosition? LastKnownPosition { get; private set; }
+
+    /// <summary>
     /// Initializes the window and wires up mouse and data-context event handlers.
     /// </summary>
     public MainWindow()
@@ -41,17 +49,18 @@ public partial class MainWindow
             }
         };
         _foregroundWatcher = new ForegroundWatcher(ReassertTopmost);
+        Closing += (_, _) => LastKnownPosition = new Models.WindowPosition(Left, Top, ScreenHelper.GetCurrentScreenDeviceName(this));
         Closed += (_, _) => _foregroundWatcher.Dispose();
     }
 
     /// <summary>
-    /// Resizes and repositions the window to exactly cover the monitor it is currently on, for
-    /// <see cref="Models.DisplayMode.Flex"/>. Switches <see cref="SizeToContent"/> to <c>Manual</c>
-    /// since the window normally auto-sizes to its content.
+    /// Resizes and repositions the window to exactly cover <paramref name="targetBounds"/>, or the
+    /// monitor it is currently on if not specified, for <see cref="Models.DisplayMode.Flex"/>.
+    /// Switches <see cref="SizeToContent"/> to <c>Manual</c> since the window normally auto-sizes to its content.
     /// </summary>
-    public void ApplyFlexBounds()
+    public void ApplyFlexBounds(Rect? targetBounds = null)
     {
-        var bounds = ScreenHelper.GetCurrentScreenBounds(this);
+        var bounds = targetBounds ?? ScreenHelper.GetCurrentScreenBounds(this);
         SizeToContent = SizeToContent.Manual;
         Left = bounds.Left;
         Top = bounds.Top;
@@ -153,6 +162,11 @@ public partial class MainWindow
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (!double.IsNaN(Left) && !double.IsNaN(Top))
+        {
+            return;
+        }
+
         var workArea = SystemParameters.WorkArea;
         Left = workArea.Right - ActualWidth - 8;
         Top = workArea.Bottom - ActualHeight - 8;

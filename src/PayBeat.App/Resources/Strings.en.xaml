@@ -67,6 +67,7 @@
 
     <!-- Validation errors -->
     <sys:String x:Key="Error.SalaryPositive">Daily salary must be greater than 0</sys:String>
+    <sys:String x:Key="Error.SalaryTooLarge">Daily salary cannot exceed 99,999,999</sys:String>
     <sys:String x:Key="Error.WorkEndAfterStart">Work end must be later than work start</sys:String>
     <sys:String x:Key="Error.AlreadyRunning">PayBeat is already running.</sys:String>
     <sys:String x:Key="Error.HotkeyConflict">Failed to register hotkey {0}. It may already be in use by another application.</sys:String>

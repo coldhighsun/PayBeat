@@ -1,3 +1,4 @@
+using System.Windows.Interop;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Services;
@@ -33,8 +34,11 @@ public partial class App
     {
         if (_mainWindow != null && _mainVm != null && _settingsService != null)
         {
-            var deviceName = ScreenHelper.GetCurrentScreenDeviceName(_mainWindow);
-            var pos = new WindowPosition(_mainWindow.Left, _mainWindow.Top, deviceName);
+            // The window's HWND is already destroyed by the time OnExit runs (WPF closes windows
+            // before firing Exit), so the current monitor can no longer be resolved here - use the
+            // snapshot MainWindow captured in its Closing handler instead.
+            var pos = _mainWindow.LastKnownPosition
+                      ?? new WindowPosition(_mainWindow.Left, _mainWindow.Top, ScreenHelper.GetCurrentScreenDeviceName(_mainWindow));
             var settings = _settingsService.Load();
             var updated = _mainVm.DisplayMode switch
             {
@@ -42,7 +46,7 @@ public partial class App
                 DisplayMode.Compact => settings with { CompactPosition = pos },
                 DisplayMode.Mini => settings with { MiniPosition = pos },
                 DisplayMode.None => settings,
-                DisplayMode.Flex => settings,
+                DisplayMode.Flex => settings with { FlexPosition = pos },
                 _ => settings
             };
             _settingsService.Save(updated);
@@ -96,33 +100,36 @@ public partial class App
             }
             _hotkeyService.Triggered += ToggleWindowVisibility;
         };
-        _mainWindow.Show();
-        _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
 
         if (settings.DisplayMode == DisplayMode.None)
         {
-            _mainWindow.Hide();
+            // Only create the HWND (for hotkey registration) without showing the window.
+            new WindowInteropHelper(_mainWindow).EnsureHandle();
+            _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
             return;
         }
 
         if (settings.DisplayMode == DisplayMode.Flex)
         {
-            _mainWindow.ApplyFlexBounds();
-            return;
-        }
-
-        var pos = GetSavedPosition(settings, settings.DisplayMode);
-        if (pos != null)
-        {
-            _mainWindow.Left = pos.Left;
-            _mainWindow.Top = pos.Top;
-            var bounds = ScreenHelper.FindScreenBoundsForRestore(pos.Left, pos.Top, pos.ScreenDeviceName, _mainWindow);
-            _mainWindow.ClampToWorkArea(bounds);
+            var flexBounds = settings.FlexPosition != null
+                ? ScreenHelper.FindScreenBoundsForRestore(0, 0, settings.FlexPosition.ScreenDeviceName, _mainWindow)
+                : (Rect?)null;
+            _mainWindow.ApplyFlexBounds(flexBounds);
         }
         else
         {
-            _mainWindow.ClampToCurrentScreen();
+            var pos = GetSavedPosition(settings, settings.DisplayMode);
+            if (pos != null)
+            {
+                _mainWindow.Left = pos.Left;
+                _mainWindow.Top = pos.Top;
+                var bounds = ScreenHelper.FindScreenBoundsForRestore(pos.Left, pos.Top, pos.ScreenDeviceName, _mainWindow);
+                _mainWindow.ClampToWorkArea(bounds);
+            }
         }
+
+        _mainWindow.Show();
+        _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
     }
 
     private static WindowPosition? GetSavedPosition(SalarySettings settings, DisplayMode mode) =>

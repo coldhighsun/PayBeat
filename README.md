@@ -58,7 +58,7 @@ Output goes to `artifacts/bin/PayBeat.App/release/`.
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| Daily salary | 500 | Pre-tax gross salary per workday (decimals supported) |
+| Daily salary | 500 | Pre-tax gross salary per workday (decimals supported, max 99,999,999) |
 | Work start | 09:00 | Time when earnings begin accruing |
 | Work end | 18:00 | Time when earnings are capped at the daily total |
 | Currency symbol | ¥ | Prefix shown before the amount |
@@ -124,7 +124,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 
 | 选项 | 默认值 | 说明 |
 |------|--------|------|
-| 日薪 | 500 | 每个工作日的税前薪资（支持小数） |
+| 日薪 | 500 | 每个工作日的税前薪资（支持小数，最大 99,999,999） |
 | 上班时间 | 09:00 | 开始计薪的时刻 |
 | 下班时间 | 18:00 | 薪资封顶的时刻 |
 | 货币符号 | ¥ | 显示在金额前的符号 |
