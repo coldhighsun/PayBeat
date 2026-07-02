@@ -2,7 +2,6 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:PayBeat.App.Views.Controls"
-
         Title="{DynamicResource Settings.WindowTitle}"
         Width="400"
         Height="470"
@@ -19,12 +18,12 @@
 
         <!-- Tab item style -->
         <Style x:Key="SettingsTabItem" TargetType="TabItem">
-            <Setter Property="Foreground" Value="#9399B2"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#9399B2" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
@@ -35,16 +34,16 @@
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter ContentSource="Header"
                                               HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#89B4FA"/>
-                                <Setter Property="Foreground" Value="#CDD6F4"/>
-                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#89B4FA" />
+                                <Setter Property="Foreground" Value="#CDD6F4" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                                <Setter Property="Foreground" Value="#CDD6F4" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -54,9 +53,9 @@
 
         <!-- TabControl style -->
         <Style x:Key="SettingsTabControl" TargetType="TabControl">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabControl">
@@ -67,17 +66,35 @@
                                     BorderThickness="0,0,0,1">
                                 <TabPanel IsItemsHost="True"
                                           Background="Transparent"
-                                          HorizontalAlignment="Left"/>
+                                          HorizontalAlignment="Left" />
                             </Border>
                             <!-- Tab content -->
                             <ContentPresenter ContentSource="SelectedContent"
-                                              Margin="0,20,0,0"/>
+                                              Margin="0,20,0,0" />
                         </DockPanel>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
+        <!-- Display mode preview tooltip -->
+        <Style x:Key="PreviewToolTip" TargetType="ToolTip">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HasDropShadow" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Border Background="#313244"
+                                BorderBrush="#45475A"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="6">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="#1E1E2E"
@@ -85,73 +102,73 @@
             BorderBrush="#45475A"
             BorderThickness="1">
         <Border.Effect>
-            <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="24" ShadowDepth="0"/>
+            <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="24" ShadowDepth="0" />
         </Border.Effect>
 
-    <DockPanel Margin="28,20" LastChildFill="True">
+        <DockPanel Margin="28,20" LastChildFill="True">
 
-        <!-- Title -->
-        <TextBlock DockPanel.Dock="Top"
+            <!-- Title -->
+            <TextBlock DockPanel.Dock="Top"
                    Text="{DynamicResource Settings.Title}"
                    Foreground="#CDD6F4"
                    FontSize="20"
                    FontWeight="Bold"
-                   Margin="0,0,0,16"/>
+                   Margin="0,0,0,16" />
 
-        <!-- Error -->
-        <TextBlock DockPanel.Dock="Bottom"
+            <!-- Error -->
+            <TextBlock DockPanel.Dock="Bottom"
                    Text="{Binding ErrorMessage}"
                    Foreground="#F38BA8"
                    FontSize="11"
                    TextWrapping="Wrap"
-                   MinHeight="16"/>
+                   MinHeight="16" />
 
-        <!-- Buttons -->
-        <StackPanel DockPanel.Dock="Bottom"
+            <!-- Buttons -->
+            <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,20,0,0">
-            <Button Content="{DynamicResource Settings.Cancel}"
+                <Button Content="{DynamicResource Settings.Cancel}"
                     Command="{Binding CancelCommand}"
                     Margin="0,0,10,0"
                     Padding="20,10"
                     Background="#313244"
-                    Foreground="#CDD6F4"/>
-            <Button Content="{DynamicResource Settings.Save}"
+                    Foreground="#CDD6F4" />
+                <Button Content="{DynamicResource Settings.Save}"
                     Command="{Binding SaveCommand}"
                     Padding="20,10"
                     Background="#89B4FA"
                     Foreground="#1E1E2E"
-                    FontWeight="SemiBold"/>
-        </StackPanel>
+                    FontWeight="SemiBold" />
+            </StackPanel>
 
-        <!-- Tab control -->
-        <TabControl DockPanel.Dock="Top"
+            <!-- Tab control -->
+            <TabControl DockPanel.Dock="Top"
                     Style="{StaticResource SettingsTabControl}">
 
-            <!-- ── Salary Calculation ── -->
-            <TabItem Header="{DynamicResource Settings.Tab.Salary}" Style="{StaticResource SettingsTabItem}">
-                <StackPanel>
+                <!-- ── Salary Calculation ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Salary}" Style="{StaticResource SettingsTabItem}">
+                    <StackPanel>
 
-                    <!-- Daily Salary -->
-                    <TextBlock Text="{DynamicResource Settings.DailySalary}"
+                        <!-- Daily Salary -->
+                        <TextBlock Text="{DynamicResource Settings.DailySalary}"
                                Foreground="#9399B2"
                                FontSize="12"
-                               Margin="0,0,0,6"/>
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="56"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0"
+                               Margin="0,0,0,6" />
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="56" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
                                  Text="{Binding CurrencyText, UpdateSourceTrigger=PropertyChanged}"
                                  Background="#313244"
                                  Foreground="#CDD6F4"
                                  BorderBrush="#45475A"
                                  BorderThickness="1"
-                                 Padding="10,8"/>
-                        <TextBox x:Name="SalaryBox"
+                                 Padding="10,8" />
+                            <TextBox x:Name="SalaryBox"
                                  Grid.Column="2"
                                  Text="{Binding DailySalaryText, UpdateSourceTrigger=PropertyChanged}"
                                  TextAlignment="Right"
@@ -161,158 +178,174 @@
                                  BorderThickness="1"
                                  Padding="10,8"
                                  PreviewTextInput="Salary_PreviewTextInput"
-                                 DataObject.Pasting="Salary_Pasting"/>
-                    </Grid>
+                                 DataObject.Pasting="Salary_Pasting" />
+                        </Grid>
 
-                    <!-- Work Hours -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{DynamicResource Settings.WorkStart}"
+                        <!-- Work Hours -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{DynamicResource Settings.WorkStart}"
                                        Foreground="#9399B2"
                                        FontSize="12"
-                                       Margin="0,0,0,6"/>
-                            <controls:TimePickerControl SelectedTime="{Binding WorkStart}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="{DynamicResource Settings.WorkEnd}"
+                                       Margin="0,0,0,6" />
+                                <controls:TimePickerControl SelectedTime="{Binding WorkStart}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{DynamicResource Settings.WorkEnd}"
                                        Foreground="#9399B2"
                                        FontSize="12"
-                                       Margin="0,0,0,6"/>
-                            <controls:TimePickerControl SelectedTime="{Binding WorkEnd}"/>
-                        </StackPanel>
-                    </Grid>
+                                       Margin="0,0,0,6" />
+                                <controls:TimePickerControl SelectedTime="{Binding WorkEnd}" />
+                            </StackPanel>
+                        </Grid>
 
-                    <!-- Refresh Interval -->
-                    <Grid Margin="0,0,0,4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
+                        <!-- Refresh Interval -->
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.RefreshInterval}"
                                    Foreground="#9399B2"
                                    FontSize="12"
-                                   VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <TextBlock Text="{Binding RefreshInterval}"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock Text="{Binding RefreshInterval}"
                                        Foreground="#A6E3A1"
                                        FontSize="12"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{DynamicResource Settings.Seconds}"
+                                       VerticalAlignment="Center" />
+                                <TextBlock Text="{DynamicResource Settings.Seconds}"
                                        Foreground="#A6E3A1"
                                        FontSize="12"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Grid>
-                    <Slider Minimum="1"
+                                       VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider Minimum="1"
                             Maximum="60"
                             Value="{Binding RefreshInterval}"
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
-                            Foreground="#89B4FA"/>
+                            Foreground="#89B4FA" />
+                    </StackPanel>
+                </TabItem>
 
-                </StackPanel>
-            </TabItem>
+                <!-- ── Display ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Display}" Style="{StaticResource SettingsTabItem}">
+                    <StackPanel>
 
-            <!-- ── Display ── -->
-            <TabItem Header="{DynamicResource Settings.Tab.Display}" Style="{StaticResource SettingsTabItem}">
-                <StackPanel>
-
-                    <!-- Display mode -->
-                    <TextBlock Text="{DynamicResource Settings.DisplayMode}"
+                        <!-- Display mode -->
+                        <TextBlock Text="{DynamicResource Settings.DisplayMode}"
                                Foreground="#9399B2"
                                FontSize="12"
-                               Margin="0,0,0,8"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <RadioButton Content="{DynamicResource Settings.Flex}"
+                               Margin="0,0,0,8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <RadioButton Content="{DynamicResource Settings.Flex}"
                                      IsChecked="{Binding IsFlexMode}"
                                      Foreground="#CDD6F4"
                                      FontSize="13"
                                      Cursor="Hand"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="{DynamicResource Settings.Normal}"
+                                     Margin="0,0,20,0"
+                                     ToolTipService.ShowDuration="60000"
+                                     ToolTipService.InitialShowDelay="200">
+                                <RadioButton.ToolTip>
+                                    <ToolTip Style="{StaticResource PreviewToolTip}">
+                                        <Image Source="pack://application:,,,/Resources/Screenshots/flex.png" Width="600" Stretch="Uniform" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </ToolTip>
+                                </RadioButton.ToolTip>
+                            </RadioButton>
+                            <RadioButton Content="{DynamicResource Settings.Normal}"
                                      IsChecked="{Binding IsNormalMode}"
                                      Foreground="#CDD6F4"
                                      FontSize="13"
                                      Cursor="Hand"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="{DynamicResource Settings.Compact}"
-                                     IsChecked="{Binding IsCompactMode}"
-                                     Foreground="#CDD6F4"
-                                     FontSize="13"
-                                     Cursor="Hand"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="{DynamicResource Settings.Mini}"
+                                     Margin="0,0,20,0"
+                                     ToolTipService.ShowDuration="60000"
+                                     ToolTipService.InitialShowDelay="200">
+                                <RadioButton.ToolTip>
+                                    <ToolTip Style="{StaticResource PreviewToolTip}">
+                                        <Image Source="pack://application:,,,/Resources/Screenshots/normal.png" Stretch="Uniform" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </ToolTip>
+                                </RadioButton.ToolTip>
+                            </RadioButton>
+                            <RadioButton Content="{DynamicResource Settings.Mini}"
                                      IsChecked="{Binding IsMiniMode}"
                                      Foreground="#CDD6F4"
                                      FontSize="13"
                                      Cursor="Hand"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="{DynamicResource Settings.None}"
+                                     Margin="0,0,20,0"
+                                     ToolTipService.ShowDuration="60000"
+                                     ToolTipService.InitialShowDelay="200">
+                                <RadioButton.ToolTip>
+                                    <ToolTip Style="{StaticResource PreviewToolTip}">
+                                        <Image Source="pack://application:,,,/Resources/Screenshots/mini.png" UseLayoutRounding="True" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </ToolTip>
+                                </RadioButton.ToolTip>
+                            </RadioButton>
+                            <RadioButton Content="{DynamicResource Settings.None}"
                                      IsChecked="{Binding IsNoneMode}"
                                      Foreground="#CDD6F4"
                                      FontSize="13"
-                                     Cursor="Hand"/>
-                    </StackPanel>
+                                     Cursor="Hand" />
+                        </StackPanel>
 
-                    <!-- Opacity -->
-                    <Grid Margin="0,0,0,4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
+                        <!-- Opacity -->
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.Opacity}"
                                    Foreground="#9399B2"
                                    FontSize="12"
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1"
+                                   VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
                                    Text="{Binding Opacity, StringFormat={}{0:P0}}"
                                    Foreground="#A6E3A1"
                                    FontSize="12"
-                                   VerticalAlignment="Center"/>
-                    </Grid>
-                    <Slider Minimum="0.1"
+                                   VerticalAlignment="Center" />
+                        </Grid>
+                        <Slider Minimum="0.1"
                             Maximum="1.0"
                             Value="{Binding Opacity}"
                             TickFrequency="0.05"
                             IsSnapToTickEnabled="True"
                             Foreground="#89B4FA"
-                            Margin="0,0,0,16"/>
+                            Margin="0,0,0,16" />
 
-                    <!-- Always on top -->
-                    <CheckBox Content="{DynamicResource Settings.AlwaysOnTop}"
+                        <!-- Always on top -->
+                        <CheckBox Content="{DynamicResource Settings.AlwaysOnTop}"
                               IsChecked="{Binding AlwaysOnTop}"
                               Foreground="#CDD6F4"
                               FontSize="13"
-                              Cursor="Hand"/>
+                              Cursor="Hand" />
+                    </StackPanel>
+                </TabItem>
 
-                </StackPanel>
-            </TabItem>
+                <!-- ── System ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.System}" Style="{StaticResource SettingsTabItem}">
+                    <StackPanel>
 
-            <!-- ── System ── -->
-            <TabItem Header="{DynamicResource Settings.Tab.System}" Style="{StaticResource SettingsTabItem}">
-                <StackPanel>
-
-                    <!-- Run at startup -->
-                    <CheckBox Content="{DynamicResource Settings.RunAtStartup}"
+                        <!-- Run at startup -->
+                        <CheckBox Content="{DynamicResource Settings.RunAtStartup}"
                               IsChecked="{Binding RunAtStartup}"
                               Foreground="#CDD6F4"
                               FontSize="13"
                               Cursor="Hand"
-                              Margin="0,0,0,16"/>
+                              Margin="0,0,0,16" />
 
-                    <!-- Hotkey -->
-                    <TextBlock Text="{DynamicResource Settings.Hotkey}"
+                        <!-- Hotkey -->
+                        <TextBlock Text="{DynamicResource Settings.Hotkey}"
                                Foreground="#9399B2"
                                FontSize="12"
-                               Margin="0,0,0,6"/>
-                    <TextBox x:Name="HotkeyBox"
+                               Margin="0,0,0,6" />
+                        <TextBox x:Name="HotkeyBox"
                              Text="{Binding HotkeyDisplayText, Mode=OneWay}"
                              IsReadOnly="True"
                              Background="#313244"
@@ -323,18 +356,18 @@
                              Cursor="IBeam"
                              PreviewKeyDown="HotkeyBox_PreviewKeyDown"
                              GotFocus="HotkeyBox_GotFocus"
-                             LostFocus="HotkeyBox_LostFocus"/>
-                    <TextBlock Text="{DynamicResource Settings.HotkeyHint}"
+                             LostFocus="HotkeyBox_LostFocus" />
+                        <TextBlock Text="{DynamicResource Settings.HotkeyHint}"
                                Foreground="#6C7086"
                                FontSize="11"
-                               Margin="0,4,0,16"/>
+                               Margin="0,4,0,16" />
 
-                    <!-- Language -->
-                    <TextBlock Text="{DynamicResource Settings.Language}"
+                        <!-- Language -->
+                        <TextBlock Text="{DynamicResource Settings.Language}"
                                Foreground="#9399B2"
                                FontSize="12"
-                               Margin="0,0,0,6"/>
-                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                               Margin="0,0,0,6" />
+                        <ComboBox ItemsSource="{Binding AvailableLanguages}"
                               SelectedValue="{Binding Language}"
                               SelectedValuePath="Code"
                               Background="#313244"
@@ -343,29 +376,26 @@
                               BorderThickness="1"
                               Padding="10,8"
                               HorizontalContentAlignment="Left">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock>
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Name}"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Code}" Value="auto">
-                                                    <Setter Property="Text" Value="{DynamicResource Settings.LanguageAuto}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                </StackPanel>
-            </TabItem>
-
-        </TabControl>
-
-    </DockPanel>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="{Binding Name}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Code}" Value="auto">
+                                                        <Setter Property="Text" Value="{DynamicResource Settings.LanguageAuto}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
     </Border>
 </Window>

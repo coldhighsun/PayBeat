@@ -106,7 +106,7 @@ public class SettingsViewModel : ViewModelBase
 
     /// <summary>
     /// Selected display mode in the settings window. Setting this also raises change notifications
-    /// for <see cref="IsNormalMode"/>, <see cref="IsCompactMode"/>, and <see cref="IsMiniMode"/>.
+    /// for <see cref="IsNormalMode"/> and <see cref="IsMiniMode"/>.
     /// </summary>
     public DisplayMode DisplayMode
     {
@@ -116,7 +116,6 @@ public class SettingsViewModel : ViewModelBase
             if (SetField(ref _displayMode, value))
             {
                 OnPropertyChanged(nameof(IsNormalMode));
-                OnPropertyChanged(nameof(IsCompactMode));
                 OnPropertyChanged(nameof(IsMiniMode));
                 OnPropertyChanged(nameof(IsNoneMode));
                 OnPropertyChanged(nameof(IsFlexMode));
@@ -160,19 +159,6 @@ public class SettingsViewModel : ViewModelBase
             if (SetField(ref _hotkeyVirtualKey, value))
             {
                 OnPropertyChanged(nameof(HotkeyDisplayText));
-            }
-        }
-    }
-
-    /// <summary>Proxy property for the Compact radio button; sets <see cref="DisplayMode"/> when assigned <see langword="true"/>.</summary>
-    public bool IsCompactMode
-    {
-        get => _displayMode == DisplayMode.Compact;
-        set
-        {
-            if (value)
-            {
-                DisplayMode = DisplayMode.Compact;
             }
         }
     }

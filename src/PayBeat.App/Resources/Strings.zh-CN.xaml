@@ -5,7 +5,6 @@
     <!-- Context menu -->
     <sys:String x:Key="Menu.DisplayMode">显示模式</sys:String>
     <sys:String x:Key="Menu.Normal">标准</sys:String>
-    <sys:String x:Key="Menu.Compact">紧凑</sys:String>
     <sys:String x:Key="Menu.Mini">迷你</sys:String>
     <sys:String x:Key="Menu.None">无</sys:String>
     <sys:String x:Key="Menu.Flex">显摆</sys:String>
@@ -41,7 +40,6 @@
     <sys:String x:Key="Settings.Tab.Display">显示</sys:String>
     <sys:String x:Key="Settings.DisplayMode">显示方式</sys:String>
     <sys:String x:Key="Settings.Normal">标准</sys:String>
-    <sys:String x:Key="Settings.Compact">紧凑</sys:String>
     <sys:String x:Key="Settings.Mini">迷你</sys:String>
     <sys:String x:Key="Settings.None">无</sys:String>
     <sys:String x:Key="Settings.Flex">显摆</sys:String>

@@ -34,7 +34,6 @@ public class MainViewModel : ViewModelBase, IDisposable
         OpenAboutCommand = new RelayCommand(OpenAbout);
         ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
         SetNormalModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Normal));
-        SetCompactModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Compact));
         SetMiniModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Mini));
         SetNoneModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.None));
         SetFlexModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Flex));
@@ -97,9 +96,6 @@ public class MainViewModel : ViewModelBase, IDisposable
     }
 
     /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
-    public bool IsCompactMode => _settings.DisplayMode == DisplayMode.Compact;
-
-    /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
     public bool IsFlexMode => _settings.DisplayMode == DisplayMode.Flex;
 
     /// <summary>Convenience flag bound to the display mode menu checkboxes.</summary>
@@ -146,12 +142,6 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     /// <summary>Remaining work time formatted as <c>hh:mm:ss</c>.</summary>
     public string RemainingFormatted => Remaining.ToString(@"hh\:mm\:ss");
-
-    /// <summary>Switches the widget to <see cref="DisplayMode.Compact"/> and saves the change.</summary>
-    public ICommand SetCompactModeCommand
-    {
-        get;
-    }
 
     /// <summary>Switches the widget to <see cref="DisplayMode.Flex"/> and saves the change.</summary>
     public ICommand SetFlexModeCommand
@@ -206,7 +196,6 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(AlwaysOnTop));
         OnPropertyChanged(nameof(Opacity));
         OnPropertyChanged(nameof(IsNormalMode));
-        OnPropertyChanged(nameof(IsCompactMode));
         OnPropertyChanged(nameof(IsMiniMode));
         OnPropertyChanged(nameof(IsNoneMode));
         OnPropertyChanged(nameof(IsFlexMode));

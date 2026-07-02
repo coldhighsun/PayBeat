@@ -6,7 +6,7 @@ namespace PayBeat.App.Views;
 
 /// <summary>
 /// Borderless, always-on-top floating widget window. Hosts a <c>ContentControl</c> that switches
-/// between <see cref="NormalView"/>, <see cref="CompactView"/>, <see cref="MiniView"/>, and
+/// between <see cref="NormalView"/>, <see cref="MiniView"/>, and
 /// <see cref="FlexView"/> based on the active <see cref="Models.DisplayMode"/>. Supports drag-to-move
 /// and opacity fade when idle. In <see cref="Models.DisplayMode.Flex"/>, dragging is still allowed so the
 /// user can move the fullscreen widget to another monitor; on mouse release it re-fills whichever
@@ -16,14 +16,6 @@ public partial class MainWindow
 {
     private readonly ForegroundWatcher _foregroundWatcher;
     private Rect? _pendingCenterScreen;
-
-    /// <summary>
-    /// The window's device name and position captured while its HWND was still alive. WPF closes
-    /// windows (destroying the HWND) before <see cref="System.Windows.Application.Exit"/> fires, so
-    /// <c>App.OnExit</c> can no longer resolve the current monitor by then - it must use this cached
-    /// snapshot, taken in the <see cref="Window.Closing"/> handler, instead.
-    /// </summary>
-    public Models.WindowPosition? LastKnownPosition { get; private set; }
 
     /// <summary>
     /// Initializes the window and wires up mouse and data-context event handlers.
@@ -51,6 +43,17 @@ public partial class MainWindow
         _foregroundWatcher = new ForegroundWatcher(ReassertTopmost);
         Closing += (_, _) => LastKnownPosition = new Models.WindowPosition(Left, Top, ScreenHelper.GetCurrentScreenDeviceName(this));
         Closed += (_, _) => _foregroundWatcher.Dispose();
+    }
+
+    /// <summary>
+    /// The window's device name and position captured while its HWND was still alive. WPF closes
+    /// windows (destroying the HWND) before <see cref="System.Windows.Application.Exit"/> fires, so
+    /// <c>App.OnExit</c> can no longer resolve the current monitor by then - it must use this cached
+    /// snapshot, taken in the <see cref="Window.Closing"/> handler, instead.
+    /// </summary>
+    public Models.WindowPosition? LastKnownPosition
+    {
+        get; private set;
     }
 
     /// <summary>

@@ -53,12 +53,6 @@ public record SalarySettings
         get; init;
     }
 
-    /// <summary>Last saved position for <see cref="DisplayMode.Compact"/> mode.</summary>
-    public WindowPosition? CompactPosition
-    {
-        get; init;
-    }
-
     /// <summary>Last saved position for <see cref="DisplayMode.Mini"/> mode.</summary>
     public WindowPosition? MiniPosition
     {

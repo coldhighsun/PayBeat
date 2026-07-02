@@ -11,9 +11,6 @@ public enum DisplayMode
     /// <summary>Full-size view showing earnings, progress bar, and rate.</summary>
     Normal,
 
-    /// <summary>Condensed single-line view showing earnings and progress.</summary>
-    Compact,
-
     /// <summary>Minimal view showing only the earnings amount.</summary>
     Mini,
 
