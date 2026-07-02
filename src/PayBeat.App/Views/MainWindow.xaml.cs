@@ -1,17 +1,21 @@
+using PayBeat.App.Helpers;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using PayBeat.App.Helpers;
 
 namespace PayBeat.App.Views;
 
 /// <summary>
 /// Borderless, always-on-top floating widget window. Hosts a <c>ContentControl</c> that switches
-/// between <see cref="NormalView"/>, <see cref="CompactView"/>, and <see cref="MiniView"/> based on
-/// the active <see cref="Models.DisplayMode"/>. Supports drag-to-move and opacity fade when idle.
+/// between <see cref="NormalView"/>, <see cref="CompactView"/>, <see cref="MiniView"/>, and
+/// <see cref="FlexView"/> based on the active <see cref="Models.DisplayMode"/>. Supports drag-to-move
+/// and opacity fade when idle. In <see cref="Models.DisplayMode.Flex"/>, dragging is still allowed so the
+/// user can move the fullscreen widget to another monitor; on mouse release it re-fills whichever
+/// monitor it was dropped on.
 /// </summary>
 public partial class MainWindow
 {
     private readonly ForegroundWatcher _foregroundWatcher;
+    private Rect? _pendingCenterScreen;
 
     /// <summary>
     /// Initializes the window and wires up mouse and data-context event handlers.
@@ -24,9 +28,35 @@ public partial class MainWindow
         DataContextChanged += OnDataContextChanged;
         MouseEnter += (_, _) => Opacity = 1.0;
         MouseLeave += (_, _) => RestoreOpacity();
-        MouseLeftButtonDown += (_, _) => DragMove();
+        KeyDown += OnKeyDown;
+        MouseLeftButtonDown += (_, _) =>
+        {
+            DragMove();
+
+            // DragMove() blocks until the mouse button is released, so by the time it returns the
+            // window may have landed on a different monitor - re-fill it there for Flex mode.
+            if (DataContext is ViewModels.MainViewModel vm && vm.DisplayMode == Models.DisplayMode.Flex)
+            {
+                ApplyFlexBounds();
+            }
+        };
         _foregroundWatcher = new ForegroundWatcher(ReassertTopmost);
         Closed += (_, _) => _foregroundWatcher.Dispose();
+    }
+
+    /// <summary>
+    /// Resizes and repositions the window to exactly cover the monitor it is currently on, for
+    /// <see cref="Models.DisplayMode.Flex"/>. Switches <see cref="SizeToContent"/> to <c>Manual</c>
+    /// since the window normally auto-sizes to its content.
+    /// </summary>
+    public void ApplyFlexBounds()
+    {
+        var bounds = ScreenHelper.GetCurrentScreenBounds(this);
+        SizeToContent = SizeToContent.Manual;
+        Left = bounds.Left;
+        Top = bounds.Top;
+        Width = bounds.Width;
+        Height = bounds.Height;
     }
 
     /// <summary>
@@ -110,6 +140,17 @@ public partial class MainWindow
         }
     }
 
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DataContext is ViewModels.MainViewModel { DisplayMode: Models.DisplayMode.Flex } vm)
+        {
+            // Capture the screen bounds now, while still fullscreen on it, since after switching
+            // to Normal the window may briefly report stale ActualWidth/Height until the next layout pass.
+            _pendingCenterScreen = ScreenHelper.GetCurrentScreenBounds(this);
+            vm.SetNormalModeCommand.Execute(null);
+        }
+    }
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         var workArea = SystemParameters.WorkArea;
@@ -119,6 +160,19 @@ public partial class MainWindow
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
+        if (DataContext is ViewModels.MainViewModel { DisplayMode: Models.DisplayMode.Flex })
+        {
+            return;
+        }
+
+        if (_pendingCenterScreen is { } screen)
+        {
+            _pendingCenterScreen = null;
+            Left = screen.Left + (screen.Width - ActualWidth) / 2;
+            Top = screen.Top + (screen.Height - ActualHeight) / 2;
+            return;
+        }
+
         ClampToCurrentScreen();
     }
 
@@ -128,6 +182,34 @@ public partial class MainWindow
         {
             RestoreOpacity(sender as ViewModels.MainViewModel);
         }
+
+        if (e.PropertyName == nameof(ViewModels.MainViewModel.DisplayMode) && sender is ViewModels.MainViewModel vm)
+        {
+            if (vm.DisplayMode == Models.DisplayMode.None)
+            {
+                Hide();
+            }
+            else if (vm.DisplayMode == Models.DisplayMode.Flex)
+            {
+                if (!IsVisible)
+                {
+                    Show();
+                }
+                ApplyFlexBounds();
+            }
+            else
+            {
+                if (SizeToContent == SizeToContent.Manual)
+                {
+                    RestoreAutoSizing();
+                }
+                if (!IsVisible)
+                {
+                    Show();
+                    ClampToCurrentScreen();
+                }
+            }
+        }
     }
 
     // explorer.exe re-asserts the taskbar's own HWND_TOPMOST position whenever it becomes
@@ -135,10 +217,30 @@ public partial class MainWindow
     // Topmost flag is still true. React only to foreground changes rather than polling.
     private void ReassertTopmost()
     {
-        if (Topmost)
+        if (!Topmost)
         {
-            TopmostHelper.ForceTopmost(this);
+            return;
         }
+
+        // Don't fight Settings/About for the topmost band - they are shown as owned, topmost
+        // windows themselves (see MainViewModel.ApplyTopmostIfNeeded) and would otherwise get
+        // buried again the moment they take focus and trigger this foreground-change callback.
+        foreach (Window w in Application.Current.Windows)
+        {
+            if (w is SettingsWindow or AboutWindow)
+            {
+                return;
+            }
+        }
+
+        TopmostHelper.ForceTopmost(this);
+    }
+
+    private void RestoreAutoSizing()
+    {
+        ClearValue(WidthProperty);
+        ClearValue(HeightProperty);
+        SizeToContent = SizeToContent.WidthAndHeight;
     }
 
     private void RestoreOpacity(ViewModels.MainViewModel? vm = null)

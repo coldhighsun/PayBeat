@@ -16,7 +16,7 @@ public class SettingsService
     {
         WriteIndented = true,
         PropertyNameCaseInsensitive = true,
-        Converters = { new TimeOnlyConverter() }
+        Converters = { new TimeOnlyConverter(), new DisplayModeConverter() }
     };
 
     /// <summary>
@@ -48,6 +48,31 @@ public class SettingsService
     {
         Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
         File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+    }
+
+    /// <summary>
+    /// Serializes <see cref="DisplayMode"/> as its name (e.g. <c>"Flex"</c>) instead of an ordinal
+    /// number, so persisted values remain stable across future enum reordering. Any value that
+    /// can't be parsed as a known name — including old files that stored the ordinal number —
+    /// falls back to <see cref="DisplayMode.None"/> instead of failing the whole settings load.
+    /// </summary>
+    private sealed class DisplayModeConverter : JsonConverter<DisplayMode>
+    {
+        /// <inheritdoc/>
+        public override DisplayMode Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.String &&
+                Enum.TryParse<DisplayMode>(reader.GetString(), ignoreCase: true, out var mode))
+            {
+                return mode;
+            }
+
+            return DisplayMode.None;
+        }
+
+        /// <inheritdoc/>
+        public override void Write(Utf8JsonWriter writer, DisplayMode value, JsonSerializerOptions options)
+            => writer.WriteStringValue(value.ToString());
     }
 
     /// <summary>

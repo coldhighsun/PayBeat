@@ -7,6 +7,8 @@
     <sys:String x:Key="Menu.Normal">Normal</sys:String>
     <sys:String x:Key="Menu.Compact">Compact</sys:String>
     <sys:String x:Key="Menu.Mini">Mini</sys:String>
+    <sys:String x:Key="Menu.None">None</sys:String>
+    <sys:String x:Key="Menu.Flex">Flex</sys:String>
     <sys:String x:Key="Menu.Settings">Settings</sys:String>
     <sys:String x:Key="Menu.About">About</sys:String>
     <sys:String x:Key="Menu.Exit">Exit</sys:String>
@@ -15,6 +17,11 @@
     <sys:String x:Key="View.WorkStart">Start </sys:String>
     <sys:String x:Key="View.WorkEnd">End </sys:String>
     <sys:String x:Key="View.DailySalary">Daily</sys:String>
+
+    <!-- Flex view labels -->
+    <sys:String x:Key="View.Elapsed">Elapsed</sys:String>
+    <sys:String x:Key="View.Remaining">Remaining</sys:String>
+    <sys:String x:Key="View.WorkWindow">Work Hours</sys:String>
 
     <!-- Settings window -->
     <sys:String x:Key="Settings.WindowTitle">PayBeat Settings</sys:String>
@@ -36,6 +43,8 @@
     <sys:String x:Key="Settings.Normal">Normal</sys:String>
     <sys:String x:Key="Settings.Compact">Compact</sys:String>
     <sys:String x:Key="Settings.Mini">Mini</sys:String>
+    <sys:String x:Key="Settings.None">None</sys:String>
+    <sys:String x:Key="Settings.Flex">Flex</sys:String>
     <sys:String x:Key="Settings.Opacity">Opacity</sys:String>
     <sys:String x:Key="Settings.AlwaysOnTop">Always on Top</sys:String>
 

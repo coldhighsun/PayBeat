@@ -17,16 +17,16 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 
 ## Architecture
 
-WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderless, always-on-top window. No system tray — the main window is the primary UI surface.
+WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderless, always-on-top window, plus a system tray icon for display-mode switching, Settings/About, and Exit.
 
 **Data flow:**
 `DispatcherTimer` (configurable interval) → `MainViewModel.Refresh()` → `EarningsCalculator.Calculate()` → bound properties update the active view template.
 
-**Display modes:** The app has three display modes (`Normal`, `Compact`, `Mini`) that swap view templates inside a single `MainWindow` via `DataTemplate` + `DataTrigger`. Double-clicking the widget opens the settings window. Each mode saves its last position independently per screen (`NormalPosition`, `CompactPosition`, `MiniPosition` in `SalarySettings`).
+**Display modes:** `DisplayMode` has `None`, `Normal`, `Compact`, `Mini`, and `Flex`, swapped inside a single `MainWindow` via `DataTemplate` + `DataTrigger` (`None` shows no window; only the tray icon remains). Double-clicking the widget opens the settings window. Each mode saves its last position independently per screen (`NormalPosition`, `CompactPosition`, `MiniPosition`, `FlexPosition` in `SalarySettings`). `Flex` is a fullscreen "show-off" view (`FlexView`) with a huge earnings figure, full workday stats, and a decorative animated background/glow pulse driven by `ColorAnimation`/`DoubleAnimation` started in its code-behind.
 
 **Key files:**
 - `src/PayBeat.App/App.xaml.cs` — `OnStartup` creates `MainViewModel`, shows `MainWindow`, restores saved position per display mode, and registers the global hotkey. `OnExit` saves window position back to settings.
-- `src/PayBeat.App/Views/MainWindow.xaml` — borderless `Window` (`WindowStyle="None"`, `AllowsTransparency`, `ShowInTaskbar="False"`); hosts a `ContentControl` that switches between `NormalView`, `CompactView`, and `MiniView` templates based on `DisplayMode`.
+- `src/PayBeat.App/Views/MainWindow.xaml` — borderless `Window` (`WindowStyle="None"`, `AllowsTransparency`, `ShowInTaskbar="False"`); hosts a `ContentControl` that switches between `NormalView`, `CompactView`, `MiniView`, and `FlexView` templates based on `DisplayMode`.
 - `src/PayBeat.App/ViewModels/MainViewModel.cs` — owns the timer and all earnings/display state; `ReloadSettings()` is called by `SettingsViewModel` after save; raises `HotkeySettingsChanged` event when hotkey config changes.
 - `src/PayBeat.App/Services/EarningsCalculator.cs` — pure static calculations: `Calculate()`, `WorkdayProgress()`, `RatePerSecond()`.
 - `src/PayBeat.App/Services/SettingsService.cs` — persists `SalarySettings` to `%APPDATA%\PayBeat\settings.json`; uses a custom `TimeOnlyConverter` for `HH:mm` JSON serialization.
@@ -34,6 +34,7 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 - `src/PayBeat.App/Services/LocalizationService.cs` — swaps `Strings.en.xaml` / `Strings.zh-CN.xaml` into `MergedDictionaries` at startup; `"auto"` resolves from `CultureInfo.CurrentUICulture`.
 - `src/PayBeat.App/Services/StartupService.cs` — reads/writes `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` to manage Windows startup registration.
 - `src/PayBeat.App/Helpers/ScreenHelper.cs` — Win32 P/Invoke helpers for multi-monitor position restore (matches by device name, falls back to nearest monitor) and `ClampToWorkArea`/`ClampToCurrentScreen` on `Window`.
+- `src/PayBeat.App/Services/TrayIconService.cs` — `NotifyIcon` + `ContextMenuStrip` (WinForms) with display-mode submenu, Settings/About/Exit; left-click invokes an `onActivate` callback to bring the widget to front.
 
 **Other view models & windows:**
 - `src/PayBeat.App/ViewModels/SettingsViewModel.cs` — validates and saves user preferences; calls `MainViewModel.ReloadSettings()` after save. `HotkeyService` is suspended while the settings window is open to prevent the hotkey from interfering with keyboard capture.
