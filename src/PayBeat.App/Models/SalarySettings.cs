@@ -6,6 +6,8 @@ namespace PayBeat.App.Models;
 /// </summary>
 public record SalarySettings
 {
+    public const decimal MaxDailySalary = 99_999_999m;
+
     /// <summary>Daily gross salary used to compute the per-second earnings rate.</summary>
     public decimal DailySalary { get; init; } = 500m;
 
@@ -46,11 +48,26 @@ public record SalarySettings
     public int HotkeyVirtualKey { get; init; } = 0x58;
 
     /// <summary>Last saved position for <see cref="DisplayMode.Normal"/> mode.</summary>
-    public WindowPosition? NormalPosition { get; init; }
+    public WindowPosition? NormalPosition
+    {
+        get; init;
+    }
 
     /// <summary>Last saved position for <see cref="DisplayMode.Compact"/> mode.</summary>
-    public WindowPosition? CompactPosition { get; init; }
+    public WindowPosition? CompactPosition
+    {
+        get; init;
+    }
 
     /// <summary>Last saved position for <see cref="DisplayMode.Mini"/> mode.</summary>
-    public WindowPosition? MiniPosition { get; init; }
+    public WindowPosition? MiniPosition
+    {
+        get; init;
+    }
+
+    /// <summary>Last saved monitor for <see cref="DisplayMode.Flex"/> mode. Only <see cref="WindowPosition.ScreenDeviceName"/> is used.</summary>
+    public WindowPosition? FlexPosition
+    {
+        get; init;
+    }
 }

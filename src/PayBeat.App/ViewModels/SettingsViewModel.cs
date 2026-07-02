@@ -286,7 +286,7 @@ public class SettingsViewModel : ViewModelBase
     }
 
     private bool CanSave() =>
-        decimal.TryParse(_dailySalaryText, out var d) && d > 0 && WorkStart < WorkEnd;
+        decimal.TryParse(_dailySalaryText, out var d) && d > 0 && d <= SalarySettings.MaxDailySalary && WorkStart < WorkEnd;
 
     private void CloseWindow()
     {
@@ -305,6 +305,11 @@ public class SettingsViewModel : ViewModelBase
         if (!decimal.TryParse(_dailySalaryText, out var salary) || salary <= 0)
         {
             ErrorMessage = LocalizationService.Get("Error.SalaryPositive");
+            return;
+        }
+        if (salary > SalarySettings.MaxDailySalary)
+        {
+            ErrorMessage = LocalizationService.Get("Error.SalaryTooLarge");
             return;
         }
         if (WorkStart >= WorkEnd)
