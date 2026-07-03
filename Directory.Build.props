@@ -13,4 +13,6 @@
   <ItemGroup>
     <PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
+
+  <Import Project="Directory.Build.user" Condition="Exists('Directory.Build.user')" />
 </Project>

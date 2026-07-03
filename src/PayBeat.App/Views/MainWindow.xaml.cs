@@ -46,6 +46,15 @@ public partial class MainWindow
     }
 
     /// <summary>
+    /// Indicates startup restore is in progress so default placement and clamping handlers
+    /// do not override the position applied by <c>App</c> after first render.
+    /// </summary>
+    public bool IsRestoringStartupPosition
+    {
+        get; set;
+    }
+
+    /// <summary>
     /// The window's device name and position captured while its HWND was still alive. WPF closes
     /// windows (destroying the HWND) before <see cref="System.Windows.Application.Exit"/> fires, so
     /// <c>App.OnExit</c> can no longer resolve the current monitor by then - it must use this cached
@@ -165,6 +174,11 @@ public partial class MainWindow
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (IsRestoringStartupPosition)
+        {
+            return;
+        }
+
         if (!double.IsNaN(Left) && !double.IsNaN(Top))
         {
             return;
@@ -177,6 +191,11 @@ public partial class MainWindow
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
+        if (IsRestoringStartupPosition)
+        {
+            return;
+        }
+
         if (DataContext is ViewModels.MainViewModel { DisplayMode: Models.DisplayMode.Flex })
         {
             return;
