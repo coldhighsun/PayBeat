@@ -20,6 +20,7 @@ public partial class App
     private MainWindow? _mainWindow;
     private SettingsService? _settingsService;
     private Mutex? _singleInstanceMutex;
+    private SalarySettings? _startupSettings;
     private TrayIconService? _trayIconService;
     private bool _windowsHidden;
 
@@ -66,6 +67,7 @@ public partial class App
 
         _settingsService = new SettingsService();
         var settings = _settingsService.Load();
+        _startupSettings = settings;
         LocalizationService.Apply(settings.Language);
 
         _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
@@ -99,36 +101,51 @@ public partial class App
             }
             _hotkeyService.Triggered += ToggleWindowVisibility;
         };
+        _mainWindow.ContentRendered += OnMainWindowContentRendered;
 
         if (settings.DisplayMode == DisplayMode.None)
         {
             // Only create the HWND (for hotkey registration) without showing the window.
             new WindowInteropHelper(_mainWindow).EnsureHandle();
+            _mainWindow.ContentRendered -= OnMainWindowContentRendered;
             _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
             return;
         }
 
-        if (settings.DisplayMode == DisplayMode.Flex)
+        _mainWindow.IsRestoringStartupPosition = settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini or DisplayMode.Flex;
+        if (settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini)
         {
-            var flexBounds = settings.FlexPosition != null
-                ? ScreenHelper.FindScreenBoundsForRestore(0, 0, settings.FlexPosition.ScreenDeviceName, _mainWindow)
-                : (Rect?)null;
-            _mainWindow.ApplyFlexBounds(flexBounds);
-        }
-        else
-        {
-            var pos = GetSavedPosition(settings, settings.DisplayMode);
-            if (pos != null)
+            var startupPos = GetSavedPosition(settings, settings.DisplayMode);
+            if (startupPos != null)
             {
-                _mainWindow.Left = pos.Left;
-                _mainWindow.Top = pos.Top;
-                var bounds = ScreenHelper.FindScreenBoundsForRestore(pos.Left, pos.Top, pos.ScreenDeviceName, _mainWindow);
-                _mainWindow.ClampToWorkArea(bounds);
+                _mainWindow.Left = startupPos.Left;
+                _mainWindow.Top = startupPos.Top;
             }
         }
 
         _mainWindow.Show();
         _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
+    }
+
+    // Run restore after first render because clamping depends on measured window size.
+    private static void ApplyStartupPlacement(MainWindow mainWindow, SalarySettings settings)
+    {
+        if (settings.DisplayMode == DisplayMode.Flex)
+        {
+            var flexBounds = ResolveFlexBounds(mainWindow, settings);
+            mainWindow.ApplyFlexBounds(flexBounds);
+            return;
+        }
+
+        var placement = ResolveSavedPlacement(mainWindow, settings, settings.DisplayMode);
+        if (placement == null)
+        {
+            return;
+        }
+
+        mainWindow.Left = placement.Value.Left;
+        mainWindow.Top = placement.Value.Top;
+        mainWindow.ClampToWorkArea(placement.Value.Bounds);
     }
 
     private static WindowPosition? GetSavedPosition(SalarySettings settings, DisplayMode mode) =>
@@ -140,6 +157,41 @@ public partial class App
             DisplayMode.Flex => null,
             _ => null
         };
+
+    /// <summary>
+    /// Restore Flex by preferred monitor name, falling back to nearest available monitor.
+    /// </summary>
+    /// <param name="mainWindow">The main window.</param>
+    /// <param name="settings">The salary settings.</param>
+    /// <returns>The bounds for the Flex display mode, or null if not available.</returns>
+    private static Rect? ResolveFlexBounds(MainWindow mainWindow, SalarySettings settings)
+    {
+        if (settings.FlexPosition == null)
+        {
+            return null;
+        }
+
+        return ScreenHelper.FindScreenBoundsForRestore(0, 0, settings.FlexPosition.ScreenDeviceName, mainWindow);
+    }
+
+    /// <summary>
+    /// Resolve saved mode-specific coordinates and target bounds for clamped restore.
+    /// </summary>
+    /// <param name="mainWindow">The main window.</param>
+    /// <param name="settings">The salary settings.</param>
+    /// <param name="mode">The display mode.</param>
+    /// <returns>A tuple containing the left, top, and bounds, or null if not available.</returns>
+    private static (double Left, double Top, Rect Bounds)? ResolveSavedPlacement(MainWindow mainWindow, SalarySettings settings, DisplayMode mode)
+    {
+        var pos = GetSavedPosition(settings, mode);
+        if (pos == null)
+        {
+            return null;
+        }
+
+        var bounds = ScreenHelper.FindScreenBoundsForRestore(pos.Left, pos.Top, pos.ScreenDeviceName, mainWindow);
+        return (pos.Left, pos.Top, bounds);
+    }
 
     private void ActivateMainWindow()
     {
@@ -170,6 +222,18 @@ public partial class App
                     MessageBoxImage.Warning);
             }
         }
+    }
+
+    private void OnMainWindowContentRendered(object? sender, EventArgs e)
+    {
+        if (_mainWindow == null || _startupSettings == null)
+        {
+            return;
+        }
+
+        _mainWindow.ContentRendered -= OnMainWindowContentRendered;
+        ApplyStartupPlacement(_mainWindow, _startupSettings);
+        _mainWindow.IsRestoringStartupPosition = false;
     }
 
     private void ToggleWindowVisibility()
