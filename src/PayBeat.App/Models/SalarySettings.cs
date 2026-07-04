@@ -64,4 +64,28 @@ public record SalarySettings
     {
         get; init;
     }
+
+    /// <summary>Whether earnings should be deducted for a daily lunch break.</summary>
+    public bool LunchBreakEnabled { get; init; } = false;
+
+    /// <summary>Lunch break start time; only used when <see cref="LunchBreakEnabled"/> is true.</summary>
+    public TimeOnly LunchBreakStart { get; init; } = new(12, 0);
+
+    /// <summary>Lunch break end time; only used when <see cref="LunchBreakEnabled"/> is true.</summary>
+    public TimeOnly LunchBreakEnd { get; init; } = new(13, 0);
+
+    /// <summary>Whether earnings accrue on Saturdays and Sundays. When false, weekends earn nothing.</summary>
+    public bool WorkOnWeekends { get; init; } = false;
+
+    /// <summary>Whether to show a tray balloon notification shortly before work ends.</summary>
+    public bool EnableEndOfDayReminder { get; init; } = false;
+
+    /// <summary>How many minutes before <see cref="WorkEnd"/> the end-of-day reminder fires.</summary>
+    public int EndOfDayReminderMinutes { get; init; } = 5;
+
+    /// <summary>Whether to show a tray balloon notification each time earnings cross a <see cref="MilestoneAmount"/> increment.</summary>
+    public bool EnableMilestoneNotifications { get; init; } = false;
+
+    /// <summary>Earnings increment that triggers a milestone notification (e.g. every ¥100).</summary>
+    public decimal MilestoneAmount { get; init; } = 100m;
 }

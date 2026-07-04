@@ -30,11 +30,24 @@
 
     <!-- Salary tab -->
     <sys:String x:Key="Settings.Tab.Salary">Salary</sys:String>
+    <sys:String x:Key="Settings.Section.Salary">SALARY</sys:String>
+    <sys:String x:Key="Settings.Section.Schedule">WORK SCHEDULE</sys:String>
+    <sys:String x:Key="Settings.Section.Refresh">REFRESH</sys:String>
     <sys:String x:Key="Settings.DailySalary">Daily Salary</sys:String>
-    <sys:String x:Key="Settings.WorkStart">Work Start</sys:String>
-    <sys:String x:Key="Settings.WorkEnd">Work End</sys:String>
+    <sys:String x:Key="Settings.WorkHours">Work Hours</sys:String>
     <sys:String x:Key="Settings.RefreshInterval">Refresh Interval</sys:String>
     <sys:String x:Key="Settings.Seconds"> s</sys:String>
+    <sys:String x:Key="Settings.LunchBreakEnabled">Deduct Lunch Break</sys:String>
+    <sys:String x:Key="Settings.LunchBreakStart">Break Start</sys:String>
+    <sys:String x:Key="Settings.LunchBreakEnd">Break End</sys:String>
+    <sys:String x:Key="Settings.WorkOnWeekends">Earn on Weekends</sys:String>
+
+    <!-- Notifications tab -->
+    <sys:String x:Key="Settings.Tab.Notifications">Notifications</sys:String>
+    <sys:String x:Key="Settings.EnableEndOfDayReminder">End-of-Day Reminder</sys:String>
+    <sys:String x:Key="Settings.EndOfDayReminderMinutes">Minutes Before Work End</sys:String>
+    <sys:String x:Key="Settings.EnableMilestoneNotifications">Milestone Notifications</sys:String>
+    <sys:String x:Key="Settings.MilestoneAmount">Notify Every</sys:String>
 
     <!-- Display tab -->
     <sys:String x:Key="Settings.Tab.Display">Display</sys:String>
@@ -69,5 +82,14 @@
     <sys:String x:Key="Error.WorkEndAfterStart">Work end must be later than work start</sys:String>
     <sys:String x:Key="Error.AlreadyRunning">PayBeat is already running.</sys:String>
     <sys:String x:Key="Error.HotkeyConflict">Failed to register hotkey {0}. It may already be in use by another application.</sys:String>
+    <sys:String x:Key="Error.LunchBreakInvalid">Lunch break must fall within work hours and end after it starts</sys:String>
+    <sys:String x:Key="Error.MilestoneAmountPositive">Milestone amount must be greater than 0</sys:String>
+
+    <!-- Tray notifications -->
+    <sys:String x:Key="Tray.HiddenTooltip">I love work!</sys:String>
+    <sys:String x:Key="Notification.MilestoneTitle">Earnings Milestone</sys:String>
+    <sys:String x:Key="Notification.MilestoneBody">You've earned {0} today!</sys:String>
+    <sys:String x:Key="Notification.EndOfDayTitle">Almost Done</sys:String>
+    <sys:String x:Key="Notification.EndOfDayBody">Work ends in {0} minutes.</sys:String>
 
 </ResourceDictionary>

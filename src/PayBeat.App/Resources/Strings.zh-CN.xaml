@@ -30,11 +30,24 @@
 
     <!-- Salary tab -->
     <sys:String x:Key="Settings.Tab.Salary">薪资计算</sys:String>
+    <sys:String x:Key="Settings.Section.Salary">薪资</sys:String>
+    <sys:String x:Key="Settings.Section.Schedule">工作日程</sys:String>
+    <sys:String x:Key="Settings.Section.Refresh">刷新</sys:String>
     <sys:String x:Key="Settings.DailySalary">日薪</sys:String>
-    <sys:String x:Key="Settings.WorkStart">上班时间</sys:String>
-    <sys:String x:Key="Settings.WorkEnd">下班时间</sys:String>
+    <sys:String x:Key="Settings.WorkHours">工作时间</sys:String>
     <sys:String x:Key="Settings.RefreshInterval">刷新间隔</sys:String>
     <sys:String x:Key="Settings.Seconds"> 秒</sys:String>
+    <sys:String x:Key="Settings.LunchBreakEnabled">扣除午休时间</sys:String>
+    <sys:String x:Key="Settings.LunchBreakStart">午休开始</sys:String>
+    <sys:String x:Key="Settings.LunchBreakEnd">午休结束</sys:String>
+    <sys:String x:Key="Settings.WorkOnWeekends">周末也计薪</sys:String>
+
+    <!-- Notifications tab -->
+    <sys:String x:Key="Settings.Tab.Notifications">提醒</sys:String>
+    <sys:String x:Key="Settings.EnableEndOfDayReminder">下班提醒</sys:String>
+    <sys:String x:Key="Settings.EndOfDayReminderMinutes">提前提醒（分钟）</sys:String>
+    <sys:String x:Key="Settings.EnableMilestoneNotifications">收入里程碑提醒</sys:String>
+    <sys:String x:Key="Settings.MilestoneAmount">每达到</sys:String>
 
     <!-- Display tab -->
     <sys:String x:Key="Settings.Tab.Display">显示</sys:String>
@@ -69,5 +82,14 @@
     <sys:String x:Key="Error.WorkEndAfterStart">下班时间须晚于上班时间</sys:String>
     <sys:String x:Key="Error.AlreadyRunning">PayBeat 已在运行中。</sys:String>
     <sys:String x:Key="Error.HotkeyConflict">快捷键 {0} 注册失败，可能已被其他程序占用。</sys:String>
+    <sys:String x:Key="Error.LunchBreakInvalid">午休时间必须在工作时间内，且结束时间须晚于开始时间</sys:String>
+    <sys:String x:Key="Error.MilestoneAmountPositive">里程碑金额须大于 0</sys:String>
+
+    <!-- Tray notifications -->
+    <sys:String x:Key="Tray.HiddenTooltip">我爱上班！</sys:String>
+    <sys:String x:Key="Notification.MilestoneTitle">收入里程碑</sys:String>
+    <sys:String x:Key="Notification.MilestoneBody">今天已赚到 {0}！</sys:String>
+    <sys:String x:Key="Notification.EndOfDayTitle">快下班了</sys:String>
+    <sys:String x:Key="Notification.EndOfDayBody">还有 {0} 分钟下班。</sys:String>
 
 </ResourceDictionary>

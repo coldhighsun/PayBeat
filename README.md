@@ -21,6 +21,8 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 - Each mode remembers its last position independently, with multi-monitor support
 - System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
 - Global hotkey to show / hide all windows (default `Ctrl+Alt+X`)
+- Optional lunch break deduction and weekend earnings
+- Tray balloon notifications for an end-of-day reminder and earnings milestones
 - English and Simplified Chinese UI, auto-detected from the OS locale
 - Configurable opacity, refresh interval, and currency symbol
 - Optional Windows startup registration
@@ -73,6 +75,10 @@ Output goes to `artifacts/bin/PayBeat.App/release/`.
 | Opacity | 1.0 | Window opacity when the mouse is not hovering (0.1–1.0) |
 | Global hotkey | Ctrl+Alt+X | Toggle visibility of all windows |
 | Run at startup | Off | Launch automatically when Windows starts |
+| Deduct lunch break | Off | Excludes a daily break window from earnings (default 12:00–13:00) |
+| Earn on weekends | Off | When off, Saturdays and Sundays earn nothing |
+| End-of-day reminder | Off | Tray balloon a configurable number of minutes before work end (default 5) |
+| Milestone notifications | Off | Tray balloon each time earnings cross an amount increment (default ¥100) |
 
 ## License
 
@@ -93,6 +99,8 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - 每种模式独立记忆上次所在位置（支持多显示器）
 - 系统托盘图标，右键菜单可切换显示模式、打开设置 / 关于、退出；左键点击会将悬浮窗置于最前并闪烁放大提示
 - 全局热键一键显示 / 隐藏（默认 `Ctrl+Alt+X`）
+- 可选午休扣除时段，可选周末计薪
+- 托盘气泡通知：下班提醒、赚钱里程碑提醒
 - 支持中英文界面，随系统语言自动切换
 - 可设置透明度、刷新间隔、货币符号
 - 支持开机自启
@@ -145,3 +153,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 | 透明度 | 1.0 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
 | 全局热键 | Ctrl+Alt+X | 显示 / 隐藏全部窗口 |
 | 开机自启 | 关 | 登录 Windows 后自动启动 |
+| 扣除午休 | 关 | 从计薪时段中排除一段每日午休时间（默认 12:00–13:00） |
+| 周末计薪 | 关 | 关闭时，周六、周日不计薪 |
+| 下班提醒 | 关 | 下班前若干分钟发送托盘气泡提醒（默认 5 分钟） |
+| 里程碑提醒 | 关 | 每赚够一定金额发送托盘气泡提醒（默认 ¥100） |

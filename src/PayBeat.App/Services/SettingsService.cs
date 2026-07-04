@@ -36,6 +36,7 @@ public class SettingsService
         }
         catch
         {
+            BackupCorruptFile();
             return new SalarySettings();
         }
     }
@@ -48,6 +49,23 @@ public class SettingsService
     {
         Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
         File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+    }
+
+    /// <summary>
+    /// Preserves an unreadable settings file as <c>settings.json.bak</c> (overwriting any prior
+    /// backup) so a load failure doesn't silently destroy the user's saved position/preferences.
+    /// Swallows failures — this is a best-effort safety net, not a critical path.
+    /// </summary>
+    private static void BackupCorruptFile()
+    {
+        try
+        {
+            File.Copy(FilePath, FilePath + ".bak", overwrite: true);
+        }
+        catch
+        {
+            // Best-effort; if we can't back it up, still fall back to defaults.
+        }
     }
 
     /// <summary>
