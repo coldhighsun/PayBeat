@@ -2,6 +2,7 @@ using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.Views;
+using System.ComponentModel;
 
 namespace PayBeat.App.ViewModels;
 
@@ -14,7 +15,7 @@ public record LanguageOption(string Code, string Name);
 /// View model for the settings window. Validates and saves user preferences,
 /// then calls <see cref="MainViewModel.ReloadSettings"/> to apply changes immediately.
 /// </summary>
-public class SettingsViewModel : ViewModelBase
+public class SettingsViewModel : ViewModelBase, IDataErrorInfo
 {
     private readonly MainViewModel _mainVm;
     private readonly SettingsService _service;
@@ -35,7 +36,7 @@ public class SettingsViewModel : ViewModelBase
     private TimeOnly _lunchBreakEnd;
     private bool _workOnWeekends;
     private bool _enableEndOfDayReminder;
-    private int _endOfDayReminderMinutes;
+    private string _endOfDayReminderMinutesText;
     private bool _enableMilestoneNotifications;
     private string _milestoneAmountText;
 
@@ -68,7 +69,7 @@ public class SettingsViewModel : ViewModelBase
         _lunchBreakEnd = s.LunchBreakEnd;
         _workOnWeekends = s.WorkOnWeekends;
         _enableEndOfDayReminder = s.EnableEndOfDayReminder;
-        _endOfDayReminderMinutes = s.EndOfDayReminderMinutes;
+        _endOfDayReminderMinutesText = s.EndOfDayReminderMinutes.ToString();
         _enableMilestoneNotifications = s.EnableMilestoneNotifications;
         _milestoneAmountText = s.MilestoneAmount.ToString("G29");
 
@@ -116,7 +117,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _dailySalaryText, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -139,25 +140,37 @@ public class SettingsViewModel : ViewModelBase
         }
     }
 
-    /// <summary>Minutes before work end that the end-of-day reminder fires, clamped to [1, 120].</summary>
-    public int EndOfDayReminderMinutes
+    /// <summary>Raw text entered in the end-of-day reminder minutes field; must be an integer in [1, 60].</summary>
+    public string EndOfDayReminderMinutesText
     {
-        get => _endOfDayReminderMinutes;
-        set => SetField(ref _endOfDayReminderMinutes, Math.Clamp(value, 1, 120));
+        get => _endOfDayReminderMinutesText;
+        set
+        {
+            SetField(ref _endOfDayReminderMinutesText, value);
+            Revalidate();
+        }
     }
 
     /// <summary>Whether the milestone earnings tray notification is enabled.</summary>
     public bool EnableMilestoneNotifications
     {
         get => _enableMilestoneNotifications;
-        set => SetField(ref _enableMilestoneNotifications, value);
+        set
+        {
+            SetField(ref _enableMilestoneNotifications, value);
+            Revalidate();
+        }
     }
 
     /// <summary>Whether the end-of-day reminder tray notification is enabled.</summary>
     public bool EnableEndOfDayReminder
     {
         get => _enableEndOfDayReminder;
-        set => SetField(ref _enableEndOfDayReminder, value);
+        set
+        {
+            SetField(ref _enableEndOfDayReminder, value);
+            Revalidate();
+        }
     }
 
     /// <summary>Validation error message shown below the Save button; empty string when there is no error.</summary>
@@ -166,6 +179,18 @@ public class SettingsViewModel : ViewModelBase
         get;
         private set => SetField(ref field, value);
     } = string.Empty;
+
+    /// <summary>Unused; per-field errors are reported via the indexer instead.</summary>
+    string IDataErrorInfo.Error => string.Empty;
+
+    /// <summary>Per-field validation error shown as a bubble popup next to the offending input.</summary>
+    string IDataErrorInfo.this[string columnName] => columnName switch
+    {
+        nameof(DailySalaryText) => ValidateDailySalary() ?? string.Empty,
+        nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() ?? string.Empty : string.Empty,
+        nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() ?? string.Empty : string.Empty,
+        _ => string.Empty,
+    };
 
     /// <summary>Human-readable hotkey string (e.g. <c>Ctrl+Alt+X</c>) shown in the hotkey field.</summary>
     public string HotkeyDisplayText => HotkeyService.Format(HotkeyModifiers, HotkeyVirtualKey);
@@ -263,7 +288,11 @@ public class SettingsViewModel : ViewModelBase
     public bool LunchBreakEnabled
     {
         get => _lunchBreakEnabled;
-        set => SetField(ref _lunchBreakEnabled, value);
+        set
+        {
+            SetField(ref _lunchBreakEnabled, value);
+            Revalidate();
+        }
     }
 
     /// <summary>Lunch break end time. Changing this re-evaluates <see cref="SaveCommand"/> availability.</summary>
@@ -273,7 +302,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _lunchBreakEnd, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -284,7 +313,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _lunchBreakStart, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -295,7 +324,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _milestoneAmountText, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -333,7 +362,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _workEnd, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -344,7 +373,7 @@ public class SettingsViewModel : ViewModelBase
         set
         {
             SetField(ref _workStart, value);
-            ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+            Revalidate();
         }
     }
 
@@ -355,11 +384,107 @@ public class SettingsViewModel : ViewModelBase
         set => SetField(ref _workOnWeekends, value);
     }
 
-    private bool CanSave() =>
-        decimal.TryParse(_dailySalaryText, out var d) && d > 0 && d <= SalarySettings.MaxDailySalary
-        && WorkStart < WorkEnd
-        && (!LunchBreakEnabled || (LunchBreakStart < LunchBreakEnd && LunchBreakStart >= WorkStart && LunchBreakEnd <= WorkEnd))
-        && (!EnableMilestoneNotifications || (decimal.TryParse(_milestoneAmountText, out var m) && m > 0));
+    private bool CanSave() => Validate() is null;
+
+    /// <summary>
+    /// Updates the bottom-of-window error message and Save availability. Only schedule-related errors are
+    /// shown here — the daily salary, milestone amount, and reminder minutes fields report their own errors
+    /// via a bubble popup next to the field instead.
+    /// </summary>
+    private void Revalidate()
+    {
+        ErrorMessage = ValidateSchedule() ?? string.Empty;
+        ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+    }
+
+    /// <summary>Validates work hours and lunch break; returns <see langword="null"/> when valid.</summary>
+    private string? ValidateSchedule()
+    {
+        if (WorkStart >= WorkEnd)
+        {
+            return LocalizationService.Get("Error.WorkEndAfterStart");
+        }
+        if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
+        {
+            return LocalizationService.Get("Error.LunchBreakInvalid");
+        }
+
+        return null;
+    }
+
+    /// <summary>Validates all fields and returns the first error message, or <see langword="null"/> when everything is valid.</summary>
+    private string? Validate()
+    {
+        var salaryError = ValidateDailySalary();
+        if (salaryError is not null)
+        {
+            return salaryError;
+        }
+        var scheduleError = ValidateSchedule();
+        if (scheduleError is not null)
+        {
+            return scheduleError;
+        }
+        if (EnableEndOfDayReminder)
+        {
+            var minutesError = ValidateEndOfDayReminderMinutes();
+            if (minutesError is not null)
+            {
+                return minutesError;
+            }
+        }
+        if (EnableMilestoneNotifications)
+        {
+            var milestoneError = ValidateMilestoneAmount();
+            if (milestoneError is not null)
+            {
+                return milestoneError;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Validates <see cref="DailySalaryText"/>; returns <see langword="null"/> when valid.</summary>
+    private string? ValidateDailySalary()
+    {
+        if (!decimal.TryParse(_dailySalaryText, out var salary) || salary <= 0)
+        {
+            return LocalizationService.Get("Error.SalaryPositive");
+        }
+        if (salary > SalarySettings.MaxDailySalary)
+        {
+            return LocalizationService.Get("Error.SalaryTooLarge");
+        }
+
+        return null;
+    }
+
+    /// <summary>Validates <see cref="EndOfDayReminderMinutesText"/>; returns <see langword="null"/> when valid.</summary>
+    private string? ValidateEndOfDayReminderMinutes()
+    {
+        if (!int.TryParse(_endOfDayReminderMinutesText, out var minutes) || minutes < 1 || minutes > 60)
+        {
+            return LocalizationService.Get("Error.EndOfDayReminderMinutesInvalid");
+        }
+
+        return null;
+    }
+
+    /// <summary>Validates <see cref="MilestoneAmountText"/>; returns <see langword="null"/> when valid.</summary>
+    private string? ValidateMilestoneAmount()
+    {
+        if (!decimal.TryParse(_milestoneAmountText, out var milestone) || milestone <= 0)
+        {
+            return LocalizationService.Get("Error.MilestoneAmountPositive");
+        }
+        if (decimal.TryParse(_dailySalaryText, out var daily) && milestone > daily)
+        {
+            return LocalizationService.Get("Error.MilestoneAmountTooLarge");
+        }
+
+        return null;
+    }
 
     private void CloseWindow()
     {
@@ -375,32 +500,13 @@ public class SettingsViewModel : ViewModelBase
 
     private void Save()
     {
-        if (!decimal.TryParse(_dailySalaryText, out var salary) || salary <= 0)
+        if (Validate() is not null)
         {
-            ErrorMessage = LocalizationService.Get("Error.SalaryPositive");
-            return;
-        }
-        if (salary > SalarySettings.MaxDailySalary)
-        {
-            ErrorMessage = LocalizationService.Get("Error.SalaryTooLarge");
-            return;
-        }
-        if (WorkStart >= WorkEnd)
-        {
-            ErrorMessage = LocalizationService.Get("Error.WorkEndAfterStart");
-            return;
-        }
-        if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
-        {
-            ErrorMessage = LocalizationService.Get("Error.LunchBreakInvalid");
-            return;
-        }
-        if (EnableMilestoneNotifications && (!decimal.TryParse(_milestoneAmountText, out var milestone) || milestone <= 0))
-        {
-            ErrorMessage = LocalizationService.Get("Error.MilestoneAmountPositive");
+            ErrorMessage = ValidateSchedule() ?? string.Empty;
             return;
         }
 
+        var salary = decimal.Parse(_dailySalaryText);
         var existing = _service.Load();
         var settings = existing with
         {
@@ -420,7 +526,9 @@ public class SettingsViewModel : ViewModelBase
             LunchBreakEnd = LunchBreakEnd,
             WorkOnWeekends = WorkOnWeekends,
             EnableEndOfDayReminder = EnableEndOfDayReminder,
-            EndOfDayReminderMinutes = EndOfDayReminderMinutes,
+            EndOfDayReminderMinutes = EnableEndOfDayReminder && int.TryParse(_endOfDayReminderMinutesText, out var parsedMinutes)
+                ? parsedMinutes
+                : existing.EndOfDayReminderMinutes,
             EnableMilestoneNotifications = EnableMilestoneNotifications,
             MilestoneAmount = EnableMilestoneNotifications && decimal.TryParse(_milestoneAmountText, out var parsedMilestone)
                 ? Math.Round(parsedMilestone, 2)

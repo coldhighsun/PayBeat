@@ -84,6 +84,8 @@
     <sys:String x:Key="Error.HotkeyConflict">Failed to register hotkey {0}. It may already be in use by another application.</sys:String>
     <sys:String x:Key="Error.LunchBreakInvalid">Lunch break must fall within work hours and end after it starts</sys:String>
     <sys:String x:Key="Error.MilestoneAmountPositive">Milestone amount must be greater than 0</sys:String>
+    <sys:String x:Key="Error.MilestoneAmountTooLarge">Milestone amount cannot exceed the daily salary</sys:String>
+    <sys:String x:Key="Error.EndOfDayReminderMinutesInvalid">Reminder minutes must be an integer between 1 and 60</sys:String>
 
     <!-- Tray notifications -->
     <sys:String x:Key="Tray.HiddenTooltip">I love work!</sys:String>

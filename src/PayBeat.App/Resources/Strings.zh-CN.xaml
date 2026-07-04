@@ -84,6 +84,8 @@
     <sys:String x:Key="Error.HotkeyConflict">快捷键 {0} 注册失败，可能已被其他程序占用。</sys:String>
     <sys:String x:Key="Error.LunchBreakInvalid">午休时间必须在工作时间内，且结束时间须晚于开始时间</sys:String>
     <sys:String x:Key="Error.MilestoneAmountPositive">里程碑金额须大于 0</sys:String>
+    <sys:String x:Key="Error.MilestoneAmountTooLarge">里程碑金额不能超过日薪总额</sys:String>
+    <sys:String x:Key="Error.EndOfDayReminderMinutesInvalid">提醒分钟数须为 1 到 60 之间的整数</sys:String>
 
     <!-- Tray notifications -->
     <sys:String x:Key="Tray.HiddenTooltip">我爱上班！</sys:String>

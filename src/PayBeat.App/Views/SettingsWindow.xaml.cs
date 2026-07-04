@@ -12,6 +12,7 @@ namespace PayBeat.App.Views;
 public partial class SettingsWindow
 {
     private static readonly Regex DecimalPattern = new(@"^\d*\.?\d{0,2}$", RegexOptions.Compiled);
+    private static readonly Regex IntegerPattern = new(@"^\d*$", RegexOptions.Compiled);
 
     private bool _hotkeyCommitted;
     private bool _isCapturing;
@@ -194,6 +195,31 @@ public partial class SettingsWindow
             box.Text.Remove(box.SelectionStart, box.SelectionLength).Insert(box.SelectionStart, e.Text);
 
         e.Handled = !DecimalPattern.IsMatch(prospective);
+    }
+
+    private void Integer_Pasting(object sender, DataObjectPastingEventArgs e)
+    {
+        if (e.DataObject.GetDataPresent(typeof(string)))
+        {
+            var text = (string)e.DataObject.GetData(typeof(string))!;
+            if (!IntegerPattern.IsMatch(text))
+            {
+                e.CancelCommand();
+            }
+        }
+        else
+        {
+            e.CancelCommand();
+        }
+    }
+
+    private void Integer_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        var box = (TextBox)sender;
+        var prospective =
+            box.Text.Remove(box.SelectionStart, box.SelectionLength).Insert(box.SelectionStart, e.Text);
+
+        e.Handled = !IntegerPattern.IsMatch(prospective);
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

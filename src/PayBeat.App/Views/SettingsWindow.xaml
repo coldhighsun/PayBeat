@@ -106,6 +106,39 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Bubble popup shown next to a TextBox when its bound value fails validation -->
+        <ControlTemplate x:Key="ValidationBubbleTemplate">
+            <StackPanel>
+                <AdornedElementPlaceholder x:Name="Placeholder" />
+                <Popup IsOpen="True"
+                       PlacementTarget="{Binding ElementName=Placeholder}"
+                       Placement="Top"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade">
+                    <Border Background="#F38BA8"
+                            CornerRadius="6"
+                            Padding="8,5"
+                            Margin="0,0,0,4">
+                        <TextBlock Text="{Binding ElementName=Placeholder, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
+                                   Foreground="#1E1E2E"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="240" />
+                    </Border>
+                </Popup>
+            </StackPanel>
+        </ControlTemplate>
+
+        <!-- TextBox style applying the validation bubble and a red border while invalid -->
+        <Style x:Key="ValidatedTextBox" TargetType="TextBox">
+            <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationBubbleTemplate}" />
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="BorderBrush" Value="#F38BA8" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Border Background="#1E1E2E"
@@ -184,13 +217,15 @@
                                  Padding="10,8" />
                             <TextBox x:Name="SalaryBox"
                                  Grid.Column="2"
-                                 Text="{Binding DailySalaryText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource ValidatedTextBox}"
+                                 Text="{Binding DailySalaryText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
                                  Background="#313244"
                                  Foreground="#CDD6F4"
                                  BorderBrush="#45475A"
                                  BorderThickness="1"
                                  Padding="10,8"
+                                 MaxLength="11"
                                  PreviewTextInput="Salary_PreviewTextInput"
                                  DataObject.Pasting="Salary_Pasting" />
                         </Grid>
@@ -304,13 +339,17 @@
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <TextBox Grid.Column="2"
-                                 Text="{Binding EndOfDayReminderMinutes}"
+                                 Style="{StaticResource ValidatedTextBox}"
+                                 Text="{Binding EndOfDayReminderMinutesText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
                                  Background="#313244"
                                  Foreground="#CDD6F4"
                                  BorderBrush="#45475A"
                                  BorderThickness="1"
-                                 Padding="10,8" />
+                                 Padding="10,8"
+                                 MaxLength="2"
+                                 PreviewTextInput="Integer_PreviewTextInput"
+                                 DataObject.Pasting="Integer_Pasting" />
                         </Grid>
 
                         <!-- Milestone notifications -->
@@ -332,13 +371,17 @@
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <TextBox Grid.Column="2"
-                                 Text="{Binding MilestoneAmountText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource ValidatedTextBox}"
+                                 Text="{Binding MilestoneAmountText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
                                  Background="#313244"
                                  Foreground="#CDD6F4"
                                  BorderBrush="#45475A"
                                  BorderThickness="1"
-                                 Padding="10,8" />
+                                 Padding="10,8"
+                                 MaxLength="11"
+                                 PreviewTextInput="Salary_PreviewTextInput"
+                                 DataObject.Pasting="Salary_Pasting" />
                         </Grid>
                     </StackPanel>
                 </TabItem>
