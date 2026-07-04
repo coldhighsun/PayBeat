@@ -246,6 +246,8 @@ public partial class App
             }
             _hiddenWindows.Clear();
             _windowsHidden = false;
+            _mainVm?.ResumeNotifications();
+            _trayIconService?.SetHidden(false);
         }
         else
         {
@@ -258,6 +260,8 @@ public partial class App
                 }
             }
             _windowsHidden = true;
+            _mainVm?.SuspendNotifications();
+            _trayIconService?.SetHidden(true);
         }
     }
 }

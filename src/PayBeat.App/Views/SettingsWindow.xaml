@@ -4,7 +4,7 @@
         xmlns:controls="clr-namespace:PayBeat.App.Views.Controls"
         Title="{DynamicResource Settings.WindowTitle}"
         Width="400"
-        Height="470"
+        Height="580"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="NoResize"
@@ -69,12 +69,23 @@
                                           HorizontalAlignment="Left" />
                             </Border>
                             <!-- Tab content -->
-                            <ContentPresenter ContentSource="SelectedContent"
-                                              Margin="0,20,0,0" />
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          Margin="0,20,0,0">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </ScrollViewer>
                         </DockPanel>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- Section header used to group related settings within a tab -->
+        <Style x:Key="SettingsSectionHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#89B4FA" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,8" />
         </Style>
 
         <!-- Display mode preview tooltip -->
@@ -150,11 +161,14 @@
                 <TabItem Header="{DynamicResource Settings.Tab.Salary}" Style="{StaticResource SettingsTabItem}">
                     <StackPanel>
 
+                        <!-- ── Group: Salary ── -->
+                        <TextBlock Text="{DynamicResource Settings.Section.Salary}" Style="{StaticResource SettingsSectionHeader}" />
+
                         <!-- Daily Salary -->
                         <TextBlock Text="{DynamicResource Settings.DailySalary}"
                                Foreground="#9399B2"
                                FontSize="12"
-                               Margin="0,0,0,6" />
+                               Margin="0,0,0,4" />
                         <Grid Margin="0,0,0,16">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="56" />
@@ -181,31 +195,63 @@
                                  DataObject.Pasting="Salary_Pasting" />
                         </Grid>
 
+                        <!-- ── Group: Work Schedule ── -->
+                        <TextBlock Text="{DynamicResource Settings.Section.Schedule}" Style="{StaticResource SettingsSectionHeader}" />
+
                         <!-- Work Hours -->
-                        <Grid Margin="0,0,0,16">
+                        <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="16" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{DynamicResource Settings.WorkStart}"
-                                       Foreground="#9399B2"
-                                       FontSize="12"
-                                       Margin="0,0,0,6" />
+                            <TextBlock Grid.Column="0"
+                                   Text="{DynamicResource Settings.WorkHours}"
+                                   Foreground="#9399B2"
+                                   FontSize="12"
+                                   VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <controls:TimePickerControl SelectedTime="{Binding WorkStart}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="{DynamicResource Settings.WorkEnd}"
-                                       Foreground="#9399B2"
-                                       FontSize="12"
-                                       Margin="0,0,0,6" />
+                                <TextBlock Text="–" Foreground="#6C7086" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
                                 <controls:TimePickerControl SelectedTime="{Binding WorkEnd}" />
                             </StackPanel>
                         </Grid>
 
+                        <!-- Lunch break -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                  Content="{DynamicResource Settings.LunchBreakEnabled}"
+                                  IsChecked="{Binding LunchBreakEnabled}"
+                                  Foreground="#CDD6F4"
+                                  FontSize="13"
+                                  Cursor="Hand"
+                                  VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    IsEnabled="{Binding LunchBreakEnabled}">
+                                <controls:TimePickerControl SelectedTime="{Binding LunchBreakStart}" />
+                                <TextBlock Text="–" Foreground="#6C7086" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
+                                <controls:TimePickerControl SelectedTime="{Binding LunchBreakEnd}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Weekend earning -->
+                        <CheckBox Content="{DynamicResource Settings.WorkOnWeekends}"
+                              IsChecked="{Binding WorkOnWeekends}"
+                              Foreground="#CDD6F4"
+                              FontSize="13"
+                              Cursor="Hand"
+                              Margin="0,0,0,16" />
+
+                        <!-- ── Group: Refresh ── -->
+                        <TextBlock Text="{DynamicResource Settings.Section.Refresh}" Style="{StaticResource SettingsSectionHeader}" />
+
                         <!-- Refresh Interval -->
-                        <Grid Margin="0,0,0,4">
+                        <Grid Margin="0,0,0,2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -232,6 +278,68 @@
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
                             Foreground="#89B4FA" />
+                    </StackPanel>
+                </TabItem>
+
+                <!-- ── Notifications ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Notifications}" Style="{StaticResource SettingsTabItem}">
+                    <StackPanel>
+
+                        <!-- End of day reminder -->
+                        <CheckBox Content="{DynamicResource Settings.EnableEndOfDayReminder}"
+                              IsChecked="{Binding EnableEndOfDayReminder}"
+                              Foreground="#CDD6F4"
+                              FontSize="13"
+                              Cursor="Hand"
+                              Margin="0,0,0,8" />
+                        <Grid Margin="0,0,0,16" IsEnabled="{Binding EnableEndOfDayReminder}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="80" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                   Text="{DynamicResource Settings.EndOfDayReminderMinutes}"
+                                   Foreground="#9399B2"
+                                   FontSize="12"
+                                   VerticalAlignment="Center" />
+                            <TextBox Grid.Column="2"
+                                 Text="{Binding EndOfDayReminderMinutes}"
+                                 TextAlignment="Right"
+                                 Background="#313244"
+                                 Foreground="#CDD6F4"
+                                 BorderBrush="#45475A"
+                                 BorderThickness="1"
+                                 Padding="10,8" />
+                        </Grid>
+
+                        <!-- Milestone notifications -->
+                        <CheckBox Content="{DynamicResource Settings.EnableMilestoneNotifications}"
+                              IsChecked="{Binding EnableMilestoneNotifications}"
+                              Foreground="#CDD6F4"
+                              FontSize="13"
+                              Cursor="Hand"
+                              Margin="0,0,0,8" />
+                        <Grid IsEnabled="{Binding EnableMilestoneNotifications}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="80" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                   Text="{DynamicResource Settings.MilestoneAmount}"
+                                   Foreground="#9399B2"
+                                   FontSize="12"
+                                   VerticalAlignment="Center" />
+                            <TextBox Grid.Column="2"
+                                 Text="{Binding MilestoneAmountText, UpdateSourceTrigger=PropertyChanged}"
+                                 TextAlignment="Right"
+                                 Background="#313244"
+                                 Foreground="#CDD6F4"
+                                 BorderBrush="#45475A"
+                                 BorderThickness="1"
+                                 Padding="10,8" />
+                        </Grid>
                     </StackPanel>
                 </TabItem>
 

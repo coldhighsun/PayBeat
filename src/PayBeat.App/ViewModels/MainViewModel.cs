@@ -19,6 +19,10 @@ public class MainViewModel : ViewModelBase, IDisposable
     private TimeSpan _remaining;
     private SalarySettings _settings;
     private DispatcherTimer? _wakeTimer;
+    private DateOnly _notifiedDate;
+    private decimal _nextMilestoneThreshold;
+    private bool _endOfDayReminderSent;
+    private bool _notificationsSuspended;
 
     /// <summary>
     /// Initializes a new instance of <see cref="MainViewModel"/>, loads settings, starts the refresh timer,
@@ -29,6 +33,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         _settingsService = settingsService;
         _settings = _settingsService.Load();
+        _notifiedDate = DateOnly.FromDateTime(DateTime.Now);
+        _nextMilestoneThreshold = _settings.MilestoneAmount;
 
         OpenSettingsCommand = new RelayCommand(OpenSettings);
         OpenAboutCommand = new RelayCommand(OpenAbout);
@@ -47,6 +53,9 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     /// <summary>Raised when hotkey settings change so <c>App</c> can re-register the global hotkey.</summary>
     public event Action? HotkeySettingsChanged;
+
+    /// <summary>Raised when a milestone or end-of-day reminder should be shown as a tray notification.</summary>
+    public event Action<string, string>? NotificationRequested;
 
     /// <summary>Whether the window should stay above all other windows.</summary>
     public bool AlwaysOnTop => _settings.AlwaysOnTop;
@@ -180,6 +189,12 @@ public class MainViewModel : ViewModelBase, IDisposable
         _timer.Stop();
     }
 
+    /// <summary>Resumes end-of-day/milestone tray notifications after a prior <see cref="SuspendNotifications"/> call.</summary>
+    public void ResumeNotifications() => _notificationsSuspended = false;
+
+    /// <summary>Suppresses end-of-day/milestone tray notifications while the widget is hidden.</summary>
+    public void SuspendNotifications() => _notificationsSuspended = true;
+
     /// <summary>
     /// Reloads settings from disk and notifies all bound properties. Called by
     /// <see cref="SettingsViewModel"/> after the user saves changes.
@@ -206,6 +221,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             _timer.Start();
         }
+        _nextMilestoneThreshold = _settings.MilestoneAmount;
+        _endOfDayReminderSent = false;
         HotkeySettingsChanged?.Invoke();
         Refresh();
     }
@@ -259,16 +276,55 @@ public class MainViewModel : ViewModelBase, IDisposable
     private void Refresh()
     {
         var now = DateTime.Now;
+
+        var today = DateOnly.FromDateTime(now);
+        if (today != _notifiedDate)
+        {
+            _notifiedDate = today;
+            _nextMilestoneThreshold = _settings.MilestoneAmount;
+            _endOfDayReminderSent = false;
+        }
+
         Earned = EarningsCalculator.Calculate(_settings, now);
         Progress = EarningsCalculator.WorkdayProgress(_settings, now);
         Elapsed = EarningsCalculator.Elapsed(_settings, now);
         Remaining = EarningsCalculator.Remaining(_settings, now);
+
+        CheckNotifications(now);
 
         var current = TimeOnly.FromDateTime(now);
         if (current <= _settings.WorkStart || current >= _settings.WorkEnd)
         {
             _timer.Stop();
             ScheduleWakeTimer(now);
+        }
+    }
+
+    private void CheckNotifications(DateTime now)
+    {
+        if (_notificationsSuspended || !EarningsCalculator.IsWorkday(_settings, now))
+        {
+            return;
+        }
+
+        if (_settings.EnableMilestoneNotifications && _settings.MilestoneAmount > 0)
+        {
+            while (Earned >= _nextMilestoneThreshold)
+            {
+                NotificationRequested?.Invoke(
+                    LocalizationService.Get("Notification.MilestoneTitle"),
+                    string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{_nextMilestoneThreshold:N2}"));
+                _nextMilestoneThreshold += _settings.MilestoneAmount;
+            }
+        }
+
+        if (_settings.EnableEndOfDayReminder && !_endOfDayReminderSent
+            && Remaining > TimeSpan.Zero && Remaining <= TimeSpan.FromMinutes(_settings.EndOfDayReminderMinutes))
+        {
+            _endOfDayReminderSent = true;
+            NotificationRequested?.Invoke(
+                LocalizationService.Get("Notification.EndOfDayTitle"),
+                string.Format(LocalizationService.Get("Notification.EndOfDayBody"), _settings.EndOfDayReminderMinutes));
         }
     }
 
