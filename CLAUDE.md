@@ -38,6 +38,10 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 - The tray icon (`TrayIconService`) uses **WinForms** `NotifyIcon` + `ContextMenuStrip` hosted inside the WPF app — any changes must account for the WinForms/WPF interop boundary.
 - `HotkeyService` uses Win32 `RegisterHotKey`/`UnregisterHotKey` P/Invoke; it supports `Suspend()`/`Resume()` to avoid conflicts while the settings window captures key input.
 - `ScreenHelper` uses Win32 P/Invoke for multi-monitor position restore (matches by device name, falls back to nearest monitor).
+- `TopmostHelper` periodically re-asserts the window's topmost z-order via Win32 `SetWindowPos` P/Invoke, working around other apps that steal focus.
+- `ForegroundWatcher` monitors the active foreground window via a Win32 event hook to trigger topmost re-assertion when another window takes focus.
+- `StartupService` manages the Windows startup registry entry (`HKCU\...\Run`) for the "Run at startup" setting.
+- `LocalizationService` handles runtime language switching by swapping `ResourceDictionary` entries in `MergedDictionaries`.
 - Localization: `Strings.en.xaml` / `Strings.zh-CN.xaml` are swapped into `MergedDictionaries` at startup; UI strings use `{DynamicResource}`. `"auto"` resolves from `CultureInfo.CurrentUICulture`.
 
 **Models:**
@@ -48,9 +52,11 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 
 ## Solution Configuration
 
+There is no `.sln` file — build and run via the project path directly.
+
 | File | Purpose |
 |------|---------|
-| `Directory.Build.props` | Shared build properties: `TargetFramework`, `Nullable`, `LangVersion`, `UseArtifactsOutput` |
+| `Directory.Build.props` | Shared build properties: `Nullable`, `ImplicitUsings`, `LangVersion`, `UseArtifactsOutput`, `TreatWarningsAsErrors`, `SatelliteResourceLanguages` (en;zh-CN), `DebugType=embedded`, `MinVerTagPrefix=v`. Imports optional `Directory.Build.user` for local overrides. |
 | `Directory.Packages.props` | Central package versions (`ManagePackageVersionsCentrally=true`) |
 | `nuget.config` | Restricts package sources to nuget.org only (`<clear/>` overrides global config) |
 
