@@ -36,7 +36,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ github.ref_name }}"
-          $zipName = "PayBeat-$version-win-x64.zip"
+          $zipName = "PayBeat-$version-portable-win-x64.zip"
           Compress-Archive -Path "publish/*" -DestinationPath $zipName
           echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
 

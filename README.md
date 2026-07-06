@@ -47,11 +47,11 @@ dotnet build
 # Run
 dotnet run --project src/PayBeat.App/PayBeat.App.csproj
 
-# Publish (single file)
+# Publish (portable)
 dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 ```
 
-Output goes to `artifacts/bin/PayBeat.App/release/`.
+Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-<version>-portable-win-x64.zip` release artifact.
 
 ## Usage
 
@@ -125,11 +125,11 @@ dotnet build
 # 运行
 dotnet run --project src/PayBeat.App/PayBeat.App.csproj
 
-# 发布（单文件）
+# 发布（便携版）
 dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 ```
 
-产物输出至 `artifacts/bin/PayBeat.App/release/`。
+产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会生成 `PayBeat-<version>-portable-win-x64.zip` 发布包。
 
 ## 使用
 
