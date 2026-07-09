@@ -1,3 +1,4 @@
+using PayBeat.Core.Models;
 using PayBeat.App.Helpers;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -7,8 +8,8 @@ namespace PayBeat.App.Views;
 /// <summary>
 /// Borderless, always-on-top floating widget window. Hosts a <c>ContentControl</c> that switches
 /// between <see cref="NormalView"/>, <see cref="MiniView"/>, and
-/// <see cref="FlexView"/> based on the active <see cref="Models.DisplayMode"/>. Supports drag-to-move
-/// and opacity fade when idle. In <see cref="Models.DisplayMode.Flex"/>, dragging is still allowed so the
+/// <see cref="FlexView"/> based on the active <see cref="DisplayMode"/>. Supports drag-to-move
+/// and opacity fade when idle. In <see cref="DisplayMode.Flex"/>, dragging is still allowed so the
 /// user can move the fullscreen widget to another monitor; on mouse release it re-fills whichever
 /// monitor it was dropped on.
 /// </summary>
@@ -35,13 +36,13 @@ public partial class MainWindow
 
             // DragMove() blocks until the mouse button is released, so by the time it returns the
             // window may have landed on a different monitor - re-fill it there for Flex mode.
-            if (DataContext is ViewModels.MainViewModel vm && vm.DisplayMode == Models.DisplayMode.Flex)
+            if (DataContext is ViewModels.MainViewModel vm && vm.DisplayMode == DisplayMode.Flex)
             {
                 ApplyFlexBounds();
             }
         };
-        _foregroundWatcher = new ForegroundWatcher(ReassertTopmost);
-        Closing += (_, _) => LastKnownPosition = new Models.WindowPosition(Left, Top, ScreenHelper.GetCurrentScreenDeviceName(this));
+        _foregroundWatcher = new(ReassertTopmost);
+        Closing += (_, _) => LastKnownPosition = new(Left, Top, ScreenHelper.GetCurrentScreenDeviceName(this));
         Closed += (_, _) => _foregroundWatcher.Dispose();
     }
 
@@ -60,14 +61,14 @@ public partial class MainWindow
     /// <c>App.OnExit</c> can no longer resolve the current monitor by then - it must use this cached
     /// snapshot, taken in the <see cref="Window.Closing"/> handler, instead.
     /// </summary>
-    public Models.WindowPosition? LastKnownPosition
+    public WindowPosition? LastKnownPosition
     {
         get; private set;
     }
 
     /// <summary>
     /// Resizes and repositions the window to exactly cover <paramref name="targetBounds"/>, or the
-    /// monitor it is currently on if not specified, for <see cref="Models.DisplayMode.Flex"/>.
+    /// monitor it is currently on if not specified, for <see cref="DisplayMode.Flex"/>.
     /// Switches <see cref="SizeToContent"/> to <c>Manual</c> since the window normally auto-sizes to its content.
     /// </summary>
     public void ApplyFlexBounds(Rect? targetBounds = null)
@@ -163,7 +164,7 @@ public partial class MainWindow
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && DataContext is ViewModels.MainViewModel { DisplayMode: Models.DisplayMode.Flex } vm)
+        if (e.Key == Key.Escape && DataContext is ViewModels.MainViewModel { DisplayMode: DisplayMode.Flex } vm)
         {
             // Capture the screen bounds now, while still fullscreen on it, since after switching
             // to Normal the window may briefly report stale ActualWidth/Height until the next layout pass.
@@ -196,7 +197,7 @@ public partial class MainWindow
             return;
         }
 
-        if (DataContext is ViewModels.MainViewModel { DisplayMode: Models.DisplayMode.Flex })
+        if (DataContext is ViewModels.MainViewModel { DisplayMode: DisplayMode.Flex })
         {
             return;
         }
@@ -221,11 +222,11 @@ public partial class MainWindow
 
         if (e.PropertyName == nameof(ViewModels.MainViewModel.DisplayMode) && sender is ViewModels.MainViewModel vm)
         {
-            if (vm.DisplayMode == Models.DisplayMode.None)
+            if (vm.DisplayMode == DisplayMode.None)
             {
                 Hide();
             }
-            else if (vm.DisplayMode == Models.DisplayMode.Flex)
+            else if (vm.DisplayMode == DisplayMode.Flex)
             {
                 if (!IsVisible)
                 {

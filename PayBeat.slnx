@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/PayBeat.App/PayBeat.App.csproj" />
+    <Project Path="src/PayBeat.Core/PayBeat.Core.csproj" />
+    <Project Path="src/PayBeat.WinUI/PayBeat.WinUI.csproj" />
   </Folder>
   <Folder Name="/assets/">
     <File Path="CLAUDE.md" />

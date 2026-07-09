@@ -1,6 +1,6 @@
 using Microsoft.Win32;
 
-namespace PayBeat.App.Services;
+namespace PayBeat.Core.Services;
 
 /// <summary>
 /// Manages the Windows auto-startup registry entry for PayBeat under

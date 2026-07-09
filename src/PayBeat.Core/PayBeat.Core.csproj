@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--
+      Pinned to WinUI's exact TargetPlatformVersion (rather than an unversioned net10.0-windows)
+      so this is never the higher-versioned side of a project reference: both PayBeat.App
+      (net10.0-windows, unversioned - resolves to whatever Windows SDK is installed) and
+      PayBeat.WinUI (net10.0-windows10.0.19041.0) must reference a library whose platform
+      version is less than or equal to their own.
+    -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <RootNamespace>PayBeat.Core</RootNamespace>
+  </PropertyGroup>
+
+</Project>

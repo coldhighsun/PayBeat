@@ -1,12 +1,10 @@
-using PayBeat.App.Services;
-using PayBeat.App.Views;
+using PayBeat.WinUI.Services;
 using PayBeat.Core.Helpers;
 using PayBeat.Core.Models;
 using PayBeat.Core.Services;
 using PayBeat.Core.ViewModels;
-using System.ComponentModel;
 
-namespace PayBeat.App.ViewModels;
+namespace PayBeat.WinUI.ViewModels;
 
 /// <summary>Represents a language choice shown in the settings language dropdown.</summary>
 /// <param name="Code">Language code stored in settings (e.g. <c>"en"</c>, <c>"zh-CN"</c>, <c>"auto"</c>).</param>
@@ -16,8 +14,11 @@ public record LanguageOption(string Code, string Name);
 /// <summary>
 /// View model for the settings window. Validates and saves user preferences,
 /// then calls <see cref="MainViewModel.ReloadSettings"/> to apply changes immediately.
+/// WinUI3 has no equivalent to WPF's <c>IDataErrorInfo</c>-driven per-field bubble popups, so all
+/// validation errors surface through the single <see cref="ErrorMessage"/> instead of the WPF
+/// build's mix of bubble popups (salary/milestone/minutes) plus a bottom error line (schedule).
 /// </summary>
-public class SettingsViewModel : ViewModelBase, IDataErrorInfo
+public class SettingsViewModel : ViewModelBase
 {
     private readonly MainViewModel _mainVm;
     private readonly SettingsService _service;
@@ -28,6 +29,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     private bool _enableEndOfDayReminder;
     private bool _enableMilestoneNotifications;
     private string _endOfDayReminderMinutesText;
+    private string _errorMessage = string.Empty;
     private int _hotkeyModifiers;
     private int _hotkeyVirtualKey;
     private string _language;
@@ -76,8 +78,11 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         _milestoneAmountText = s.MilestoneAmount.ToString("G29");
 
         SaveCommand = new RelayCommand(Save, CanSave);
-        CancelCommand = new RelayCommand(CloseWindow);
+        CancelCommand = new RelayCommand(() => CloseRequested?.Invoke());
     }
+
+    /// <summary>Raised when the window should close, either via Cancel or after a successful Save.</summary>
+    public event Action? CloseRequested;
 
     /// <summary>Binds to the Always on Top checkbox in the settings window.</summary>
     public bool AlwaysOnTop
@@ -91,8 +96,8 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         get;
     } =
-        [
-        new("auto", "Auto"),
+    [
+        new("auto", LocalizationService.Instance["Settings.LanguageAuto"]),
         new("en", "English"),
         new("zh-CN", "中文"),
     ];
@@ -175,15 +180,12 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Unused; per-field errors are reported via the indexer instead.</summary>
-    string IDataErrorInfo.Error => string.Empty;
-
     /// <summary>Validation error message shown below the Save button; empty string when there is no error.</summary>
     public string ErrorMessage
     {
-        get;
-        private set => SetField(ref field, value);
-    } = string.Empty;
+        get => _errorMessage;
+        private set => SetField(ref _errorMessage, value);
+    }
 
     /// <summary>Human-readable hotkey string (e.g. <c>Ctrl+Alt+X</c>) shown in the hotkey field.</summary>
     public string HotkeyDisplayText => HotkeyService.Format(HotkeyModifiers, HotkeyVirtualKey);
@@ -377,37 +379,12 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Per-field validation error shown as a bubble popup next to the offending input.</summary>
-    string IDataErrorInfo.this[string columnName] => columnName switch
-    {
-        nameof(DailySalaryText) => ValidateDailySalary() ?? string.Empty,
-        nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() ?? string.Empty : string.Empty,
-        nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() ?? string.Empty : string.Empty,
-        _ => string.Empty,
-    };
-
     private bool CanSave() => Validate() is null;
 
-    private void CloseWindow()
-    {
-        foreach (Window w in Application.Current.Windows)
-        {
-            if (w is SettingsWindow)
-            {
-                w.Close();
-                break;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Updates the bottom-of-window error message and Save availability. Only schedule-related errors are
-    /// shown here — the daily salary, milestone amount, and reminder minutes fields report their own errors
-    /// via a bubble popup next to the field instead.
-    /// </summary>
+    /// <summary>Updates the error message shown below the Save button and re-evaluates <see cref="SaveCommand"/> availability.</summary>
     private void Revalidate()
     {
-        ErrorMessage = ValidateSchedule() ?? string.Empty;
+        ErrorMessage = Validate() ?? string.Empty;
         ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
     }
 
@@ -415,7 +392,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         if (Validate() is not null)
         {
-            ErrorMessage = ValidateSchedule() ?? string.Empty;
+            ErrorMessage = Validate() ?? string.Empty;
             return;
         }
 
@@ -450,10 +427,10 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
 
         _service.Save(settings);
         StartupService.SetEnabled(_runAtStartup);
-        LocalizationService.Apply(Language);
+        LocalizationService.Instance.Apply(Language);
         _mainVm.ReloadSettings();
 
-        CloseWindow();
+        CloseRequested?.Invoke();
     }
 
     /// <summary>Validates all fields and returns the first error message, or <see langword="null"/> when everything is valid.</summary>
@@ -494,11 +471,11 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         if (!decimal.TryParse(_dailySalaryText, out var salary) || salary <= 0)
         {
-            return LocalizationService.Get("Error.SalaryPositive");
+            return LocalizationService.Instance["Error.SalaryPositive"];
         }
         if (salary > SalarySettings.MaxDailySalary)
         {
-            return LocalizationService.Get("Error.SalaryTooLarge");
+            return LocalizationService.Instance["Error.SalaryTooLarge"];
         }
 
         return null;
@@ -507,9 +484,9 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     /// <summary>Validates <see cref="EndOfDayReminderMinutesText"/>; returns <see langword="null"/> when valid.</summary>
     private string? ValidateEndOfDayReminderMinutes()
     {
-        if (!int.TryParse(_endOfDayReminderMinutesText, out var minutes) || minutes < 1 || minutes > 60)
+        if (!int.TryParse(_endOfDayReminderMinutesText, out var minutes) || minutes < 0 || minutes > 60)
         {
-            return LocalizationService.Get("Error.EndOfDayReminderMinutesInvalid");
+            return LocalizationService.Instance["Error.EndOfDayReminderMinutesInvalid"];
         }
 
         return null;
@@ -520,11 +497,11 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         if (!decimal.TryParse(_milestoneAmountText, out var milestone) || milestone <= 0)
         {
-            return LocalizationService.Get("Error.MilestoneAmountPositive");
+            return LocalizationService.Instance["Error.MilestoneAmountPositive"];
         }
         if (decimal.TryParse(_dailySalaryText, out var daily) && milestone > daily)
         {
-            return LocalizationService.Get("Error.MilestoneAmountTooLarge");
+            return LocalizationService.Instance["Error.MilestoneAmountTooLarge"];
         }
 
         return null;
@@ -535,11 +512,11 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         if (WorkStart >= WorkEnd)
         {
-            return LocalizationService.Get("Error.WorkEndAfterStart");
+            return LocalizationService.Instance["Error.WorkEndAfterStart"];
         }
         if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
         {
-            return LocalizationService.Get("Error.LunchBreakInvalid");
+            return LocalizationService.Instance["Error.LunchBreakInvalid"];
         }
 
         return null;

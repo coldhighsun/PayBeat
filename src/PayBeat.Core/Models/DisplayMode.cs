@@ -1,4 +1,4 @@
-namespace PayBeat.App.Models;
+namespace PayBeat.Core.Models;
 
 /// <summary>
 /// Represents the widget display modes, each with its own view template and saved window position.

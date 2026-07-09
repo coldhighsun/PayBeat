@@ -1,0 +1,80 @@
+<helpers:AutoSizingWindow
+    x:Class="PayBeat.WinUI.Views.AboutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="using:PayBeat.WinUI.Helpers">
+
+    <Grid x:Name="RootGrid"
+          Background="{StaticResource BaseBrush}">
+
+        <Border BorderBrush="{StaticResource OverlayBrush}"
+                BorderThickness="1">
+            <StackPanel Margin="28,24">
+
+                <StackPanel HorizontalAlignment="Center" Margin="0,10,0,20">
+                    <Image Source="/Resources/Icons/PayBeat.ico"
+                           Width="96" Height="96"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,12" />
+                    <TextBlock Text="PayBeat"
+                               Foreground="{StaticResource TextBrush}"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock x:Name="VersionText"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="{x:Bind DescriptionLabel, Mode=OneWay}"
+                           Foreground="{StaticResource SubtextBrush}"
+                           FontSize="13"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20" />
+
+                <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,0,0,16" />
+
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Bind AuthorLabel, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" FontSize="12" />
+                    <TextBlock Grid.Column="1" Text="coldhighsun" Foreground="{StaticResource TextBrush}" FontSize="12" />
+                </Grid>
+
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Bind LicenseLabel, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" FontSize="12" />
+                    <TextBlock Grid.Column="1" Text="MIT" Foreground="{StaticResource TextBrush}" FontSize="12" />
+                </Grid>
+
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Bind GitHubLabel, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" FontSize="12" />
+                    <HyperlinkButton Grid.Column="1"
+                                     Content="https://github.com/coldhighsun/PayBeat"
+                                     NavigateUri="https://github.com/coldhighsun/PayBeat"
+                                     Padding="0"
+                                     FontSize="12" />
+                </Grid>
+
+                <Button Content="{x:Bind CloseLabel, Mode=OneWay}"
+                        HorizontalAlignment="Center"
+                        Padding="32,10"
+                        Click="CloseButton_Click" />
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</helpers:AutoSizingWindow>

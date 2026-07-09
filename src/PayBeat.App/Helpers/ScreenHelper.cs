@@ -119,7 +119,7 @@ internal static class ScreenHelper
 
     private static IntPtr GetPrimaryMonitor()
     {
-        return MonitorFromPoint(new POINT { X = 0, Y = 0 }, MonitorDefaultToNearest);
+        return MonitorFromPoint(new() { X = 0, Y = 0 }, MonitorDefaultToNearest);
     }
 
     private static Rect GetScreenBoundsWpf(IntPtr hMonitor, Visual visual)
@@ -127,7 +127,7 @@ internal static class ScreenHelper
         var info = GetMonitorInfoEx(hMonitor);
         var dpi = GetDpiScale(visual);
         var r = info.rcMonitor;
-        return new Rect(
+        return new(
             r.Left / dpi.X,
             r.Top / dpi.Y,
             (r.Right - r.Left) / dpi.X,

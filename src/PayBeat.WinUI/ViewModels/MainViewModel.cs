@@ -1,20 +1,24 @@
-using PayBeat.App.Services;
-using PayBeat.App.Views;
+using Microsoft.UI.Xaml;
+using PayBeat.WinUI.Services;
 using PayBeat.Core.Helpers;
 using PayBeat.Core.Models;
 using PayBeat.Core.Services;
 using PayBeat.Core.ViewModels;
 
-namespace PayBeat.App.ViewModels;
+namespace PayBeat.WinUI.ViewModels;
 
 /// <summary>
 /// Primary view model for the floating widget. Owns the refresh timer, drives earned/progress
-/// state, and exposes commands for display mode switching and settings.
+/// state, and exposes commands for display mode switching and settings. <c>MainWindow</c> reacts
+/// to <see cref="DisplayMode"/> property-change notifications to drive its own AppWindow chrome,
+/// mirroring the WPF build's <c>OnVmPropertyChanged</c> pattern - this view model has no knowledge
+/// of window mechanics.
 /// </summary>
 public class MainViewModel : ViewModelBase, IDisposable
 {
     private readonly SettingsService _settingsService;
     private readonly DispatcherTimer _timer;
+    private Views.AboutWindow? _aboutWindow;
     private decimal _earned;
     private TimeSpan _elapsed;
     private bool _endOfDayReminderSent;
@@ -24,6 +28,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     private double _progress;
     private TimeSpan _remaining;
     private SalarySettings _settings;
+    private Views.SettingsWindow? _settingsWindow;
     private DispatcherTimer? _wakeTimer;
 
     /// <summary>
@@ -40,18 +45,24 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         OpenSettingsCommand = new RelayCommand(OpenSettings);
         OpenAboutCommand = new RelayCommand(OpenAbout);
-        ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
+        ExitCommand = new RelayCommand(() => ExitRequested?.Invoke());
         SetNormalModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Normal));
         SetMiniModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Mini));
         SetNoneModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.None));
         SetFlexModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Flex));
 
-        _timer = new() { Interval = TimeSpan.FromSeconds(_settings.RefreshInterval) };
+        _timer = new()
+        {
+            Interval = TimeSpan.FromSeconds(_settings.RefreshInterval)
+        };
         _timer.Tick += (_, _) => Refresh();
         _timer.Start();
 
         Refresh();
     }
+
+    /// <summary>Raised when the Exit command is invoked; <c>App</c> owns actual process shutdown.</summary>
+    public event Action? ExitRequested;
 
     /// <summary>Raised when hotkey settings change so <c>App</c> can re-register the global hotkey.</summary>
     public event Action? HotkeySettingsChanged;
@@ -68,6 +79,12 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// <summary>Configured daily salary used only for display purposes in the settings summary.</summary>
     public decimal DailySalary => _settings.DailySalary;
 
+    /// <summary>
+    /// <see cref="DailySalary"/> formatted as <c>N2</c>. WinUI3's classic <c>{Binding}</c> has no
+    /// <c>StringFormat</c> (unlike WPF), so views bind to this instead of formatting inline.
+    /// </summary>
+    public string DailySalaryFormatted => DailySalary.ToString("N2");
+
     /// <summary>Currently active display mode; drives the view template selection in <c>MainWindow</c>.</summary>
     public DisplayMode DisplayMode => _settings.DisplayMode;
 
@@ -83,8 +100,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     }
 
     /// <summary>Earned amount formatted as <c>{Currency}{Amount:N2}</c> (e.g. <c>¥123.45</c>).</summary>
-    public string EarnedFormatted =>
-        $"{_settings.Currency}{Earned:N2}";
+    public string EarnedFormatted => $"{_settings.Currency}{Earned:N2}";
 
     /// <summary>Time elapsed since work start, clamped to the workday window. Setting this also notifies <see cref="ElapsedFormatted"/>.</summary>
     public TimeSpan Elapsed
@@ -137,8 +153,15 @@ public class MainViewModel : ViewModelBase, IDisposable
     public double Progress
     {
         get => _progress;
-        private set => SetField(ref _progress, value);
+        private set
+        {
+            SetField(ref _progress, value);
+            OnPropertyChanged(nameof(ProgressFormatted));
+        }
     }
+
+    /// <summary><see cref="Progress"/> formatted as a percentage, e.g. <c>42.00%</c>.</summary>
+    public string ProgressFormatted => Progress.ToString("P2");
 
     /// <summary>Time remaining until work end, clamped to the workday window. Setting this also notifies <see cref="RemainingFormatted"/>.</summary>
     public TimeSpan Remaining
@@ -181,8 +204,14 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// <summary>Work day end time, exposed for display in the settings summary.</summary>
     public TimeOnly WorkEnd => _settings.WorkEnd;
 
+    /// <summary><see cref="WorkEnd"/> formatted as <c>HH:mm</c>; see <see cref="DailySalaryFormatted"/> for why.</summary>
+    public string WorkEndFormatted => WorkEnd.ToString("HH:mm");
+
     /// <summary>Work day start time, exposed for display in the settings summary.</summary>
     public TimeOnly WorkStart => _settings.WorkStart;
+
+    /// <summary><see cref="WorkStart"/> formatted as <c>HH:mm</c>; see <see cref="DailySalaryFormatted"/> for why.</summary>
+    public string WorkStartFormatted => WorkStart.ToString("HH:mm");
 
     /// <inheritdoc/>
     public void Dispose()
@@ -200,8 +229,11 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         _settings = _settingsService.Load();
         OnPropertyChanged(nameof(WorkStart));
+        OnPropertyChanged(nameof(WorkStartFormatted));
         OnPropertyChanged(nameof(WorkEnd));
+        OnPropertyChanged(nameof(WorkEndFormatted));
         OnPropertyChanged(nameof(DailySalary));
+        OnPropertyChanged(nameof(DailySalaryFormatted));
         OnPropertyChanged(nameof(Currency));
         OnPropertyChanged(nameof(DisplayMode));
         OnPropertyChanged(nameof(AlwaysOnTop));
@@ -229,17 +261,6 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// <summary>Suppresses end-of-day/milestone tray notifications while the widget is hidden.</summary>
     public void SuspendNotifications() => _notificationsSuspended = true;
 
-    // MainWindow stays pinned to HWND_TOPMOST while AlwaysOnTop is on (see TopmostHelper),
-    // which would otherwise bury this dialog behind it in fullscreen Flex mode.
-    private static void ApplyTopmostIfNeeded(Window win)
-    {
-        if (Application.Current.MainWindow is { Topmost: true } mainWindow)
-        {
-            win.Owner = mainWindow;
-            win.Topmost = true;
-        }
-    }
-
     private void CheckNotifications(DateTime now)
     {
         if (_notificationsSuspended || !EarningsCalculator.IsWorkday(_settings, now))
@@ -252,8 +273,8 @@ public class MainViewModel : ViewModelBase, IDisposable
             while (Earned >= _nextMilestoneThreshold)
             {
                 NotificationRequested?.Invoke(
-                    LocalizationService.Get("Notification.MilestoneTitle"),
-                    string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{_nextMilestoneThreshold:N2}"));
+                    LocalizationService.Instance["Notification.MilestoneTitle"],
+                    string.Format(LocalizationService.Instance["Notification.MilestoneBody"], $"{_settings.Currency}{_nextMilestoneThreshold:N2}"));
                 _nextMilestoneThreshold += _settings.MilestoneAmount;
             }
         }
@@ -263,44 +284,35 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             _endOfDayReminderSent = true;
             NotificationRequested?.Invoke(
-                LocalizationService.Get("Notification.EndOfDayTitle"),
-                string.Format(LocalizationService.Get("Notification.EndOfDayBody"), _settings.EndOfDayReminderMinutes));
+                LocalizationService.Instance["Notification.EndOfDayTitle"],
+                string.Format(LocalizationService.Instance["Notification.EndOfDayBody"], _settings.EndOfDayReminderMinutes));
         }
     }
 
     private void OpenAbout()
     {
-        foreach (Window w in Application.Current.Windows)
+        if (_aboutWindow != null)
         {
-            if (w is AboutWindow existing)
-            {
-                existing.Activate();
-                return;
-            }
+            _aboutWindow.Activate();
+            return;
         }
 
-        var win = new AboutWindow();
-        ApplyTopmostIfNeeded(win);
-        win.Show();
+        _aboutWindow = new();
+        _aboutWindow.Closed += (_, _) => _aboutWindow = null;
+        _aboutWindow.Activate();
     }
 
     private void OpenSettings()
     {
-        foreach (Window w in Application.Current.Windows)
+        if (_settingsWindow != null)
         {
-            if (w is SettingsWindow existing)
-            {
-                existing.Activate();
-                return;
-            }
+            _settingsWindow.Activate();
+            return;
         }
 
-        var win = new SettingsWindow
-        {
-            DataContext = new SettingsViewModel(_settingsService, this)
-        };
-        ApplyTopmostIfNeeded(win);
-        win.Show();
+        _settingsWindow = new(new(_settingsService, this));
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Activate();
     }
 
     private void Refresh()
@@ -340,7 +352,10 @@ public class MainViewModel : ViewModelBase, IDisposable
             : now.Date.AddDays(1) + _settings.WorkStart.ToTimeSpan();
 
         var delay = nextStart - now;
-        _wakeTimer = new() { Interval = delay };
+        _wakeTimer = new()
+        {
+            Interval = delay
+        };
         _wakeTimer.Tick += (_, _) =>
         {
             _wakeTimer!.Stop();

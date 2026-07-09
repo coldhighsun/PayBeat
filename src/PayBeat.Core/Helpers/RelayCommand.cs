@@ -1,4 +1,4 @@
-namespace PayBeat.App.Helpers;
+namespace PayBeat.Core.Helpers;
 
 /// <summary>
 /// Minimal <see cref="ICommand"/> implementation that delegates execution and availability

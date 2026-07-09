@@ -1,6 +1,6 @@
-using PayBeat.App.Models;
+using PayBeat.Core.Models;
 
-namespace PayBeat.App.Services;
+namespace PayBeat.Core.Services;
 
 /// <summary>
 /// Loads and saves <see cref="SalarySettings"/> as JSON at <c>%APPDATA%\PayBeat\settings.json</c>.
@@ -27,7 +27,7 @@ public class SettingsService
     {
         if (!File.Exists(FilePath))
         {
-            return new SalarySettings();
+            return new();
         }
         try
         {
@@ -37,7 +37,7 @@ public class SettingsService
         catch
         {
             BackupCorruptFile();
-            return new SalarySettings();
+            return new();
         }
     }
 

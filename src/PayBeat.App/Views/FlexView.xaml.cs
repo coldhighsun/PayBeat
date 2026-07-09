@@ -5,7 +5,7 @@ namespace PayBeat.App.Views;
 
 /// <summary>
 /// Fullscreen "show-off" widget view: a huge earnings figure with a decorative animated
-/// background, glow pulse, and full workday stats. Used only by <see cref="Models.DisplayMode.Flex"/>.
+/// background, glow pulse, and full workday stats. Used only by <see cref="PayBeat.Core.Models.DisplayMode.Flex"/>.
 /// </summary>
 public partial class FlexView
 {

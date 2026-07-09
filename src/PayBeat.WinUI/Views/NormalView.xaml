@@ -1,0 +1,69 @@
+<UserControl Background="Transparent"
+    x:Class="PayBeat.WinUI.Views.NormalView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Width="270">
+
+        <Border x:Name="BackgroundBorder"
+                Background="{StaticResource BaseBrush}"
+                BorderBrush="{StaticResource OverlayBrush}"
+                BorderThickness="1" />
+
+        <StackPanel Margin="20,18">
+
+            <!-- Header -->
+            <TextBlock Text="PayBeat"
+                       Foreground="{StaticResource SubtextBrush}"
+                       FontSize="12"
+                       FontWeight="SemiBold" />
+
+            <!-- Earned amount -->
+            <TextBlock Text="{Binding EarnedFormatted}"
+                       Foreground="{StaticResource GreenBrush}"
+                       FontSize="40"
+                       FontWeight="Bold"
+                       Margin="0,6,0,0" />
+
+            <!-- Progress bar -->
+            <ProgressBar Value="{Binding Progress, Mode=OneWay}"
+                         Minimum="0" Maximum="1"
+                         Margin="0,14,0,8" />
+
+            <!-- Time range -->
+            <Grid Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="{x:Bind WorkStartLabel, Mode=OneWay}" Foreground="{StaticResource SubtextBrush}" FontSize="11" />
+                    <TextBlock Text="{Binding WorkStartFormatted}" Foreground="{StaticResource SubtextBrush}" FontSize="11" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="{x:Bind WorkEndLabel, Mode=OneWay}" Foreground="{StaticResource SubtextBrush}" FontSize="11" />
+                    <TextBlock Text="{Binding WorkEndFormatted}" Foreground="{StaticResource SubtextBrush}" FontSize="11" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Separator -->
+            <Border Height="1" Background="{StaticResource SurfaceBrush}" Margin="0,4,0,10" />
+
+            <!-- Daily total -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{x:Bind DailySalaryLabel, Mode=OneWay}"
+                           Foreground="{StaticResource MutedBrush}"
+                           FontSize="11" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="{Binding Currency}" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                    <TextBlock Text="{Binding DailySalaryFormatted}" Foreground="{StaticResource MutedBrush}" FontSize="11" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</UserControl>

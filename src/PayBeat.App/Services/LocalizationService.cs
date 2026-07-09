@@ -30,7 +30,7 @@ public static class LocalizationService
         }
 
         var uri = new Uri(resolved == "zh-CN" ? ZhUri : EnUri);
-        dicts.Add(new ResourceDictionary { Source = uri });
+        dicts.Add(new() { Source = uri });
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-namespace PayBeat.App.Models;
+namespace PayBeat.Core.Models;
 
 /// <summary>
 /// Immutable user configuration record persisted to <c>%APPDATA%\PayBeat\settings.json</c>.

@@ -1,4 +1,4 @@
-namespace PayBeat.App.Models;
+namespace PayBeat.Core.Models;
 
 /// <summary>
 /// Stores a saved window position together with the device name of the screen it was last on,

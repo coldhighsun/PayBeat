@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace PayBeat.App.Helpers;
+namespace PayBeat.WinUI.Helpers;
 
 /// <summary>
 /// Watches for foreground-window changes (e.g. clicking the taskbar or another app) via a
@@ -16,27 +16,27 @@ internal sealed class ForegroundWatcher : IDisposable
     // reference to it.
     private readonly WinEventDelegate _callback;
 
-    private readonly IntPtr _hook;
+    private readonly nint _hook;
 
     public ForegroundWatcher(Action onForegroundChanged)
     {
         _callback = (_, _, _, _, _, _, _) => onForegroundChanged();
-        _hook = SetWinEventHook(EventSystemForeground, EventSystemForeground, IntPtr.Zero, _callback, 0, 0, WinEventOutOfContext);
+        _hook = SetWinEventHook(EventSystemForeground, EventSystemForeground, 0, _callback, 0, 0, WinEventOutOfContext);
     }
 
-    private delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime);
+    private delegate void WinEventDelegate(nint hWinEventHook, uint eventType, nint hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime);
 
     public void Dispose()
     {
-        if (_hook != IntPtr.Zero)
+        if (_hook != 0)
         {
             UnhookWinEvent(_hook);
         }
     }
 
     [DllImport("user32.dll")]
-    private static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+    private static extern nint SetWinEventHook(uint eventMin, uint eventMax, nint hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
     [DllImport("user32.dll")]
-    private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
+    private static extern bool UnhookWinEvent(nint hWinEventHook);
 }

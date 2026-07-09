@@ -118,7 +118,7 @@ public partial class SettingsWindow
         {
             _hotkeyCommitted = false;
             _isCapturing = false;
-            box.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            box.MoveFocus(new(FocusNavigationDirection.Next));
             return;
         }
 
@@ -169,7 +169,7 @@ public partial class SettingsWindow
         SetHotkeyBoxCapturingStyle(box, false);
         ((App)Application.Current).ResumeHotkey();
 
-        box.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        box.MoveFocus(new(FocusNavigationDirection.Next));
     }
 
     private void Salary_Pasting(object sender, DataObjectPastingEventArgs e)
@@ -236,7 +236,7 @@ public partial class SettingsWindow
         {
             _hotkeyCommitted = false;
             _isCapturing = false;
-            HotkeyBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            HotkeyBox.MoveFocus(new(FocusNavigationDirection.Next));
         }
     }
 }

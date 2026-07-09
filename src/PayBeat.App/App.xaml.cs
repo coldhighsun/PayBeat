@@ -1,16 +1,15 @@
 using PayBeat.App.Helpers;
-using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
+using PayBeat.Core.Models;
+using PayBeat.Core.Services;
 using System.Windows.Interop;
 
 namespace PayBeat.App;
 
 /// <summary>
-/// Application entry point. Owns the top-level object graph: <see cref="Services.SettingsService"/>,
-/// <see cref="ViewModels.MainViewModel"/>, <see cref="Views.MainWindow"/>, and <see cref="Services.HotkeyService"/>.
-/// Saves window position to settings on exit and manages hotkey suspension while the settings window is open.
+/// Interaction logic for App.xaml 
 /// </summary>
 public partial class App
 {
@@ -65,12 +64,12 @@ public partial class App
     {
         base.OnStartup(e);
 
-        _settingsService = new SettingsService();
+        _settingsService = new();
         var settings = _settingsService.Load();
         _startupSettings = settings;
         LocalizationService.Apply(settings.Language);
 
-        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
+        _singleInstanceMutex = new(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
         if (!createdNew)
         {
             MessageBox.Show(
@@ -81,14 +80,14 @@ public partial class App
             Shutdown();
             return;
         }
-        _mainVm = new MainViewModel(_settingsService);
+        _mainVm = new(_settingsService);
         _mainVm.HotkeySettingsChanged += OnHotkeySettingsChanged;
 
-        _mainWindow = new MainWindow { DataContext = _mainVm };
+        _mainWindow = new() { DataContext = _mainVm };
         _mainWindow.SourceInitialized += (_, _) =>
         {
             var s = _settingsService.Load();
-            _hotkeyService = new HotkeyService();
+            _hotkeyService = new();
             var registered = _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
             if (!registered)
             {
@@ -108,7 +107,7 @@ public partial class App
             // Only create the HWND (for hotkey registration) without showing the window.
             new WindowInteropHelper(_mainWindow).EnsureHandle();
             _mainWindow.ContentRendered -= OnMainWindowContentRendered;
-            _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
+            _trayIconService = new(_mainVm, ActivateMainWindow);
             return;
         }
 
@@ -124,7 +123,7 @@ public partial class App
         }
 
         _mainWindow.Show();
-        _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
+        _trayIconService = new(_mainVm, ActivateMainWindow);
     }
 
     // Run restore after first render because clamping depends on measured window size.
@@ -153,8 +152,6 @@ public partial class App
         {
             DisplayMode.Normal => settings.NormalPosition,
             DisplayMode.Mini => settings.MiniPosition,
-            DisplayMode.None => null,
-            DisplayMode.Flex => null,
             _ => null
         };
 

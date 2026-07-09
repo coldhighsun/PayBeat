@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <OutputType>WinExe</OutputType>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>Resources\Icons\PayBeat.ico</ApplicationIcon>
+    <AssemblyName>PayBeat</AssemblyName>
+    <RootNamespace>PayBeat.WinUI</RootNamespace>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <!--
+      Windows App SDK's SingleFile.targets defaults self-contained WinUI3 apps to
+      PublishSingleFile=true. That silently drops loose Content items (localization JSON,
+      icon) from the publish output instead of embedding them - LocalizationService reads
+      them from disk at runtime and would find nothing there. Publish as a plain folder
+      instead, matching the WPF build's existing "unzip and run" portable distribution.
+    -->
+    <PublishSingleFile>false</PublishSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PayBeat.Core\PayBeat.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Tray icon needs System.Windows.Forms (NotifyIcon/ContextMenuStrip - WinUI3 has no tray API).
+      Setting the UseWindowsForms *property* instead of this direct FrameworkReference pulls in
+      Microsoft.NET.Sdk.WindowsDesktop's WPF markup-compiler targets (Microsoft.WinFX.targets),
+      which fail our .xaml Page items with MC6000 ("must include PresentationCore/Framework")
+      even though UseWPF is never set. Referencing the shared framework directly avoids that
+      import entirely while still resolving NotifyIcon/ContextMenuStrip/Icon.
+    -->
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Strings.en.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Strings.zh-CN.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\PayBeat.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

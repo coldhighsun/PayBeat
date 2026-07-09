@@ -27,22 +27,44 @@ jobs:
       - name: Build
         run: dotnet build -c Release
 
-      - name: Publish
+      - name: Publish (WPF)
         if: startsWith(github.ref, 'refs/tags/v')
-        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --no-self-contained -o publish/
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -o publish-wpf/
 
-      - name: Zip artifact
+      - name: Publish (WinUI)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: dotnet publish src/PayBeat.WinUI/PayBeat.WinUI.csproj -c Release --self-contained -r win-x64 -o publish-winui/
+
+      - name: Prune WinUI locale resources
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          # Windows App SDK's native components (Microsoft.ui.xaml.dll etc.) ship one .mui
+          # resource folder per locale unconditionally on self-contained publish - this is
+          # separate from and unaffected by SatelliteResourceLanguages, which only trims .NET
+          # managed satellite assemblies. Keep only the two locales the app actually supports.
+          $keep = @('en-us', 'zh-CN')
+          Get-ChildItem -Path "publish-winui" -Directory |
+            Where-Object { $_.Name -match '^[a-zA-Z]{2,3}(-[a-zA-Z]+){1,2}$' -and $keep -notcontains $_.Name } |
+            Remove-Item -Recurse -Force
+
+      - name: Zip artifacts
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
         run: |
           $version = "${{ github.ref_name }}"
-          $zipName = "PayBeat-$version-portable-win-x64.zip"
-          Compress-Archive -Path "publish/*" -DestinationPath $zipName
-          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+          $wpfZipName = "PayBeat-$version-wpf-portable-win-x64.zip"
+          $winuiZipName = "PayBeat-$version-winui-portable-win-x64.zip"
+          Compress-Archive -Path "publish-wpf/*" -DestinationPath $wpfZipName
+          Compress-Archive -Path "publish-winui/*" -DestinationPath $winuiZipName
+          echo "WPF_ZIP_NAME=$wpfZipName" >> $env:GITHUB_ENV
+          echo "WINUI_ZIP_NAME=$winuiZipName" >> $env:GITHUB_ENV
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ZIP_NAME }}
+          files: |
+            ${{ env.WPF_ZIP_NAME }}
+            ${{ env.WINUI_ZIP_NAME }}
           generate_release_notes: true

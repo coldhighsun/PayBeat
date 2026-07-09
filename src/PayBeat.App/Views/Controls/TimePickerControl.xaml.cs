@@ -53,7 +53,7 @@ public partial class TimePickerControl
             && h is >= 0 and <= 23 && m is >= 0 and <= 59)
         {
             _isUpdating = true;
-            SelectedTime = new TimeOnly(h, m);
+            SelectedTime = new(h, m);
             _isUpdating = false;
         }
     }

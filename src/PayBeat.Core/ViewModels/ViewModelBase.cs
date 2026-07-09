@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PayBeat.App.ViewModels;
+namespace PayBeat.Core.ViewModels;
 
 /// <summary>
 /// Base class for all view models; implements <see cref="INotifyPropertyChanged"/> and provides
@@ -17,7 +17,7 @@ public abstract class ViewModelBase : INotifyPropertyChanged
     /// </summary>
     /// <param name="name">Property name; inferred from the call site via <see cref="CallerMemberNameAttribute"/>.</param>
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        => PropertyChanged?.Invoke(this, new(name));
 
     /// <summary>
     /// Assigns <paramref name="value"/> to <paramref name="field"/> and raises

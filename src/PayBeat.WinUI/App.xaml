@@ -1,0 +1,21 @@
+<Application
+    x:Class="PayBeat.WinUI.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:PayBeat.WinUI.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--
+                    Required for unpackaged WinUI3 desktop apps: standard control default
+                    resources (used by MenuFlyout/ToggleMenuFlyoutItem/etc.) are not implicitly
+                    available and must be merged explicitly, unlike WPF's generic.xaml.
+                -->
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:StringToDoubleConverter x:Key="StringToDoubleConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

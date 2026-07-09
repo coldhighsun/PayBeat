@@ -1,6 +1,6 @@
-using PayBeat.App.Models;
+using PayBeat.Core.Models;
 
-namespace PayBeat.App.Services;
+namespace PayBeat.Core.Services;
 
 /// <summary>
 /// Pure static helper that computes real-time earnings and workday progress from <see cref="SalarySettings"/>.

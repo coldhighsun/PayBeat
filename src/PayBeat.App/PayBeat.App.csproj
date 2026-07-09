@@ -1,7 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      Unversioned net10.0-windows resolves to the minimum Windows TFM (7.0) for NuGet's
+      project-reference compatibility check, which is lower than PayBeat.Core's pinned
+      net10.0-windows10.0.19041.0 - a referencing project's target platform version must be >=
+      the referenced project's. The version must be encoded directly in the TFM moniker (a
+      separate TargetPlatformVersion property does not affect NuGet's restore-time check); this
+      doesn't require any new APIs, it only pins which Windows SDK contract version is resolved.
+    -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -15,6 +23,10 @@
   <ItemGroup>
     <Resource Include="Resources\Icons\PayBeat.ico" />
     <Resource Include="Resources\Screenshots\*.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PayBeat.Core\PayBeat.Core.csproj" />
   </ItemGroup>
     
 </Project>
