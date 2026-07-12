@@ -221,7 +221,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             _timer.Start();
         }
-        _nextMilestoneThreshold = _settings.MilestoneAmount;
+        _nextMilestoneThreshold = NextMilestoneThresholdAbove(Earned, _settings.MilestoneAmount);
         _endOfDayReminderSent = false;
         HotkeySettingsChanged?.Invoke();
         Refresh();
@@ -298,6 +298,17 @@ public class MainViewModel : ViewModelBase, IDisposable
             _timer.Stop();
             ScheduleWakeTimer(now);
         }
+    }
+
+    /// <summary>Smallest multiple of <paramref name="milestoneAmount"/> that is strictly greater than <paramref name="earned"/>.</summary>
+    private static decimal NextMilestoneThresholdAbove(decimal earned, decimal milestoneAmount)
+    {
+        if (milestoneAmount <= 0)
+        {
+            return milestoneAmount;
+        }
+
+        return (Math.Floor(earned / milestoneAmount) + 1) * milestoneAmount;
     }
 
     private void CheckNotifications(DateTime now)
