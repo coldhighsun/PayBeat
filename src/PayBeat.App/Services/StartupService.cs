@@ -12,12 +12,19 @@ public static class StartupService
     private const string ValueName = "PayBeat";
 
     /// <summary>
-    /// Returns <see langword="true"/> when the PayBeat startup entry exists in the registry.
+    /// Returns <see langword="true"/> when the PayBeat startup entry exists in the registry
+    /// and points at the currently running executable's path.
     /// </summary>
     public static bool IsEnabled()
     {
         using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
-        return key?.GetValue(ValueName) is not null;
+        if (key?.GetValue(ValueName) is not string value || string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        var exe = GetCurrentExecutablePath();
+        return !string.IsNullOrEmpty(exe) && string.Equals(value.Trim('"'), exe, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -34,7 +41,7 @@ public static class StartupService
 
         if (enabled)
         {
-            var exe = Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+            var exe = GetCurrentExecutablePath();
             if (!string.IsNullOrEmpty(exe))
             {
                 key.SetValue(ValueName, $"\"{exe}\"");
@@ -45,4 +52,7 @@ public static class StartupService
             key.DeleteValue(ValueName, throwOnMissingValue: false);
         }
     }
+
+    private static string? GetCurrentExecutablePath() =>
+        Environment.ProcessPath ?? System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
 }
