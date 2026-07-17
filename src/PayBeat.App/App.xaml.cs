@@ -3,6 +3,7 @@ using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
+using Microsoft.Win32;
 using System.Windows.Interop;
 
 namespace PayBeat.App;
@@ -33,25 +34,17 @@ public partial class App
     /// <inheritdoc/>
     protected override void OnExit(ExitEventArgs e)
     {
-        if (_mainWindow != null && _mainVm != null && _settingsService != null)
+        if (_mainWindow != null)
         {
             // The window's HWND is already destroyed by the time OnExit runs (WPF closes windows
             // before firing Exit), so the current monitor can no longer be resolved here - use the
             // snapshot MainWindow captured in its Closing handler instead.
             var pos = _mainWindow.LastKnownPosition
                       ?? new WindowPosition(_mainWindow.Left, _mainWindow.Top, ScreenHelper.GetCurrentScreenDeviceName(_mainWindow));
-            var settings = _settingsService.Load();
-            var updated = _mainVm.DisplayMode switch
-            {
-                DisplayMode.Normal => settings with { NormalPosition = pos },
-                DisplayMode.Mini => settings with { MiniPosition = pos },
-                DisplayMode.None => settings,
-                DisplayMode.Flex => settings with { FlexPosition = pos },
-                _ => settings
-            };
-            _settingsService.Save(updated);
+            SaveWindowPosition(pos);
         }
 
+        SystemEvents.SessionEnding -= OnSessionEnding;
         _trayIconService?.Dispose();
         _hotkeyService?.Dispose();
         _mainVm?.Dispose();
@@ -81,6 +74,7 @@ public partial class App
             Shutdown();
             return;
         }
+        SystemEvents.SessionEnding += OnSessionEnding;
         _mainVm = new MainViewModel(_settingsService);
         _mainVm.HotkeySettingsChanged += OnHotkeySettingsChanged;
 
@@ -149,14 +143,14 @@ public partial class App
     }
 
     private static WindowPosition? GetSavedPosition(SalarySettings settings, DisplayMode mode) =>
-        mode switch
-        {
-            DisplayMode.Normal => settings.NormalPosition,
-            DisplayMode.Mini => settings.MiniPosition,
-            DisplayMode.None => null,
-            DisplayMode.Flex => null,
-            _ => null
-        };
+            mode switch
+            {
+                DisplayMode.Normal => settings.NormalPosition,
+                DisplayMode.Mini => settings.MiniPosition,
+                DisplayMode.None => null,
+                DisplayMode.Flex => null,
+                _ => null
+            };
 
     /// <summary>
     /// Restore Flex by preferred monitor name, falling back to nearest available monitor.
@@ -234,6 +228,42 @@ public partial class App
         _mainWindow.ContentRendered -= OnMainWindowContentRendered;
         ApplyStartupPlacement(_mainWindow, _startupSettings);
         _mainWindow.IsRestoringStartupPosition = false;
+    }
+
+    /// <summary>
+    /// Proactively saves the window position when Windows is shutting down or the user is logging off.
+    /// WPF does not guarantee that <see cref="Window.Closing"/>/<see cref="OnExit"/> run in response to
+    /// a session-ending signal, so this subscribes directly rather than relying on that incidental path.
+    /// </summary>
+    private void OnSessionEnding(object? sender, SessionEndingEventArgs e)
+    {
+        if (_mainWindow == null)
+        {
+            return;
+        }
+
+        var pos = new WindowPosition(_mainWindow.Left, _mainWindow.Top, ScreenHelper.GetCurrentScreenDeviceName(_mainWindow));
+        SaveWindowPosition(pos);
+    }
+
+    /// <summary>Merges <paramref name="pos"/> into the settings slot for the active display mode and persists it.</summary>
+    private void SaveWindowPosition(WindowPosition pos)
+    {
+        if (_mainVm == null || _settingsService == null)
+        {
+            return;
+        }
+
+        var settings = _settingsService.Load();
+        var updated = _mainVm.DisplayMode switch
+        {
+            DisplayMode.Normal => settings with { NormalPosition = pos },
+            DisplayMode.Mini => settings with { MiniPosition = pos },
+            DisplayMode.None => settings,
+            DisplayMode.Flex => settings with { FlexPosition = pos },
+            _ => settings
+        };
+        _settingsService.Save(updated);
     }
 
     private void ToggleWindowVisibility()

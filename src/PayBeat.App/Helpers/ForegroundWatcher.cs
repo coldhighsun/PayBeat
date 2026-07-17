@@ -10,7 +10,7 @@ namespace PayBeat.App.Helpers;
 internal sealed class ForegroundWatcher : IDisposable
 {
     private const uint EventSystemForeground = 0x0003;
-    private const uint WineventOutofcontext = 0x0000;
+    private const uint WinEventOutOfContext = 0x0000;
 
     // Kept as a field so the delegate is not garbage-collected while the native hook holds a
     // reference to it.
@@ -21,7 +21,7 @@ internal sealed class ForegroundWatcher : IDisposable
     public ForegroundWatcher(Action onForegroundChanged)
     {
         _callback = (_, _, _, _, _, _, _) => onForegroundChanged();
-        _hook = SetWinEventHook(EventSystemForeground, EventSystemForeground, IntPtr.Zero, _callback, 0, 0, WineventOutofcontext);
+        _hook = SetWinEventHook(EventSystemForeground, EventSystemForeground, IntPtr.Zero, _callback, 0, 0, WinEventOutOfContext);
     }
 
     private delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime);
