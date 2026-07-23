@@ -52,13 +52,16 @@ WPF floating widget app (.NET 10, MVVM). Shows real-time earnings as a borderles
 
 ## Solution Configuration
 
-There is no `.sln` file — build and run via the project path directly.
+`PayBeat.slnx` (new XML-based solution format) references the single app project — build and run commands typically target the project path directly rather than the solution.
 
 | File | Purpose |
 |------|---------|
-| `Directory.Build.props` | Shared build properties: `Nullable`, `ImplicitUsings`, `LangVersion`, `UseArtifactsOutput`, `TreatWarningsAsErrors`, `SatelliteResourceLanguages` (en;zh-CN), `DebugType=embedded`, `MinVerTagPrefix=v`. Imports optional `Directory.Build.user` for local overrides. |
+| `global.json` | Pins SDK to `10.0.100` with `rollForward: latestMinor` |
+| `Directory.Build.props` | Shared build properties: `Nullable`, `ImplicitUsings`, `LangVersion`, `UseArtifactsOutput`, `TreatWarningsAsErrors`, `SatelliteResourceLanguages` (en;zh-CN), `DebugType=embedded`, `MinVerTagPrefix=v`. Imports optional `Directory.Build.user` for local, gitignored overrides (e.g. a custom `ArtifactsPath`). |
 | `Directory.Packages.props` | Central package versions (`ManagePackageVersionsCentrally=true`) |
 | `nuget.config` | Restricts package sources to nuget.org only (`<clear/>` overrides global config) |
+
+`PayBeat.App.csproj` targets `net10.0-windows`, sets `UseWPF=true` **and** `UseWindowsForms=true` (WinForms is pulled in for the tray icon's `NotifyIcon`/`ContextMenuStrip`), `PublishSingleFile=true`, and a custom `AssemblyName=PayBeat` (differs from the project name).
 
 Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layout via `UseArtifactsOutput=true`).
 
