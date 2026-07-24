@@ -16,9 +16,14 @@ dotnet build
 # Run
 dotnet run --project src/PayBeat.App/PayBeat.App.csproj
 
-# Publish
+# Publish (portable, requires .NET 10 Desktop Runtime on target machine)
 dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
+
+# Publish (self-contained, no runtime prerequisite)
+dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained
 ```
+
+Output goes to `artifacts/bin/PayBeat.App/release/`.
 
 ## Architecture
 
@@ -69,7 +74,7 @@ Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layou
 
 ## CI / Release
 
-`.github/workflows/ci.yml` builds on every push (Windows runner, .NET 10). On a `v*` tag push, it additionally publishes a self-contained-false `win-x64` build, zips it, and creates a GitHub Release via `softprops/action-gh-release`. Versioning is derived from git tags via MinVer (e.g. `v1.2.0`); locally, ensure the tag is reachable from HEAD for a meaningful version.
+`.github/workflows/ci.yml` has two jobs (Windows runner, .NET 10). `build` runs on every push and just compiles. `release` runs `needs: build` with a job-level `if: startsWith(github.ref, 'refs/tags/v')` — only on a `v*` tag push does it publish both a portable (`--no-self-contained`) and a self-contained `win-x64` build, zip each (`PayBeat-<version>-portable-runtime-required-win-x64.zip`, `PayBeat-<version>-portable-standalone-win-x64.zip`), and create a GitHub Release via `softprops/action-gh-release`. Versioning is derived from git tags via MinVer (e.g. `v1.2.0`); locally, ensure the tag is reachable from HEAD for a meaningful version.
 
 User settings are persisted to `%APPDATA%\PayBeat\settings.json`.
 

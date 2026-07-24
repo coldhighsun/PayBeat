@@ -43,8 +43,8 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 
 Grab the latest release from the [Releases page](https://github.com/coldhighsun/PayBeat/releases/latest). Two `win-x64` packages are published per version:
 
-- `PayBeat-<version>-portable-win-x64.zip` — smaller, requires the .NET 10 Desktop Runtime
-- `PayBeat-<version>-selfcontained-win-x64.zip` — larger, runs standalone with no prerequisites
+- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — smaller, requires the .NET 10 Desktop Runtime
+- `PayBeat-<version>-portable-standalone-win-x64.zip` — larger, runs standalone with no prerequisites
 
 ## Build
 
@@ -62,7 +62,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained
 ```
 
-Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce both a `PayBeat-<version>-portable-win-x64.zip` and a `PayBeat-<version>-selfcontained-win-x64.zip` release artifact.
+Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce both a `PayBeat-<version>-portable-runtime-required-win-x64.zip` and a `PayBeat-<version>-portable-standalone-win-x64.zip` release artifact.
 
 ## Usage
 
@@ -132,8 +132,8 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 
 前往 [Releases 页面](https://github.com/coldhighsun/PayBeat/releases/latest) 下载最新版本。每个版本会发布两个 `win-x64` 压缩包：
 
-- `PayBeat-<version>-portable-win-x64.zip` — 体积较小，需预装 .NET 10 Desktop Runtime
-- `PayBeat-<version>-selfcontained-win-x64.zip` — 体积较大，内置运行时，无需任何前置依赖
+- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — 体积较小，需预装 .NET 10 Desktop Runtime
+- `PayBeat-<version>-portable-standalone-win-x64.zip` — 体积较大，内置运行时，无需任何前置依赖
 
 ## 构建
 
@@ -151,7 +151,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release
 dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained
 ```
 
-产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-win-x64.zip` 和 `PayBeat-<version>-selfcontained-win-x64.zip` 两个发布包。
+产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-runtime-required-win-x64.zip` 和 `PayBeat-<version>-portable-standalone-win-x64.zip` 两个发布包。
 
 ## 使用
 
