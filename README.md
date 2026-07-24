@@ -24,6 +24,7 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 - Optional lunch break deduction and weekend earnings
 - Tray balloon notifications for an end-of-day reminder and earnings milestones
 - English and Simplified Chinese UI, auto-detected from the OS locale
+- Light and dark themes, auto-detected from the Windows appearance setting
 - Configurable opacity, refresh interval, and currency symbol
 - Optional Windows startup registration
 
@@ -84,6 +85,7 @@ Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce both a `Pay
 | Display mode | Normal | Initial widget size (None / Normal / Mini / Flex) |
 | Refresh interval | 1 s | UI update frequency (1–60 seconds) |
 | Opacity | 1.0 | Window opacity when the mouse is not hovering (0.1–1.0) |
+| Theme | Auto | UI color theme (Auto / Light / Dark); Auto follows the Windows appearance setting |
 | Global hotkey | Ctrl+Alt+X | Toggle visibility of all windows |
 | Run at startup | Off | Launch automatically when Windows starts |
 | Deduct lunch break | Off | Excludes a daily break window from earnings (default 12:00–13:00) |
@@ -113,6 +115,7 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - 可选午休扣除时段，可选周末计薪
 - 托盘气泡通知：下班提醒、赚钱里程碑提醒
 - 支持中英文界面，随系统语言自动切换
+- 支持浅色 / 深色主题，随系统外观设置自动切换
 - 可设置透明度、刷新间隔、货币符号
 - 支持开机自启
 
@@ -173,6 +176,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-c
 | 显示模式 | Normal | 初始显示模式（None / Normal / Mini / Flex） |
 | 刷新间隔 | 1 秒 | 界面更新频率（1–60 秒） |
 | 透明度 | 1.0 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
+| 主题 | Auto | 界面配色（Auto / Light / Dark），Auto 跟随系统外观设置 |
 | 全局热键 | Ctrl+Alt+X | 显示 / 隐藏全部窗口 |
 | 开机自启 | 关 | 登录 Windows 后自动启动 |
 | 扣除午休 | 关 | 从计薪时段中排除一段每日午休时间（默认 12:00–13:00） |
