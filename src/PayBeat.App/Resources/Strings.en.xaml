@@ -64,6 +64,10 @@
     <sys:String x:Key="Settings.RunAtStartup">Run at Startup</sys:String>
     <sys:String x:Key="Settings.Language">Language</sys:String>
     <sys:String x:Key="Settings.LanguageAuto">Auto</sys:String>
+    <sys:String x:Key="Settings.Theme">Theme</sys:String>
+    <sys:String x:Key="Settings.ThemeAuto">Auto</sys:String>
+    <sys:String x:Key="Settings.ThemeLight">Light</sys:String>
+    <sys:String x:Key="Settings.ThemeDark">Dark</sys:String>
     <sys:String x:Key="Settings.Hotkey">Toggle Visibility Hotkey</sys:String>
     <sys:String x:Key="Settings.HotkeyHint">Click, then press a key combination</sys:String>
     <sys:String x:Key="Settings.HotkeyCapturing">Press a key combination...</sys:String>

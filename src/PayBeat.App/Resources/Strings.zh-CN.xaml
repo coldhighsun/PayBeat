@@ -64,6 +64,10 @@
     <sys:String x:Key="Settings.RunAtStartup">开机自动启动</sys:String>
     <sys:String x:Key="Settings.Language">语言</sys:String>
     <sys:String x:Key="Settings.LanguageAuto">自动</sys:String>
+    <sys:String x:Key="Settings.Theme">主题</sys:String>
+    <sys:String x:Key="Settings.ThemeAuto">自动</sys:String>
+    <sys:String x:Key="Settings.ThemeLight">浅色</sys:String>
+    <sys:String x:Key="Settings.ThemeDark">深色</sys:String>
     <sys:String x:Key="Settings.Hotkey">显示/隐藏快捷键</sys:String>
     <sys:String x:Key="Settings.HotkeyHint">点击后输入快捷键组合</sys:String>
     <sys:String x:Key="Settings.HotkeyCapturing">请输入快捷键组合...</sys:String>

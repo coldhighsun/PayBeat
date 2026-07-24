@@ -18,7 +18,7 @@
 
         <!-- Tab item style -->
         <Style x:Key="SettingsTabItem" TargetType="TabItem">
-            <Setter Property="Foreground" Value="#9399B2" />
+            <Setter Property="Foreground" Value="{DynamicResource SubtextBrush}" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="Padding" Value="16,8" />
             <Setter Property="Background" Value="Transparent" />
@@ -38,12 +38,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#89B4FA" />
-                                <Setter Property="Foreground" Value="#CDD6F4" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource BlueBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                                 <Setter Property="FontWeight" Value="SemiBold" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#CDD6F4" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -62,7 +62,7 @@
                         <DockPanel>
                             <!-- Tab strip -->
                             <Border DockPanel.Dock="Top"
-                                    BorderBrush="#313244"
+                                    BorderBrush="{DynamicResource SurfaceBrush}"
                                     BorderThickness="0,0,0,1">
                                 <TabPanel IsItemsHost="True"
                                           Background="Transparent"
@@ -82,7 +82,7 @@
 
         <!-- Section header used to group related settings within a tab -->
         <Style x:Key="SettingsSectionHeader" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#89B4FA" />
+            <Setter Property="Foreground" Value="{DynamicResource BlueBrush}" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Margin" Value="0,0,0,8" />
@@ -95,8 +95,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToolTip">
-                        <Border Background="#313244"
-                                BorderBrush="#45475A"
+                        <Border Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource OverlayBrush}"
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="6">
@@ -116,12 +116,12 @@
                        Placement="Top"
                        AllowsTransparency="True"
                        PopupAnimation="Fade">
-                    <Border Background="#F38BA8"
+                    <Border Background="{DynamicResource RedBrush}"
                             CornerRadius="6"
                             Padding="8,5"
                             Margin="0,0,0,4">
                         <TextBlock Text="{Binding ElementName=Placeholder, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}"
-                                   Foreground="#1E1E2E"
+                                   Foreground="{DynamicResource BaseBrush}"
                                    FontSize="11"
                                    TextWrapping="Wrap"
                                    MaxWidth="240" />
@@ -135,15 +135,15 @@
             <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationBubbleTemplate}" />
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="True">
-                    <Setter Property="BorderBrush" Value="#F38BA8" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Border Background="#1E1E2E"
+    <Border Background="{DynamicResource BaseBrush}"
             CornerRadius="12"
-            BorderBrush="#45475A"
+            BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="24" ShadowDepth="0" />
@@ -154,7 +154,7 @@
             <!-- Title -->
             <TextBlock DockPanel.Dock="Top"
                    Text="{DynamicResource Settings.Title}"
-                   Foreground="#CDD6F4"
+                   Foreground="{DynamicResource TextBrush}"
                    FontSize="20"
                    FontWeight="Bold"
                    Margin="0,0,0,16" />
@@ -162,7 +162,7 @@
             <!-- Error -->
             <TextBlock DockPanel.Dock="Bottom"
                    Text="{Binding ErrorMessage}"
-                   Foreground="#F38BA8"
+                   Foreground="{DynamicResource RedBrush}"
                    FontSize="11"
                    TextWrapping="Wrap"
                    MinHeight="16" />
@@ -176,13 +176,13 @@
                     Command="{Binding CancelCommand}"
                     Margin="0,0,10,0"
                     Padding="20,10"
-                    Background="#313244"
-                    Foreground="#CDD6F4" />
+                    Background="{DynamicResource SurfaceBrush}"
+                    Foreground="{DynamicResource TextBrush}" />
                 <Button Content="{DynamicResource Settings.Save}"
                     Command="{Binding SaveCommand}"
                     Padding="20,10"
-                    Background="#89B4FA"
-                    Foreground="#1E1E2E"
+                    Background="{DynamicResource BlueBrush}"
+                    Foreground="{DynamicResource BaseBrush}"
                     FontWeight="SemiBold" />
             </StackPanel>
 
@@ -199,7 +199,7 @@
 
                         <!-- Daily Salary -->
                         <TextBlock Text="{DynamicResource Settings.DailySalary}"
-                               Foreground="#9399B2"
+                               Foreground="{DynamicResource SubtextBrush}"
                                FontSize="12"
                                Margin="0,0,0,4" />
                         <Grid Margin="0,0,0,16">
@@ -210,9 +210,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0"
                                  Text="{Binding CurrencyText, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="#313244"
-                                 Foreground="#CDD6F4"
-                                 BorderBrush="#45475A"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextBrush}"
+                                 BorderBrush="{DynamicResource OverlayBrush}"
                                  BorderThickness="1"
                                  Padding="10,8" />
                             <TextBox x:Name="SalaryBox"
@@ -220,9 +220,9 @@
                                  Style="{StaticResource ValidatedTextBox}"
                                  Text="{Binding DailySalaryText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
-                                 Background="#313244"
-                                 Foreground="#CDD6F4"
-                                 BorderBrush="#45475A"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextBrush}"
+                                 BorderBrush="{DynamicResource OverlayBrush}"
                                  BorderThickness="1"
                                  Padding="10,8"
                                  MaxLength="11"
@@ -241,12 +241,12 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.WorkHours}"
-                                   Foreground="#9399B2"
+                                   Foreground="{DynamicResource SubtextBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                 <controls:TimePickerControl SelectedTime="{Binding WorkStart}" />
-                                <TextBlock Text="–" Foreground="#6C7086" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
+                                <TextBlock Text="–" Foreground="{DynamicResource MutedBrush}" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
                                 <controls:TimePickerControl SelectedTime="{Binding WorkEnd}" />
                             </StackPanel>
                         </Grid>
@@ -260,7 +260,7 @@
                             <CheckBox Grid.Column="0"
                                   Content="{DynamicResource Settings.LunchBreakEnabled}"
                                   IsChecked="{Binding LunchBreakEnabled}"
-                                  Foreground="#CDD6F4"
+                                  Foreground="{DynamicResource TextBrush}"
                                   FontSize="13"
                                   Cursor="Hand"
                                   VerticalAlignment="Center" />
@@ -269,7 +269,7 @@
                                     VerticalAlignment="Center"
                                     IsEnabled="{Binding LunchBreakEnabled}">
                                 <controls:TimePickerControl SelectedTime="{Binding LunchBreakStart}" />
-                                <TextBlock Text="–" Foreground="#6C7086" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
+                                <TextBlock Text="–" Foreground="{DynamicResource MutedBrush}" FontSize="13" VerticalAlignment="Center" Margin="6,0" />
                                 <controls:TimePickerControl SelectedTime="{Binding LunchBreakEnd}" />
                             </StackPanel>
                         </Grid>
@@ -277,7 +277,7 @@
                         <!-- Weekend earning -->
                         <CheckBox Content="{DynamicResource Settings.WorkOnWeekends}"
                               IsChecked="{Binding WorkOnWeekends}"
-                              Foreground="#CDD6F4"
+                              Foreground="{DynamicResource TextBrush}"
                               FontSize="13"
                               Cursor="Hand"
                               Margin="0,0,0,16" />
@@ -293,16 +293,16 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.RefreshInterval}"
-                                   Foreground="#9399B2"
+                                   Foreground="{DynamicResource SubtextBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <TextBlock Text="{Binding RefreshInterval}"
-                                       Foreground="#A6E3A1"
+                                       Foreground="{DynamicResource GreenBrush}"
                                        FontSize="12"
                                        VerticalAlignment="Center" />
                                 <TextBlock Text="{DynamicResource Settings.Seconds}"
-                                       Foreground="#A6E3A1"
+                                       Foreground="{DynamicResource GreenBrush}"
                                        FontSize="12"
                                        VerticalAlignment="Center" />
                             </StackPanel>
@@ -312,7 +312,7 @@
                             Value="{Binding RefreshInterval}"
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
-                            Foreground="#89B4FA" />
+                            Foreground="{DynamicResource BlueBrush}" />
                     </StackPanel>
                 </TabItem>
 
@@ -323,7 +323,7 @@
                         <!-- End of day reminder -->
                         <CheckBox Content="{DynamicResource Settings.EnableEndOfDayReminder}"
                               IsChecked="{Binding EnableEndOfDayReminder}"
-                              Foreground="#CDD6F4"
+                              Foreground="{DynamicResource TextBrush}"
                               FontSize="13"
                               Cursor="Hand"
                               Margin="0,0,0,8" />
@@ -335,16 +335,16 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.EndOfDayReminderMinutes}"
-                                   Foreground="#9399B2"
+                                   Foreground="{DynamicResource SubtextBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <TextBox Grid.Column="2"
                                  Style="{StaticResource ValidatedTextBox}"
                                  Text="{Binding EndOfDayReminderMinutesText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
-                                 Background="#313244"
-                                 Foreground="#CDD6F4"
-                                 BorderBrush="#45475A"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextBrush}"
+                                 BorderBrush="{DynamicResource OverlayBrush}"
                                  BorderThickness="1"
                                  Padding="10,8"
                                  MaxLength="2"
@@ -355,7 +355,7 @@
                         <!-- Milestone notifications -->
                         <CheckBox Content="{DynamicResource Settings.EnableMilestoneNotifications}"
                               IsChecked="{Binding EnableMilestoneNotifications}"
-                              Foreground="#CDD6F4"
+                              Foreground="{DynamicResource TextBrush}"
                               FontSize="13"
                               Cursor="Hand"
                               Margin="0,0,0,8" />
@@ -367,16 +367,16 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.MilestoneAmount}"
-                                   Foreground="#9399B2"
+                                   Foreground="{DynamicResource SubtextBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <TextBox Grid.Column="2"
                                  Style="{StaticResource ValidatedTextBox}"
                                  Text="{Binding MilestoneAmountText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  TextAlignment="Right"
-                                 Background="#313244"
-                                 Foreground="#CDD6F4"
-                                 BorderBrush="#45475A"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 Foreground="{DynamicResource TextBrush}"
+                                 BorderBrush="{DynamicResource OverlayBrush}"
                                  BorderThickness="1"
                                  Padding="10,8"
                                  MaxLength="11"
@@ -392,13 +392,13 @@
 
                         <!-- Display mode -->
                         <TextBlock Text="{DynamicResource Settings.DisplayMode}"
-                               Foreground="#9399B2"
+                               Foreground="{DynamicResource SubtextBrush}"
                                FontSize="12"
                                Margin="0,0,0,8" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                             <RadioButton Content="{DynamicResource Settings.Flex}"
                                      IsChecked="{Binding IsFlexMode}"
-                                     Foreground="#CDD6F4"
+                                     Foreground="{DynamicResource TextBrush}"
                                      FontSize="13"
                                      Cursor="Hand"
                                      Margin="0,0,20,0"
@@ -412,7 +412,7 @@
                             </RadioButton>
                             <RadioButton Content="{DynamicResource Settings.Normal}"
                                      IsChecked="{Binding IsNormalMode}"
-                                     Foreground="#CDD6F4"
+                                     Foreground="{DynamicResource TextBrush}"
                                      FontSize="13"
                                      Cursor="Hand"
                                      Margin="0,0,20,0"
@@ -426,7 +426,7 @@
                             </RadioButton>
                             <RadioButton Content="{DynamicResource Settings.Mini}"
                                      IsChecked="{Binding IsMiniMode}"
-                                     Foreground="#CDD6F4"
+                                     Foreground="{DynamicResource TextBrush}"
                                      FontSize="13"
                                      Cursor="Hand"
                                      Margin="0,0,20,0"
@@ -440,7 +440,7 @@
                             </RadioButton>
                             <RadioButton Content="{DynamicResource Settings.None}"
                                      IsChecked="{Binding IsNoneMode}"
-                                     Foreground="#CDD6F4"
+                                     Foreground="{DynamicResource TextBrush}"
                                      FontSize="13"
                                      Cursor="Hand" />
                         </StackPanel>
@@ -453,12 +453,12 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                    Text="{DynamicResource Settings.Opacity}"
-                                   Foreground="#9399B2"
+                                   Foreground="{DynamicResource SubtextBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1"
                                    Text="{Binding Opacity, StringFormat={}{0:P0}}"
-                                   Foreground="#A6E3A1"
+                                   Foreground="{DynamicResource GreenBrush}"
                                    FontSize="12"
                                    VerticalAlignment="Center" />
                         </Grid>
@@ -467,15 +467,54 @@
                             Value="{Binding Opacity}"
                             TickFrequency="0.05"
                             IsSnapToTickEnabled="True"
-                            Foreground="#89B4FA"
+                            Foreground="{DynamicResource BlueBrush}"
                             Margin="0,0,0,16" />
 
                         <!-- Always on top -->
                         <CheckBox Content="{DynamicResource Settings.AlwaysOnTop}"
                               IsChecked="{Binding AlwaysOnTop}"
-                              Foreground="#CDD6F4"
+                              Foreground="{DynamicResource TextBrush}"
                               FontSize="13"
-                              Cursor="Hand" />
+                              Cursor="Hand"
+                              Margin="0,0,0,16" />
+
+                        <!-- Theme -->
+                        <TextBlock Text="{DynamicResource Settings.Theme}"
+                               Foreground="{DynamicResource SubtextBrush}"
+                               FontSize="12"
+                               Margin="0,0,0,6" />
+                        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                              SelectedValue="{Binding Theme}"
+                              SelectedValuePath="Code"
+                              Background="{DynamicResource SurfaceBrush}"
+                              Foreground="{DynamicResource TextBrush}"
+                              BorderBrush="{DynamicResource OverlayBrush}"
+                              BorderThickness="1"
+                              Padding="10,8"
+                              HorizontalContentAlignment="Left">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="{Binding Name}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Code}" Value="auto">
+                                                        <Setter Property="Text" Value="{DynamicResource Settings.ThemeAuto}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Code}" Value="light">
+                                                        <Setter Property="Text" Value="{DynamicResource Settings.ThemeLight}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Code}" Value="dark">
+                                                        <Setter Property="Text" Value="{DynamicResource Settings.ThemeDark}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
                 </TabItem>
 
@@ -486,22 +525,22 @@
                         <!-- Run at startup -->
                         <CheckBox Content="{DynamicResource Settings.RunAtStartup}"
                               IsChecked="{Binding RunAtStartup}"
-                              Foreground="#CDD6F4"
+                              Foreground="{DynamicResource TextBrush}"
                               FontSize="13"
                               Cursor="Hand"
                               Margin="0,0,0,16" />
 
                         <!-- Hotkey -->
                         <TextBlock Text="{DynamicResource Settings.Hotkey}"
-                               Foreground="#9399B2"
+                               Foreground="{DynamicResource SubtextBrush}"
                                FontSize="12"
                                Margin="0,0,0,6" />
                         <TextBox x:Name="HotkeyBox"
                              Text="{Binding HotkeyDisplayText, Mode=OneWay}"
                              IsReadOnly="True"
-                             Background="#313244"
-                             Foreground="#CDD6F4"
-                             BorderBrush="#45475A"
+                             Background="{DynamicResource SurfaceBrush}"
+                             Foreground="{DynamicResource TextBrush}"
+                             BorderBrush="{DynamicResource OverlayBrush}"
                              BorderThickness="1"
                              Padding="10,8"
                              Cursor="IBeam"
@@ -509,24 +548,25 @@
                              GotFocus="HotkeyBox_GotFocus"
                              LostFocus="HotkeyBox_LostFocus" />
                         <TextBlock Text="{DynamicResource Settings.HotkeyHint}"
-                               Foreground="#6C7086"
+                               Foreground="{DynamicResource MutedBrush}"
                                FontSize="11"
                                Margin="0,4,0,16" />
 
                         <!-- Language -->
                         <TextBlock Text="{DynamicResource Settings.Language}"
-                               Foreground="#9399B2"
+                               Foreground="{DynamicResource SubtextBrush}"
                                FontSize="12"
                                Margin="0,0,0,6" />
                         <ComboBox ItemsSource="{Binding AvailableLanguages}"
                               SelectedValue="{Binding Language}"
                               SelectedValuePath="Code"
-                              Background="#313244"
-                              Foreground="#CDD6F4"
-                              BorderBrush="#45475A"
+                              Background="{DynamicResource SurfaceBrush}"
+                              Foreground="{DynamicResource TextBrush}"
+                              BorderBrush="{DynamicResource OverlayBrush}"
                               BorderThickness="1"
                               Padding="10,8"
-                              HorizontalContentAlignment="Left">
+                              HorizontalContentAlignment="Left"
+                              Margin="0,0,0,16">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock>

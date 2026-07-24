@@ -1,9 +1,9 @@
+using Microsoft.Win32;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
-using Microsoft.Win32;
 using System.Windows.Interop;
 
 namespace PayBeat.App;
@@ -62,6 +62,7 @@ public partial class App
         var settings = _settingsService.Load();
         _startupSettings = settings;
         LocalizationService.Apply(settings.Language);
+        ThemeService.Apply(settings.Theme);
 
         _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
         if (!createdNew)
