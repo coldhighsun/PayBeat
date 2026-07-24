@@ -49,28 +49,6 @@ public partial class SettingsWindow
         return string.Join("+", parts);
     }
 
-    private static void SetHotkeyBoxCapturingStyle(TextBox box, bool capturing)
-    {
-        if (capturing)
-        {
-            box.Background = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1C3A5E"));
-            box.BorderBrush = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#89B4FA"));
-            box.Foreground = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#89B4FA"));
-        }
-        else
-        {
-            box.Background = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#313244"));
-            box.BorderBrush = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#45475A"));
-            box.Foreground = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#CDD6F4"));
-        }
-    }
-
     private void HotkeyBox_GotFocus(object sender, RoutedEventArgs e)
     {
         ((App)Application.Current).SuspendHotkey();
@@ -172,6 +150,31 @@ public partial class SettingsWindow
         box.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
     }
 
+    private void Integer_Pasting(object sender, DataObjectPastingEventArgs e)
+    {
+        if (e.DataObject.GetDataPresent(typeof(string)))
+        {
+            var text = (string)e.DataObject.GetData(typeof(string))!;
+            if (!IntegerPattern.IsMatch(text))
+            {
+                e.CancelCommand();
+            }
+        }
+        else
+        {
+            e.CancelCommand();
+        }
+    }
+
+    private void Integer_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        var box = (TextBox)sender;
+        var prospective =
+            box.Text.Remove(box.SelectionStart, box.SelectionLength).Insert(box.SelectionStart, e.Text);
+
+        e.Handled = !IntegerPattern.IsMatch(prospective);
+    }
+
     private void Salary_Pasting(object sender, DataObjectPastingEventArgs e)
     {
         if (e.DataObject.GetDataPresent(typeof(string)))
@@ -197,29 +200,20 @@ public partial class SettingsWindow
         e.Handled = !DecimalPattern.IsMatch(prospective);
     }
 
-    private void Integer_Pasting(object sender, DataObjectPastingEventArgs e)
+    private void SetHotkeyBoxCapturingStyle(TextBox box, bool capturing)
     {
-        if (e.DataObject.GetDataPresent(typeof(string)))
+        if (capturing)
         {
-            var text = (string)e.DataObject.GetData(typeof(string))!;
-            if (!IntegerPattern.IsMatch(text))
-            {
-                e.CancelCommand();
-            }
+            box.Background = (System.Windows.Media.Brush)FindResource("CaptureBackgroundBrush");
+            box.BorderBrush = (System.Windows.Media.Brush)FindResource("BlueBrush");
+            box.Foreground = (System.Windows.Media.Brush)FindResource("BlueBrush");
         }
         else
         {
-            e.CancelCommand();
+            box.Background = (System.Windows.Media.Brush)FindResource("SurfaceBrush");
+            box.BorderBrush = (System.Windows.Media.Brush)FindResource("OverlayBrush");
+            box.Foreground = (System.Windows.Media.Brush)FindResource("TextBrush");
         }
-    }
-
-    private void Integer_PreviewTextInput(object sender, TextCompositionEventArgs e)
-    {
-        var box = (TextBox)sender;
-        var prospective =
-            box.Text.Remove(box.SelectionStart, box.SelectionLength).Insert(box.SelectionStart, e.Text);
-
-        e.Handled = !IntegerPattern.IsMatch(prospective);
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -23,8 +23,8 @@ public partial class FlexView
     {
         var backgroundAnimation = new ColorAnimation
         {
-            From = System.Windows.Media.Color.FromRgb(0x18, 0x18, 0x25),
-            To = System.Windows.Media.Color.FromRgb(0x31, 0x32, 0x44),
+            From = (System.Windows.Media.Color)FindResource("FlexGradientMidColor"),
+            To = (System.Windows.Media.Color)FindResource("SurfaceColor"),
             Duration = TimeSpan.FromSeconds(6),
             AutoReverse = true,
             RepeatBehavior = RepeatBehavior.Forever,

@@ -11,6 +11,11 @@ namespace PayBeat.App.ViewModels;
 /// <param name="Name">Display name shown in the UI.</param>
 public record LanguageOption(string Code, string Name);
 
+/// <summary>Represents a theme choice shown in the settings theme dropdown.</summary>
+/// <param name="Code">Theme code stored in settings (e.g. <c>"auto"</c>, <c>"light"</c>, <c>"dark"</c>).</param>
+/// <param name="Name">Display name shown in the UI.</param>
+public record ThemeOption(string Code, string Name);
+
 /// <summary>
 /// View model for the settings window. Validates and saves user preferences,
 /// then calls <see cref="MainViewModel.ReloadSettings"/> to apply changes immediately.
@@ -23,22 +28,23 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     private string _currencyText;
     private string _dailySalaryText;
     private DisplayMode _displayMode;
+    private bool _enableEndOfDayReminder;
+    private bool _enableMilestoneNotifications;
+    private string _endOfDayReminderMinutesText;
     private int _hotkeyModifiers;
     private int _hotkeyVirtualKey;
     private string _language;
+    private bool _lunchBreakEnabled;
+    private TimeOnly _lunchBreakEnd;
+    private TimeOnly _lunchBreakStart;
+    private string _milestoneAmountText;
     private double _opacity;
     private int _refreshInterval;
     private bool _runAtStartup;
+    private string _theme;
     private TimeOnly _workEnd;
-    private TimeOnly _workStart;
-    private bool _lunchBreakEnabled;
-    private TimeOnly _lunchBreakStart;
-    private TimeOnly _lunchBreakEnd;
     private bool _workOnWeekends;
-    private bool _enableEndOfDayReminder;
-    private string _endOfDayReminderMinutesText;
-    private bool _enableMilestoneNotifications;
-    private string _milestoneAmountText;
+    private TimeOnly _workStart;
 
     /// <summary>
     /// Initializes a new instance of <see cref="SettingsViewModel"/>, populating fields from the
@@ -61,6 +67,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         _opacity = s.Opacity;
         _refreshInterval = s.RefreshInterval;
         _language = s.Language;
+        _theme = s.Theme;
         _hotkeyModifiers = s.HotkeyModifiers;
         _hotkeyVirtualKey = s.HotkeyVirtualKey;
         _runAtStartup = StartupService.IsEnabled();
@@ -93,6 +100,17 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         new("auto", "Auto"),
         new("en", "English"),
         new("zh-CN", "中文"),
+    ];
+
+    /// <summary>Fixed list of theme options shown in the theme dropdown.</summary>
+    public IReadOnlyList<ThemeOption> AvailableThemes
+    {
+        get;
+    } =
+        [
+        new("auto", "Auto"),
+        new("light", "Light"),
+        new("dark", "Dark"),
     ];
 
     /// <summary>Closes the settings window without saving.</summary>
@@ -140,13 +158,13 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Raw text entered in the end-of-day reminder minutes field; must be an integer in [1, 60].</summary>
-    public string EndOfDayReminderMinutesText
+    /// <summary>Whether the end-of-day reminder tray notification is enabled.</summary>
+    public bool EnableEndOfDayReminder
     {
-        get => _endOfDayReminderMinutesText;
+        get => _enableEndOfDayReminder;
         set
         {
-            SetField(ref _endOfDayReminderMinutesText, value);
+            SetField(ref _enableEndOfDayReminder, value);
             Revalidate();
         }
     }
@@ -162,16 +180,19 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Whether the end-of-day reminder tray notification is enabled.</summary>
-    public bool EnableEndOfDayReminder
+    /// <summary>Raw text entered in the end-of-day reminder minutes field; must be an integer in [1, 60].</summary>
+    public string EndOfDayReminderMinutesText
     {
-        get => _enableEndOfDayReminder;
+        get => _endOfDayReminderMinutesText;
         set
         {
-            SetField(ref _enableEndOfDayReminder, value);
+            SetField(ref _endOfDayReminderMinutesText, value);
             Revalidate();
         }
     }
+
+    /// <summary>Unused; per-field errors are reported via the indexer instead.</summary>
+    string IDataErrorInfo.Error => string.Empty;
 
     /// <summary>Validation error message shown below the Save button; empty string when there is no error.</summary>
     public string ErrorMessage
@@ -179,18 +200,6 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         get;
         private set => SetField(ref field, value);
     } = string.Empty;
-
-    /// <summary>Unused; per-field errors are reported via the indexer instead.</summary>
-    string IDataErrorInfo.Error => string.Empty;
-
-    /// <summary>Per-field validation error shown as a bubble popup next to the offending input.</summary>
-    string IDataErrorInfo.this[string columnName] => columnName switch
-    {
-        nameof(DailySalaryText) => ValidateDailySalary() ?? string.Empty,
-        nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() ?? string.Empty : string.Empty,
-        nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() ?? string.Empty : string.Empty,
-        _ => string.Empty,
-    };
 
     /// <summary>Human-readable hotkey string (e.g. <c>Ctrl+Alt+X</c>) shown in the hotkey field.</summary>
     public string HotkeyDisplayText => HotkeyService.Format(HotkeyModifiers, HotkeyVirtualKey);
@@ -355,6 +364,13 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         get;
     }
 
+    /// <summary>Selected theme code (e.g. <c>"auto"</c>, <c>"light"</c>, <c>"dark"</c>).</summary>
+    public string Theme
+    {
+        get => _theme;
+        set => SetField(ref _theme, value);
+    }
+
     /// <summary>Work day end time. Changing this re-evaluates <see cref="SaveCommand"/> availability.</summary>
     public TimeOnly WorkEnd
     {
@@ -364,6 +380,13 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
             SetField(ref _workEnd, value);
             Revalidate();
         }
+    }
+
+    /// <summary>Whether earnings accrue on Saturdays and Sundays.</summary>
+    public bool WorkOnWeekends
+    {
+        get => _workOnWeekends;
+        set => SetField(ref _workOnWeekends, value);
     }
 
     /// <summary>Work day start time. Changing this re-evaluates <see cref="SaveCommand"/> availability.</summary>
@@ -377,14 +400,28 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Whether earnings accrue on Saturdays and Sundays.</summary>
-    public bool WorkOnWeekends
+    /// <summary>Per-field validation error shown as a bubble popup next to the offending input.</summary>
+    string IDataErrorInfo.this[string columnName] => columnName switch
     {
-        get => _workOnWeekends;
-        set => SetField(ref _workOnWeekends, value);
-    }
+        nameof(DailySalaryText) => ValidateDailySalary() ?? string.Empty,
+        nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() ?? string.Empty : string.Empty,
+        nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() ?? string.Empty : string.Empty,
+        _ => string.Empty,
+    };
 
     private bool CanSave() => Validate() is null;
+
+    private void CloseWindow()
+    {
+        foreach (Window w in Application.Current.Windows)
+        {
+            if (w is SettingsWindow)
+            {
+                w.Close();
+                break;
+            }
+        }
+    }
 
     /// <summary>
     /// Updates the bottom-of-window error message and Save availability. Only schedule-related errors are
@@ -397,19 +434,51 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
     }
 
-    /// <summary>Validates work hours and lunch break; returns <see langword="null"/> when valid.</summary>
-    private string? ValidateSchedule()
+    private void Save()
     {
-        if (WorkStart >= WorkEnd)
+        if (Validate() is not null)
         {
-            return LocalizationService.Get("Error.WorkEndAfterStart");
-        }
-        if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
-        {
-            return LocalizationService.Get("Error.LunchBreakInvalid");
+            ErrorMessage = ValidateSchedule() ?? string.Empty;
+            return;
         }
 
-        return null;
+        var salary = decimal.Parse(_dailySalaryText);
+        var existing = _service.Load();
+        var settings = existing with
+        {
+            DailySalary = Math.Round(salary, 2),
+            WorkStart = WorkStart,
+            WorkEnd = WorkEnd,
+            Currency = string.IsNullOrWhiteSpace(_currencyText) ? "¥" : _currencyText.Trim(),
+            DisplayMode = DisplayMode,
+            AlwaysOnTop = AlwaysOnTop,
+            Opacity = Opacity,
+            RefreshInterval = RefreshInterval,
+            Language = Language,
+            Theme = Theme,
+            HotkeyModifiers = HotkeyModifiers,
+            HotkeyVirtualKey = HotkeyVirtualKey,
+            LunchBreakEnabled = LunchBreakEnabled,
+            LunchBreakStart = LunchBreakStart,
+            LunchBreakEnd = LunchBreakEnd,
+            WorkOnWeekends = WorkOnWeekends,
+            EnableEndOfDayReminder = EnableEndOfDayReminder,
+            EndOfDayReminderMinutes = EnableEndOfDayReminder && int.TryParse(_endOfDayReminderMinutesText, out var parsedMinutes)
+                ? parsedMinutes
+                : existing.EndOfDayReminderMinutes,
+            EnableMilestoneNotifications = EnableMilestoneNotifications,
+            MilestoneAmount = EnableMilestoneNotifications && decimal.TryParse(_milestoneAmountText, out var parsedMilestone)
+                ? Math.Round(parsedMilestone, 2)
+                : existing.MilestoneAmount
+        };
+
+        _service.Save(settings);
+        StartupService.SetEnabled(_runAtStartup);
+        LocalizationService.Apply(Language);
+        ThemeService.Apply(Theme);
+        _mainVm.ReloadSettings();
+
+        CloseWindow();
     }
 
     /// <summary>Validates all fields and returns the first error message, or <see langword="null"/> when everything is valid.</summary>
@@ -486,60 +555,18 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         return null;
     }
 
-    private void CloseWindow()
+    /// <summary>Validates work hours and lunch break; returns <see langword="null"/> when valid.</summary>
+    private string? ValidateSchedule()
     {
-        foreach (Window w in Application.Current.Windows)
+        if (WorkStart >= WorkEnd)
         {
-            if (w is SettingsWindow)
-            {
-                w.Close();
-                break;
-            }
+            return LocalizationService.Get("Error.WorkEndAfterStart");
         }
-    }
-
-    private void Save()
-    {
-        if (Validate() is not null)
+        if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
         {
-            ErrorMessage = ValidateSchedule() ?? string.Empty;
-            return;
+            return LocalizationService.Get("Error.LunchBreakInvalid");
         }
 
-        var salary = decimal.Parse(_dailySalaryText);
-        var existing = _service.Load();
-        var settings = existing with
-        {
-            DailySalary = Math.Round(salary, 2),
-            WorkStart = WorkStart,
-            WorkEnd = WorkEnd,
-            Currency = string.IsNullOrWhiteSpace(_currencyText) ? "¥" : _currencyText.Trim(),
-            DisplayMode = DisplayMode,
-            AlwaysOnTop = AlwaysOnTop,
-            Opacity = Opacity,
-            RefreshInterval = RefreshInterval,
-            Language = Language,
-            HotkeyModifiers = HotkeyModifiers,
-            HotkeyVirtualKey = HotkeyVirtualKey,
-            LunchBreakEnabled = LunchBreakEnabled,
-            LunchBreakStart = LunchBreakStart,
-            LunchBreakEnd = LunchBreakEnd,
-            WorkOnWeekends = WorkOnWeekends,
-            EnableEndOfDayReminder = EnableEndOfDayReminder,
-            EndOfDayReminderMinutes = EnableEndOfDayReminder && int.TryParse(_endOfDayReminderMinutesText, out var parsedMinutes)
-                ? parsedMinutes
-                : existing.EndOfDayReminderMinutes,
-            EnableMilestoneNotifications = EnableMilestoneNotifications,
-            MilestoneAmount = EnableMilestoneNotifications && decimal.TryParse(_milestoneAmountText, out var parsedMilestone)
-                ? Math.Round(parsedMilestone, 2)
-                : existing.MilestoneAmount
-        };
-
-        _service.Save(settings);
-        StartupService.SetEnabled(_runAtStartup);
-        LocalizationService.Apply(Language);
-        _mainVm.ReloadSettings();
-
-        CloseWindow();
+        return null;
     }
 }

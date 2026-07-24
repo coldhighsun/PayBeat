@@ -13,9 +13,9 @@
         FontFamily="Segoe UI"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
-    <Border Background="#1E1E2E"
+    <Border Background="{DynamicResource BaseBrush}"
             CornerRadius="12"
-            BorderBrush="#45475A"
+            BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="#000000" Opacity="0.5" BlurRadius="24" ShadowDepth="0"/>
@@ -30,7 +30,7 @@
                     Content="✕"
                     FontSize="12"
                     Background="Transparent"
-                    Foreground="#6C7086"
+                    Foreground="{DynamicResource MutedBrush}"
                     BorderThickness="0"
                     Cursor="Hand"
                     Click="CloseButton_Click"
@@ -49,8 +49,8 @@
                         </Setter>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#313244"/>
-                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                                <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -65,12 +65,12 @@
                        Margin="0,0,0,12"
                        RenderOptions.BitmapScalingMode="HighQuality"/>
                 <TextBlock Text="PayBeat"
-                           Foreground="#CDD6F4"
+                           Foreground="{DynamicResource TextBrush}"
                            FontSize="22"
                            FontWeight="Bold"
                            HorizontalAlignment="Center"/>
                 <TextBlock x:Name="VersionText"
-                           Foreground="#6C7086"
+                           Foreground="{DynamicResource MutedBrush}"
                            FontSize="12"
                            HorizontalAlignment="Center"
                            Margin="0,4,0,0"/>
@@ -79,7 +79,7 @@
             <!-- Description -->
             <TextBlock DockPanel.Dock="Top"
                        Text="{DynamicResource About.Description}"
-                       Foreground="#9399B2"
+                       Foreground="{DynamicResource SubtextBrush}"
                        FontSize="13"
                        TextWrapping="Wrap"
                        TextAlignment="Center"
@@ -89,7 +89,7 @@
             <!-- Separator -->
             <Border DockPanel.Dock="Top"
                     Height="1"
-                    Background="#313244"
+                    Background="{DynamicResource SurfaceBrush}"
                     Margin="0,0,0,16"/>
 
             <!-- Author row -->
@@ -100,11 +100,11 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Text="{DynamicResource About.Author}"
-                           Foreground="#6C7086"
+                           Foreground="{DynamicResource MutedBrush}"
                            FontSize="12"/>
                 <TextBlock Grid.Column="1"
                            Text="coldhighsun"
-                           Foreground="#CDD6F4"
+                           Foreground="{DynamicResource TextBrush}"
                            FontSize="12"/>
             </Grid>
 
@@ -116,11 +116,11 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Text="{DynamicResource About.License}"
-                           Foreground="#6C7086"
+                           Foreground="{DynamicResource MutedBrush}"
                            FontSize="12"/>
                 <TextBlock Grid.Column="1"
                            Text="MIT"
-                           Foreground="#CDD6F4"
+                           Foreground="{DynamicResource TextBrush}"
                            FontSize="12"/>
             </Grid>
 
@@ -132,11 +132,11 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Text="{DynamicResource About.GitHub}"
-                           Foreground="#6C7086"
+                           Foreground="{DynamicResource MutedBrush}"
                            FontSize="12"/>
                 <TextBlock Grid.Column="1" FontSize="12">
                     <Hyperlink x:Name="GitHubLink"
-                               Foreground="#89B4FA"
+                               Foreground="{DynamicResource BlueBrush}"
                                TextDecorations="None"
                                RequestNavigate="GitHubLink_RequestNavigate"
                                NavigateUri="https://github.com/coldhighsun/PayBeat">
@@ -150,15 +150,15 @@
                     Content="{DynamicResource About.Close}"
                     HorizontalAlignment="Center"
                     Padding="32,10"
-                    Background="#313244"
-                    Foreground="#CDD6F4"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Foreground="{DynamicResource TextBrush}"
                     BorderThickness="0"
                     FontSize="13"
                     Cursor="Hand"
                     Click="CloseButton_Click">
                 <Button.Style>
                     <Style TargetType="Button">
-                        <Setter Property="Background" Value="#313244"/>
+                        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="Button">
@@ -172,7 +172,7 @@
                         </Setter>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#45475A"/>
+                                <Setter Property="Background" Value="{DynamicResource OverlayBrush}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>

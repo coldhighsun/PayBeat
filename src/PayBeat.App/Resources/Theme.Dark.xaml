@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Color palette: Catppuccin Mocha (dark) -->
+    <Color x:Key="BaseColor">#1E1E2E</Color>
+    <Color x:Key="SurfaceColor">#313244</Color>
+    <Color x:Key="OverlayColor">#45475A</Color>
+    <Color x:Key="TextColor">#CDD6F4</Color>
+    <Color x:Key="SubtextColor">#9399B2</Color>
+    <Color x:Key="MutedColor">#6C7086</Color>
+    <Color x:Key="GreenColor">#A6E3A1</Color>
+    <Color x:Key="BlueColor">#89B4FA</Color>
+    <Color x:Key="RedColor">#F38BA8</Color>
+    <Color x:Key="CaptureBackgroundColor">#1C3A5E</Color>
+    <Color x:Key="FlexGradientMidColor">#181825</Color>
+
+    <SolidColorBrush x:Key="BaseBrush" Color="{StaticResource BaseColor}"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}"/>
+    <SolidColorBrush x:Key="OverlayBrush" Color="{StaticResource OverlayColor}"/>
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="SubtextBrush" Color="{StaticResource SubtextColor}"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource MutedColor}"/>
+    <SolidColorBrush x:Key="GreenBrush" Color="{StaticResource GreenColor}"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="{StaticResource BlueColor}"/>
+    <SolidColorBrush x:Key="RedBrush" Color="{StaticResource RedColor}"/>
+    <SolidColorBrush x:Key="CaptureBackgroundBrush" Color="{StaticResource CaptureBackgroundColor}"/>
+
+</ResourceDictionary>
