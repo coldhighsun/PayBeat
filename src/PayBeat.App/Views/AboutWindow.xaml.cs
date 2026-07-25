@@ -1,42 +1,49 @@
+using PayBeat.App.Helpers;
+using PayBeat.App.Services;
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Navigation;
 
 namespace PayBeat.App.Views;
 
 /// <summary>
-/// Displays app version, author, and license information.
+/// Displays app version, author, and license information, and checks for updates on open.
 /// </summary>
 public partial class AboutWindow
 {
+    private readonly SettingsService _settingsService;
+
     /// <summary>
-    /// Initializes the about window and populates the version label.
+    /// Initializes the about window, populates the version label, and starts an update check.
     /// </summary>
-    public AboutWindow()
+    public AboutWindow(SettingsService settingsService)
     {
+        _settingsService = settingsService;
         InitializeComponent();
-        VersionText.Text = GetVersionString();
+        VersionText.Text = $"v{AppVersion.Current}";
+        UpdateStatusText.Text = LocalizationService.Get("About.Update.Checking");
+        _ = CheckForUpdatesAsync();
     }
 
-    private static string GetVersionString()
+    private async Task CheckForUpdatesAsync()
     {
-        var version = Assembly.GetExecutingAssembly()
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            ?.InformationalVersion
-            ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString(3);
-
-        if (version is null)
+        var info = await new UpdateCheckService().GetLatestReleaseAsync();
+        _settingsService.Save(_settingsService.Load() with
         {
-            return string.Empty;
-        }
+            LastUpdateCheckUtc = DateTimeOffset.UtcNow
+        });
 
-        var plus = version.IndexOf('+');
-        if (plus >= 0)
+        if (info != null)
         {
-            version = version[..plus];
+            UpdateStatusText.Text = string.Empty;
+            UpdateStatusLink.NavigateUri = new Uri(info.HtmlUrl);
+            UpdateStatusLink.Inlines.Clear();
+            UpdateStatusLink.Inlines.Add(string.Format(LocalizationService.Get("About.Update.Available"), info.Version));
+            UpdateStatusLinkContainer.Visibility = Visibility.Visible;
         }
-
-        return $"v{version}";
+        else
+        {
+            UpdateStatusText.Text = LocalizationService.Get("About.Update.UpToDate");
+        }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

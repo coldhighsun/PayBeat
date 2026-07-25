@@ -79,6 +79,9 @@
     <sys:String x:Key="About.License">许可证</sys:String>
     <sys:String x:Key="About.GitHub">GitHub</sys:String>
     <sys:String x:Key="About.Close">关闭</sys:String>
+    <sys:String x:Key="About.Update.Checking">正在检查更新...</sys:String>
+    <sys:String x:Key="About.Update.UpToDate">已是最新版本</sys:String>
+    <sys:String x:Key="About.Update.Available">发现新版本：v{0}</sys:String>
 
     <!-- Validation errors -->
     <sys:String x:Key="Error.SalaryPositive">日薪须大于 0</sys:String>
@@ -97,5 +100,7 @@
     <sys:String x:Key="Notification.MilestoneBody">今天已赚到 {0}！</sys:String>
     <sys:String x:Key="Notification.EndOfDayTitle">快下班了</sys:String>
     <sys:String x:Key="Notification.EndOfDayBody">还有 {0} 分钟下班。</sys:String>
+    <sys:String x:Key="Notification.UpdateAvailableTitle">发现新版本</sys:String>
+    <sys:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} 已发布，打开"关于"窗口下载。</sys:String>
 
 </ResourceDictionary>

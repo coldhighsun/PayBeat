@@ -238,10 +238,16 @@ public class MainViewModel : ViewModelBase, IDisposable
             }
         }
 
-        var win = new AboutWindow();
+        var win = new AboutWindow(_settingsService);
         ApplyTopmostIfNeeded(win);
         win.Show();
     }
+
+    /// <summary>Raises <see cref="NotificationRequested"/> with a localized "update available" message.</summary>
+    public void NotifyUpdateAvailable(string version) =>
+        NotificationRequested?.Invoke(
+            LocalizationService.Get("Notification.UpdateAvailableTitle"),
+            string.Format(LocalizationService.Get("Notification.UpdateAvailableBody"), version));
 
     private void OpenSettings()
     {

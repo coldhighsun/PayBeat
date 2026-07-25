@@ -79,6 +79,9 @@
     <sys:String x:Key="About.License">License</sys:String>
     <sys:String x:Key="About.GitHub">GitHub</sys:String>
     <sys:String x:Key="About.Close">Close</sys:String>
+    <sys:String x:Key="About.Update.Checking">Checking for updates...</sys:String>
+    <sys:String x:Key="About.Update.UpToDate">You're up to date</sys:String>
+    <sys:String x:Key="About.Update.Available">Update available: v{0}</sys:String>
 
     <!-- Validation errors -->
     <sys:String x:Key="Error.SalaryPositive">Daily salary must be greater than 0</sys:String>
@@ -97,5 +100,7 @@
     <sys:String x:Key="Notification.MilestoneBody">You've earned {0} today!</sys:String>
     <sys:String x:Key="Notification.EndOfDayTitle">Almost Done</sys:String>
     <sys:String x:Key="Notification.EndOfDayBody">Work ends in {0} minutes.</sys:String>
+    <sys:String x:Key="Notification.UpdateAvailableTitle">Update Available</sys:String>
+    <sys:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} is available. Open About to download it.</sys:String>
 
 </ResourceDictionary>

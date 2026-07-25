@@ -134,4 +134,12 @@ public record SalarySettings
     /// supported explicit values are <c>"light"</c> and <c>"dark"</c>.
     /// </summary>
     public string Theme { get; init; } = "auto";
+
+    /// <summary>
+    /// Last time an automatic startup update check ran, used to throttle checks to once per day.
+    /// </summary>
+    public DateTimeOffset? LastUpdateCheckUtc
+    {
+        get; init;
+    }
 }
