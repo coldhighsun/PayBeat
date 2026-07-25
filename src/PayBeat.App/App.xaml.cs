@@ -58,68 +58,27 @@ public partial class App
     {
         base.OnStartup(e);
 
-        _settingsService = new SettingsService();
-        var settings = _settingsService.Load();
-        _startupSettings = settings;
-        LocalizationService.Apply(settings.Language);
-        ThemeService.Apply(settings.Theme);
+        var settings = LoadStartupSettings();
 
-        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
-        if (!createdNew)
+        if (!TryAcquireSingleInstance())
         {
-            MessageBox.Show(
-                (string)FindResource("Error.AlreadyRunning")!,
-                "PayBeat",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-            Shutdown();
             return;
         }
-        SystemEvents.SessionEnding += OnSessionEnding;
-        _mainVm = new MainViewModel(_settingsService);
-        _mainVm.HotkeySettingsChanged += OnHotkeySettingsChanged;
 
-        _mainWindow = new MainWindow { DataContext = _mainVm };
-        _mainWindow.SourceInitialized += (_, _) =>
-        {
-            var s = _settingsService.Load();
-            _hotkeyService = new HotkeyService();
-            var registered = _hotkeyService.Register(_mainWindow, s.HotkeyModifiers, s.HotkeyVirtualKey);
-            if (!registered)
-            {
-                var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
-                MessageBox.Show(
-                    string.Format((string)FindResource("Error.HotkeyConflict")!, key),
-                    "PayBeat",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            _hotkeyService.Triggered += ToggleWindowVisibility;
-        };
-        _mainWindow.ContentRendered += OnMainWindowContentRendered;
+        SystemEvents.SessionEnding += OnSessionEnding;
+        CreateMainViewModelAndWindow();
 
         if (settings.DisplayMode == DisplayMode.None)
         {
-            // Only create the HWND (for hotkey registration) without showing the window.
-            new WindowInteropHelper(_mainWindow).EnsureHandle();
-            _mainWindow.ContentRendered -= OnMainWindowContentRendered;
-            _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
-            return;
+            StartHiddenInTray();
         }
-
-        _mainWindow.IsRestoringStartupPosition = settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini or DisplayMode.Flex;
-        if (settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini)
+        else
         {
-            var startupPos = GetSavedPosition(settings, settings.DisplayMode);
-            if (startupPos != null)
-            {
-                _mainWindow.Left = startupPos.Left;
-                _mainWindow.Top = startupPos.Top;
-            }
+            ShowMainWindow(settings);
         }
 
-        _mainWindow.Show();
-        _trayIconService = new TrayIconService(_mainVm, ActivateMainWindow);
+        _trayIconService = new TrayIconService(_mainVm!, ActivateMainWindow);
+        CheckForUpdatesOnStartup(settings);
     }
 
     // Run restore after first render because clamping depends on measured window size.
@@ -144,14 +103,14 @@ public partial class App
     }
 
     private static WindowPosition? GetSavedPosition(SalarySettings settings, DisplayMode mode) =>
-            mode switch
-            {
-                DisplayMode.Normal => settings.NormalPosition,
-                DisplayMode.Mini => settings.MiniPosition,
-                DisplayMode.None => null,
-                DisplayMode.Flex => null,
-                _ => null
-            };
+                mode switch
+                {
+                    DisplayMode.Normal => settings.NormalPosition,
+                    DisplayMode.Mini => settings.MiniPosition,
+                    DisplayMode.None => null,
+                    DisplayMode.Flex => null,
+                    _ => null
+                };
 
     /// <summary>
     /// Restore Flex by preferred monitor name, falling back to nearest available monitor.
@@ -201,6 +160,51 @@ public partial class App
         _mainWindow.PlayAttentionAnimation();
     }
 
+    /// <summary>
+    /// Fires a best-effort, fire-and-forget update check, throttled to once per 24 hours via
+    /// <see cref="SalarySettings.LastUpdateCheckUtc"/>.
+    /// </summary>
+    private void CheckForUpdatesOnStartup(SalarySettings settings)
+    {
+        if (settings.LastUpdateCheckUtc is { } last && DateTimeOffset.UtcNow - last < TimeSpan.FromHours(24))
+        {
+            return;
+        }
+
+        _ = Task.Run(async () =>
+        {
+            var info = await new UpdateCheckService().GetLatestReleaseAsync();
+            _settingsService!.Save(_settingsService.Load() with
+            {
+                LastUpdateCheckUtc = DateTimeOffset.UtcNow
+            });
+            if (info != null)
+            {
+                Dispatcher.Invoke(() => _mainVm!.NotifyUpdateAvailable(info.Version));
+            }
+        });
+    }
+
+    private void CreateMainViewModelAndWindow()
+    {
+        _mainVm = new MainViewModel(_settingsService!);
+        _mainVm.HotkeySettingsChanged += OnHotkeySettingsChanged;
+
+        _mainWindow = new MainWindow { DataContext = _mainVm };
+        _mainWindow.SourceInitialized += OnMainWindowSourceInitialized;
+        _mainWindow.ContentRendered += OnMainWindowContentRendered;
+    }
+
+    private SalarySettings LoadStartupSettings()
+    {
+        _settingsService = new SettingsService();
+        var settings = _settingsService.Load();
+        _startupSettings = settings;
+        LocalizationService.Apply(settings.Language);
+        ThemeService.Apply(settings.Theme);
+        return settings;
+    }
+
     private void OnHotkeySettingsChanged()
     {
         var s = _settingsService!.Load();
@@ -229,6 +233,23 @@ public partial class App
         _mainWindow.ContentRendered -= OnMainWindowContentRendered;
         ApplyStartupPlacement(_mainWindow, _startupSettings);
         _mainWindow.IsRestoringStartupPosition = false;
+    }
+
+    private void OnMainWindowSourceInitialized(object? sender, EventArgs e)
+    {
+        var s = _settingsService!.Load();
+        _hotkeyService = new HotkeyService();
+        var registered = _hotkeyService.Register(_mainWindow!, s.HotkeyModifiers, s.HotkeyVirtualKey);
+        if (!registered)
+        {
+            var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
+            MessageBox.Show(
+                string.Format((string)FindResource("Error.HotkeyConflict")!, key),
+                "PayBeat",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+        _hotkeyService.Triggered += ToggleWindowVisibility;
     }
 
     /// <summary>
@@ -267,6 +288,29 @@ public partial class App
         _settingsService.Save(updated);
     }
 
+    private void ShowMainWindow(SalarySettings settings)
+    {
+        _mainWindow!.IsRestoringStartupPosition = settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini or DisplayMode.Flex;
+        if (settings.DisplayMode is DisplayMode.Normal or DisplayMode.Mini)
+        {
+            var startupPos = GetSavedPosition(settings, settings.DisplayMode);
+            if (startupPos != null)
+            {
+                _mainWindow.Left = startupPos.Left;
+                _mainWindow.Top = startupPos.Top;
+            }
+        }
+
+        _mainWindow.Show();
+    }
+
+    // Only create the HWND (for hotkey registration) without showing the window.
+    private void StartHiddenInTray()
+    {
+        new WindowInteropHelper(_mainWindow!).EnsureHandle();
+        _mainWindow!.ContentRendered -= OnMainWindowContentRendered;
+    }
+
     private void ToggleWindowVisibility()
     {
         if (_windowsHidden)
@@ -294,5 +338,22 @@ public partial class App
             _mainVm?.SuspendNotifications();
             _trayIconService?.SetHidden(true);
         }
+    }
+
+    private bool TryAcquireSingleInstance()
+    {
+        _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
+        if (createdNew)
+        {
+            return true;
+        }
+
+        MessageBox.Show(
+            (string)FindResource("Error.AlreadyRunning")!,
+            "PayBeat",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+        Shutdown();
+        return false;
     }
 }
