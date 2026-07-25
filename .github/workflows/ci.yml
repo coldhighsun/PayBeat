@@ -64,6 +64,18 @@ jobs:
           Compress-Archive -Path "publish-selfcontained/*" -DestinationPath $zipNameSelfContained
           echo "ZIP_NAME_SELFCONTAINED=$zipNameSelfContained" >> $env:GITHUB_ENV
 
+      - name: Install Inno Setup
+        run: winget install --id JRSoftware.InnoSetup.7 -e --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $iscc = (Get-ChildItem "$env:LocalAppData\Programs\Inno Setup*\ISCC.exe", "C:\Program Files*\Inno Setup*\ISCC.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+          & $iscc installer\PayBeat.iss "/DAppVersion=$version"
+          $setupName = Get-ChildItem "installer-output\*.exe" | Select-Object -First 1 -ExpandProperty Name
+          echo "SETUP_NAME=installer-output/$setupName" >> $env:GITHUB_ENV
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -71,4 +83,5 @@ jobs:
           files: |
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME_SELFCONTAINED }}
+            ${{ env.SETUP_NAME }}
           generate_release_notes: true
