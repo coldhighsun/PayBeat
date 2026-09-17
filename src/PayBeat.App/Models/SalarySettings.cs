@@ -46,7 +46,7 @@ public record SalarySettings
     /// <summary>
     /// Window opacity when the mouse is not hovering (0.1–1.0).
     /// </summary>
-    public double Opacity { get; init; } = 1.0;
+    public double Opacity { get; init; } = 0.8;
 
     /// <summary>
     /// UI language code. <c>"auto"</c> resolves to the OS UI culture;

@@ -3,7 +3,13 @@
 [![CI / Release](https://github.com/coldhighsun/PayBeat/actions/workflows/ci.yml/badge.svg)](https://github.com/coldhighsun/PayBeat/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/coldhighsun/PayBeat/total)](https://github.com/coldhighsun/PayBeat/releases)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows)](https://www.microsoft.com/windows)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/pulls)
+[![GitHub last commit](https://img.shields.io/github/last-commit/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/commits/main)
+[![GitHub Repo stars](https://img.shields.io/github/stars/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/stargazers)
 
 Real-time salary progress widget for Windows
 
@@ -90,7 +96,7 @@ Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-
 | Currency symbol | ¥ | Prefix shown before the amount |
 | Display mode | Normal | Initial widget size (None / Normal / Mini / Flex) |
 | Refresh interval | 1 s | UI update frequency (1–60 seconds) |
-| Opacity | 1.0 | Window opacity when the mouse is not hovering (0.1–1.0) |
+| Opacity | 0.8 | Window opacity when the mouse is not hovering (0.1–1.0) |
 | Theme | Auto | UI color theme (Auto / Light / Dark); Auto follows the Windows appearance setting |
 | Global hotkey | Ctrl+Alt+X | Toggle visibility of all windows |
 | Run at startup | Off | Launch automatically when Windows starts |
@@ -187,7 +193,7 @@ ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 | 货币符号 | ¥ | 显示在金额前的符号 |
 | 显示模式 | Normal | 初始显示模式（None / Normal / Mini / Flex） |
 | 刷新间隔 | 1 秒 | 界面更新频率（1–60 秒） |
-| 透明度 | 1.0 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
+| 透明度 | 0.8 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
 | 主题 | Auto | 界面配色（Auto / Light / Dark），Auto 跟随系统外观设置 |
 | 全局热键 | Ctrl+Alt+X | 显示 / 隐藏全部窗口 |
 | 开机自启 | 关 | 登录 Windows 后自动启动 |
