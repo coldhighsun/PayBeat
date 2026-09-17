@@ -54,8 +54,12 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// <summary>Raised when hotkey settings change so <c>App</c> can re-register the global hotkey.</summary>
     public event Action? HotkeySettingsChanged;
 
-    /// <summary>Raised when a milestone or end-of-day reminder should be shown as a tray notification.</summary>
-    public event Action<string, string>? NotificationRequested;
+    /// <summary>
+    /// Raised when a milestone, end-of-day, or update-available reminder should be shown as a tray
+    /// notification. The third parameter is an optional URL to open if the notification is clicked
+    /// (currently only set for "update available"; <see langword="null"/> for all others).
+    /// </summary>
+    public event Action<string, string, string?>? NotificationRequested;
 
     /// <summary>Whether the window should stay above all other windows.</summary>
     public bool AlwaysOnTop => _settings.AlwaysOnTop;
@@ -243,11 +247,15 @@ public class MainViewModel : ViewModelBase, IDisposable
         win.Show();
     }
 
-    /// <summary>Raises <see cref="NotificationRequested"/> with a localized "update available" message.</summary>
-    public void NotifyUpdateAvailable(string version) =>
+    /// <summary>
+    /// Raises <see cref="NotificationRequested"/> with a localized "update available" message that
+    /// opens <paramref name="htmlUrl"/> (the release page) if clicked.
+    /// </summary>
+    public void NotifyUpdateAvailable(string version, string? htmlUrl) =>
         NotificationRequested?.Invoke(
             LocalizationService.Get("Notification.UpdateAvailableTitle"),
-            string.Format(LocalizationService.Get("Notification.UpdateAvailableBody"), version));
+            string.Format(LocalizationService.Get("Notification.UpdateAvailableBody"), version),
+            htmlUrl);
 
     private void OpenSettings()
     {
@@ -299,7 +307,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         CheckNotifications(now);
 
         var current = TimeOnly.FromDateTime(now);
-        if (current <= _settings.WorkStart || current >= _settings.WorkEnd)
+        if (!EarningsCalculator.IsWithinWorkWindow(_settings, current))
         {
             _timer.Stop();
             ScheduleWakeTimer(now);
@@ -337,7 +345,8 @@ public class MainViewModel : ViewModelBase, IDisposable
 
             NotificationRequested?.Invoke(
                 LocalizationService.Get("Notification.MilestoneTitle"),
-                string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{reachedThreshold:N2}"));
+                string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{reachedThreshold:N2}"),
+                null);
             _nextMilestoneThreshold = NextMilestoneThresholdAbove(Earned, _settings.MilestoneAmount);
         }
 
@@ -347,7 +356,8 @@ public class MainViewModel : ViewModelBase, IDisposable
             _endOfDayReminderSent = true;
             NotificationRequested?.Invoke(
                 LocalizationService.Get("Notification.EndOfDayTitle"),
-                string.Format(LocalizationService.Get("Notification.EndOfDayBody"), _settings.EndOfDayReminderMinutes));
+                string.Format(LocalizationService.Get("Notification.EndOfDayBody"), _settings.EndOfDayReminderMinutes),
+                null);
         }
     }
 

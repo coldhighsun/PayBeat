@@ -61,14 +61,15 @@ public class SettingsService
 
     /// <summary>
     /// Repairs semantically invalid values that can slip past JSON deserialization (e.g. a
-    /// hand-edited file), such as a work schedule where <see cref="SalarySettings.WorkStart"/>
-    /// is not strictly before <see cref="SalarySettings.WorkEnd"/> — which would otherwise make
-    /// <c>EarningsCalculator</c> treat every moment of the day as post-workday and pay out the
-    /// full daily salary immediately.
+    /// hand-edited file), such as a zero-length work schedule where <see cref="SalarySettings.WorkStart"/>
+    /// equals <see cref="SalarySettings.WorkEnd"/> — which would otherwise make <c>EarningsCalculator</c>
+    /// treat every moment of the day as post-workday and pay out the full daily salary immediately.
+    /// A schedule where <c>WorkEnd</c> is earlier than <c>WorkStart</c> is a valid overnight shift
+    /// and is left as-is.
     /// </summary>
     private static SalarySettings Normalize(SalarySettings settings)
     {
-        if (settings.WorkStart >= settings.WorkEnd)
+        if (settings.WorkStart == settings.WorkEnd)
         {
             var defaults = new SalarySettings();
             settings = settings with { WorkStart = defaults.WorkStart, WorkEnd = defaults.WorkEnd };

@@ -15,17 +15,18 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 
 ## Features
 
-- Linearly calculates earnings per second from your daily salary and work hours
+- Linearly calculates earnings per second from your daily salary and work hours, including overnight shifts that cross midnight (e.g. 22:00–06:00)
 - Four display modes (None / Normal / Mini / Flex) — double-click to open Settings
 - Flex mode is a fullscreen "show-off" view with a huge earnings figure, full workday stats, and a decorative animated background
 - Each mode remembers its last position independently, with multi-monitor support
 - System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
 - Global hotkey to show / hide all windows (default `Ctrl+Alt+X`)
 - Optional lunch break deduction and weekend earnings
-- Tray balloon notifications for an end-of-day reminder and earnings milestones
+- Tray balloon notifications for an end-of-day reminder, earnings milestones, and available updates — clicking an update notification opens its release page
+- Checks GitHub Releases for updates on startup (throttled to once per day)
 - English and Simplified Chinese UI, auto-detected from the OS locale
 - Light and dark themes, auto-detected from the Windows appearance setting
-- Configurable opacity, refresh interval, and currency symbol
+- Configurable opacity, refresh interval, and currency symbol; numbers follow your Windows region format (decimal/thousands separators)
 - Optional Windows startup registration
 
 ## Screenshots
@@ -85,7 +86,7 @@ Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-
 |--------|---------|-------------|
 | Daily salary | 500 | Pre-tax gross salary per workday (decimals supported, max 99,999,999) |
 | Work start | 09:00 | Time when earnings begin accruing |
-| Work end | 18:00 | Time when earnings are capped at the daily total |
+| Work end | 18:00 | Time when earnings are capped at the daily total; set earlier than Work start for an overnight shift |
 | Currency symbol | ¥ | Prefix shown before the amount |
 | Display mode | Normal | Initial widget size (None / Normal / Mini / Flex) |
 | Refresh interval | 1 s | UI update frequency (1–60 seconds) |
@@ -111,17 +112,18 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 
 ## 功能
 
-- 根据日薪和工作时段，每秒线性计算已赚金额
+- 根据日薪和工作时段，每秒线性计算已赚金额，支持跨午夜的夜班排班（如 22:00–06:00）
 - 四种显示模式（None / Normal / Mini / Flex），双击打开设置
 - Flex 模式为全屏"炫耀"视图，超大金额数字、完整工时统计，配有动态背景动画
 - 每种模式独立记忆上次所在位置（支持多显示器）
 - 系统托盘图标，右键菜单可切换显示模式、打开设置 / 关于、退出；左键点击会将悬浮窗置于最前并闪烁放大提示
 - 全局热键一键显示 / 隐藏（默认 `Ctrl+Alt+X`）
 - 可选午休扣除时段，可选周末计薪
-- 托盘气泡通知：下班提醒、赚钱里程碑提醒
+- 托盘气泡通知：下班提醒、赚钱里程碑提醒、新版本提醒——点击新版本提醒气泡可直接打开发布页面
+- 启动时检查 GitHub Releases 是否有新版本（每天最多检查一次）
 - 支持中英文界面，随系统语言自动切换
 - 支持浅色 / 深色主题，随系统外观设置自动切换
-- 可设置透明度、刷新间隔、货币符号
+- 可设置透明度、刷新间隔、货币符号；数字格式跟随 Windows 系统区域设置（千分位/小数点分隔符）
 - 支持开机自启
 
 ## 界面截图
@@ -181,7 +183,7 @@ ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 |------|--------|------|
 | 日薪 | 500 | 每个工作日的税前薪资（支持小数，最大 99,999,999） |
 | 上班时间 | 09:00 | 开始计薪的时刻 |
-| 下班时间 | 18:00 | 薪资封顶的时刻 |
+| 下班时间 | 18:00 | 薪资封顶的时刻；设为早于上班时间即为夜班排班 |
 | 货币符号 | ¥ | 显示在金额前的符号 |
 | 显示模式 | Normal | 初始显示模式（None / Normal / Mini / Flex） |
 | 刷新间隔 | 1 秒 | 界面更新频率（1–60 秒） |

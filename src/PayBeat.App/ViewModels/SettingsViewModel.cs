@@ -568,14 +568,25 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         return null;
     }
 
-    /// <summary>Validates work hours and lunch break; returns <see langword="null"/> when valid.</summary>
+    /// <summary>
+    /// Validates work hours and lunch break; returns <see langword="null"/> when valid.
+    /// <c>WorkStart == WorkEnd</c> (a zero-length day) is the only invalid ordering — <c>WorkEnd</c>
+    /// before <c>WorkStart</c> is a valid overnight shift (see <see cref="EarningsCalculator"/>).
+    /// </summary>
     private string? ValidateSchedule()
     {
-        if (WorkStart >= WorkEnd)
+        if (WorkStart == WorkEnd)
         {
             return LocalizationService.Get("Error.WorkEndAfterStart");
         }
-        if (LunchBreakEnabled && (LunchBreakStart >= LunchBreakEnd || LunchBreakStart < WorkStart || LunchBreakEnd > WorkEnd))
+        if (LunchBreakEnabled && !EarningsCalculator.IsLunchBreakValid(new SalarySettings
+        {
+            WorkStart = WorkStart,
+            WorkEnd = WorkEnd,
+            LunchBreakEnabled = LunchBreakEnabled,
+            LunchBreakStart = LunchBreakStart,
+            LunchBreakEnd = LunchBreakEnd
+        }))
         {
             return LocalizationService.Get("Error.LunchBreakInvalid");
         }
