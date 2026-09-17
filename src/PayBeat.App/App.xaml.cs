@@ -4,7 +4,9 @@ using PayBeat.App.Models;
 using PayBeat.App.Services;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
+using System.Globalization;
 using System.Windows.Interop;
+using System.Windows.Markup;
 
 namespace PayBeat.App;
 
@@ -62,6 +64,16 @@ public partial class App
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // WPF's StringFormat bindings resolve culture from FrameworkElement.Language, which
+        // defaults to a hardcoded "en-US" regardless of the OS region settings. Overriding its
+        // default metadata to follow CultureInfo.CurrentCulture makes number/date formatting in
+        // XAML (e.g. NormalView/FlexView's StringFormat=N2 salary display) follow the user's
+        // regional settings, matching the culture-aware formatting C# string interpolation
+        // already uses elsewhere (e.g. MainViewModel.EarnedFormatted).
+        FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
         var settings = LoadStartupSettings();
 
@@ -185,7 +197,7 @@ public partial class App
             });
             if (info != null)
             {
-                Dispatcher.Invoke(() => _mainVm!.NotifyUpdateAvailable(info.Version));
+                Dispatcher.Invoke(() => _mainVm!.NotifyUpdateAvailable(info.Version, info.HtmlUrl));
             }
         });
     }

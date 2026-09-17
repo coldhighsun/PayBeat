@@ -86,7 +86,7 @@
     <!-- Validation errors -->
     <sys:String x:Key="Error.SalaryPositive">日薪须大于 0</sys:String>
     <sys:String x:Key="Error.SalaryTooLarge">日薪不能超过 99,999,999</sys:String>
-    <sys:String x:Key="Error.WorkEndAfterStart">下班时间须晚于上班时间</sys:String>
+    <sys:String x:Key="Error.WorkEndAfterStart">上班和下班时间不能相同</sys:String>
     <sys:String x:Key="Error.AlreadyRunning">PayBeat 已在运行中。</sys:String>
     <sys:String x:Key="Error.HotkeyConflict">快捷键 {0} 注册失败，可能已被其他程序占用。</sys:String>
     <sys:String x:Key="Error.LunchBreakInvalid">午休时间必须在工作时间内，且结束时间须晚于开始时间</sys:String>

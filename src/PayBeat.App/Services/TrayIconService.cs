@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using PayBeat.App.ViewModels;
 using MenuItem = System.Windows.Forms.ToolStripMenuItem;
 
@@ -18,6 +19,7 @@ public sealed class TrayIconService : IDisposable
     private readonly ToolStripItem[] _restrictedItems;
     private readonly MainViewModel _viewModel;
     private bool _isHidden;
+    private string? _pendingClickUrl;
 
     /// <summary>Creates and shows the tray icon.</summary>
     /// <param name="viewModel">Source of the display-mode state and commands the tray menu invokes.</param>
@@ -72,6 +74,7 @@ public sealed class TrayIconService : IDisposable
                 _viewModel.OpenSettingsCommand.Execute(null);
             }
         };
+        _notifyIcon.BalloonTipClicked += OnBalloonTipClicked;
 
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         _viewModel.NotificationRequested += OnNotificationRequested;
@@ -95,6 +98,7 @@ public sealed class TrayIconService : IDisposable
             // NotifyIcon has no HideBalloonTip API; toggling Visible dismisses any pending balloon tip.
             _notifyIcon.Visible = false;
             _notifyIcon.Visible = true;
+            _pendingClickUrl = null;
         }
     }
 
@@ -103,6 +107,7 @@ public sealed class TrayIconService : IDisposable
     {
         _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _viewModel.NotificationRequested -= OnNotificationRequested;
+        _notifyIcon.BalloonTipClicked -= OnBalloonTipClicked;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
         _icon?.Dispose();
@@ -111,8 +116,26 @@ public sealed class TrayIconService : IDisposable
     private static string Text(string key) =>
         Application.Current.TryFindResource(key) as string ?? key;
 
-    private void OnNotificationRequested(string title, string body) =>
+    private void OnNotificationRequested(string title, string body, string? url)
+    {
+        _pendingClickUrl = url;
         _notifyIcon.ShowBalloonTip(3000, title, body, ToolTipIcon.Info);
+    }
+
+    /// <summary>
+    /// Opens the URL associated with the most recently shown balloon tip (currently only set for
+    /// "update available" notifications) when the user clicks it.
+    /// </summary>
+    private void OnBalloonTipClicked(object? sender, EventArgs e)
+    {
+        if (_pendingClickUrl is not { } url)
+        {
+            return;
+        }
+
+        _pendingClickUrl = null;
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
