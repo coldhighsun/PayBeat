@@ -41,6 +41,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     private double _opacity;
     private int _refreshInterval;
     private bool _runAtStartup;
+    private readonly bool? _initialRunAtStartup;
     private string _theme;
     private TimeOnly _workEnd;
     private bool _workOnWeekends;
@@ -70,7 +71,8 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         _theme = s.Theme;
         _hotkeyModifiers = s.HotkeyModifiers;
         _hotkeyVirtualKey = s.HotkeyVirtualKey;
-        _runAtStartup = StartupService.IsEnabled();
+        _initialRunAtStartup = StartupService.IsEnabled();
+        _runAtStartup = _initialRunAtStartup ?? false;
         _lunchBreakEnabled = s.LunchBreakEnabled;
         _lunchBreakStart = s.LunchBreakStart;
         _lunchBreakEnd = s.LunchBreakEnd;
@@ -472,8 +474,19 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
                 : existing.MilestoneAmount
         };
 
-        _service.Save(settings);
-        StartupService.SetEnabled(_runAtStartup);
+        if (!_service.Save(settings))
+        {
+            ErrorMessage = LocalizationService.Get("Error.SettingsSaveFailed");
+            return;
+        }
+
+        if (_runAtStartup != (_initialRunAtStartup ?? _runAtStartup) &&
+            !StartupService.SetEnabled(_runAtStartup))
+        {
+            ErrorMessage = LocalizationService.Get("Error.StartupToggleFailed");
+            return;
+        }
+
         LocalizationService.Apply(Language);
         ThemeService.Apply(Theme);
         _mainVm.ReloadSettings();

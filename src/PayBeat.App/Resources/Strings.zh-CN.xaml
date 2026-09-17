@@ -93,6 +93,8 @@
     <sys:String x:Key="Error.MilestoneAmountPositive">里程碑金额须大于 0</sys:String>
     <sys:String x:Key="Error.MilestoneAmountTooLarge">里程碑金额不能超过日薪总额</sys:String>
     <sys:String x:Key="Error.EndOfDayReminderMinutesInvalid">提醒分钟数须为 1 到 60 之间的整数</sys:String>
+    <sys:String x:Key="Error.SettingsSaveFailed">设置保存失败，请确认设置文件未被锁定或设为只读后重试。</sys:String>
+    <sys:String x:Key="Error.StartupToggleFailed">"开机启动"设置更新失败，您可能没有权限在此设备上修改该设置。</sys:String>
 
     <!-- Tray notifications -->
     <sys:String x:Key="Tray.HiddenTooltip">我爱上班！</sys:String>

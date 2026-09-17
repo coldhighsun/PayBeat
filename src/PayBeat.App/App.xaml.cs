@@ -21,6 +21,7 @@ public partial class App
     private MainWindow? _mainWindow;
     private SettingsService? _settingsService;
     private Mutex? _singleInstanceMutex;
+    private bool _ownsSingleInstanceMutex;
     private SalarySettings? _startupSettings;
     private TrayIconService? _trayIconService;
     private bool _windowsHidden;
@@ -48,7 +49,11 @@ public partial class App
         _trayIconService?.Dispose();
         _hotkeyService?.Dispose();
         _mainVm?.Dispose();
-        _singleInstanceMutex?.ReleaseMutex();
+        if (_ownsSingleInstanceMutex)
+        {
+            _singleInstanceMutex?.ReleaseMutex();
+        }
+
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
@@ -343,6 +348,7 @@ public partial class App
     private bool TryAcquireSingleInstance()
     {
         _singleInstanceMutex = new Mutex(initiallyOwned: true, "PayBeat_SingleInstance", out var createdNew);
+        _ownsSingleInstanceMutex = createdNew;
         if (createdNew)
         {
             return true;
