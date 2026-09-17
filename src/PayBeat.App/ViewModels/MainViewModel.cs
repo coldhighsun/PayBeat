@@ -324,15 +324,21 @@ public class MainViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        if (_settings.EnableMilestoneNotifications && _settings.MilestoneAmount > 0)
+        if (_settings.EnableMilestoneNotifications && _settings.MilestoneAmount > 0 && Earned >= _nextMilestoneThreshold)
         {
-            while (Earned >= _nextMilestoneThreshold)
+            // A single long tick (e.g. after sleep/resume) can jump past several milestones at
+            // once; collapse them into one notification for the highest threshold reached
+            // instead of firing a balloon tip per crossed multiple.
+            var reachedThreshold = _nextMilestoneThreshold;
+            while (Earned >= reachedThreshold + _settings.MilestoneAmount)
             {
-                NotificationRequested?.Invoke(
-                    LocalizationService.Get("Notification.MilestoneTitle"),
-                    string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{_nextMilestoneThreshold:N2}"));
-                _nextMilestoneThreshold += _settings.MilestoneAmount;
+                reachedThreshold += _settings.MilestoneAmount;
             }
+
+            NotificationRequested?.Invoke(
+                LocalizationService.Get("Notification.MilestoneTitle"),
+                string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{reachedThreshold:N2}"));
+            _nextMilestoneThreshold = NextMilestoneThresholdAbove(Earned, _settings.MilestoneAmount);
         }
 
         if (_settings.EnableEndOfDayReminder && !_endOfDayReminderSent

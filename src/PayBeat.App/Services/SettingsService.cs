@@ -4,7 +4,10 @@ namespace PayBeat.App.Services;
 
 /// <summary>
 /// Loads and saves <see cref="SalarySettings"/> as JSON at <c>%APPDATA%\PayBeat\settings.json</c>.
-/// Returns default settings when the file is absent or unreadable.
+/// Returns default settings when the file is absent or unreadable. Caches the last-read/written
+/// instance in memory so repeated <see cref="Load"/> calls (display-mode switches, hotkey changes,
+/// settings saves) don't re-read and re-deserialize the file each time; a single instance of this
+/// service is expected to live for the app's whole lifetime.
 /// </summary>
 public class SettingsService
 {
@@ -20,24 +23,38 @@ public class SettingsService
     };
 
     /// <summary>
-    /// Reads settings from disk. Returns a default <see cref="SalarySettings"/> instance
-    /// if the file does not exist or cannot be deserialized.
+    /// In-memory copy of the last settings read from or written to disk. <see cref="SalarySettings"/>
+    /// is an immutable record, so it's safe to hand the same cached instance out to every caller.
+    /// </summary>
+    private SalarySettings? _cache;
+
+    /// <summary>
+    /// Returns the current settings, reading them from disk only once per process (subsequent
+    /// calls return the cached instance kept in sync by <see cref="Save"/>). Returns a default
+    /// <see cref="SalarySettings"/> instance if the file does not exist or cannot be deserialized.
     /// </summary>
     public SalarySettings Load()
     {
+        if (_cache is { } cached)
+        {
+            return cached;
+        }
+
         if (!File.Exists(FilePath))
         {
-            return new SalarySettings();
+            return _cache = new SalarySettings();
         }
         try
         {
             var json = File.ReadAllText(FilePath);
             var settings = JsonSerializer.Deserialize<SalarySettings>(json, Options) ?? new SalarySettings();
-            return Normalize(settings);
+            return _cache = Normalize(settings);
         }
         catch
         {
             BackupCorruptFile();
+            // Don't cache this fallback: a transient read failure (e.g. a brief antivirus lock)
+            // should be retried on the next Load() instead of permanently sticking as defaults.
             return new SalarySettings();
         }
     }
@@ -73,11 +90,13 @@ public class SettingsService
         {
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
             File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+            _cache = settings;
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // Best-effort; a locked/full disk or permission issue shouldn't crash the app.
+            // Leave the cache as-is: the write failed, so disk still holds the last-saved value.
             return false;
         }
     }
