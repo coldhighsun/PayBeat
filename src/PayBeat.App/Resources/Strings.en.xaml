@@ -93,6 +93,8 @@
     <sys:String x:Key="Error.MilestoneAmountPositive">Milestone amount must be greater than 0</sys:String>
     <sys:String x:Key="Error.MilestoneAmountTooLarge">Milestone amount cannot exceed the daily salary</sys:String>
     <sys:String x:Key="Error.EndOfDayReminderMinutesInvalid">Reminder minutes must be an integer between 1 and 60</sys:String>
+    <sys:String x:Key="Error.SettingsSaveFailed">Failed to save settings. Check that the settings file isn't locked or read-only, then try again.</sys:String>
+    <sys:String x:Key="Error.StartupToggleFailed">Failed to update the "Run at startup" setting. You may not have permission to change it on this machine.</sys:String>
 
     <!-- Tray notifications -->
     <sys:String x:Key="Tray.HiddenTooltip">I love work!</sys:String>

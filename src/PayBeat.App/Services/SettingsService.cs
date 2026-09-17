@@ -32,7 +32,8 @@ public class SettingsService
         try
         {
             var json = File.ReadAllText(FilePath);
-            return JsonSerializer.Deserialize<SalarySettings>(json, Options) ?? new SalarySettings();
+            var settings = JsonSerializer.Deserialize<SalarySettings>(json, Options) ?? new SalarySettings();
+            return Normalize(settings);
         }
         catch
         {
@@ -42,13 +43,43 @@ public class SettingsService
     }
 
     /// <summary>
+    /// Repairs semantically invalid values that can slip past JSON deserialization (e.g. a
+    /// hand-edited file), such as a work schedule where <see cref="SalarySettings.WorkStart"/>
+    /// is not strictly before <see cref="SalarySettings.WorkEnd"/> — which would otherwise make
+    /// <c>EarningsCalculator</c> treat every moment of the day as post-workday and pay out the
+    /// full daily salary immediately.
+    /// </summary>
+    private static SalarySettings Normalize(SalarySettings settings)
+    {
+        if (settings.WorkStart >= settings.WorkEnd)
+        {
+            var defaults = new SalarySettings();
+            settings = settings with { WorkStart = defaults.WorkStart, WorkEnd = defaults.WorkEnd };
+        }
+
+        return settings;
+    }
+
+    /// <summary>
     /// Serializes <paramref name="settings"/> to disk, creating the directory if needed.
     /// </summary>
     /// <param name="settings">Settings to persist.</param>
-    public void Save(SalarySettings settings)
+    /// <returns><see langword="true"/> if the write succeeded; <see langword="false"/> if a
+    /// disk or permission error prevented it (the app doesn't crash, but callers should surface
+    /// the failure instead of assuming the settings were persisted).</returns>
+    public bool Save(SalarySettings settings)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-        File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+            File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Best-effort; a locked/full disk or permission issue shouldn't crash the app.
+            return false;
+        }
     }
 
     /// <summary>

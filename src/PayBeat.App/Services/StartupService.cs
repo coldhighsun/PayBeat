@@ -13,43 +13,64 @@ public static class StartupService
 
     /// <summary>
     /// Returns <see langword="true"/> when the PayBeat startup entry exists in the registry
-    /// and points at the currently running executable's path.
+    /// and points at the currently running executable's path, <see langword="false"/> when it
+    /// doesn't, or <see langword="null"/> when the registry couldn't be read (so callers don't
+    /// mistake "unknown" for "not registered").
     /// </summary>
-    public static bool IsEnabled()
+    public static bool? IsEnabled()
     {
-        using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
-        if (key?.GetValue(ValueName) is not string value || string.IsNullOrEmpty(value))
+        try
         {
-            return false;
-        }
+            using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
+            if (key?.GetValue(ValueName) is not string value || string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
 
-        var exe = GetCurrentExecutablePath();
-        return !string.IsNullOrEmpty(exe) && string.Equals(value.Trim('"'), exe, StringComparison.OrdinalIgnoreCase);
+            var exe = GetCurrentExecutablePath();
+            return !string.IsNullOrEmpty(exe) && string.Equals(value.Trim('"'), exe, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or ObjectDisposedException)
+        {
+            return null;
+        }
     }
 
     /// <summary>
     /// Adds or removes the startup registry entry.
     /// </summary>
     /// <param name="enabled"><see langword="true"/> to register; <see langword="false"/> to remove.</param>
-    public static void SetEnabled(bool enabled)
+    /// <returns><see langword="true"/> if the registry was successfully updated; <see langword="false"/>
+    /// if a permission or access error prevented it.</returns>
+    public static bool SetEnabled(bool enabled)
     {
-        using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
-        if (key is null)
+        try
         {
-            return;
-        }
-
-        if (enabled)
-        {
-            var exe = GetCurrentExecutablePath();
-            if (!string.IsNullOrEmpty(exe))
+            using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+            if (key is null)
             {
-                key.SetValue(ValueName, $"\"{exe}\"");
+                return false;
             }
+
+            if (enabled)
+            {
+                var exe = GetCurrentExecutablePath();
+                if (!string.IsNullOrEmpty(exe))
+                {
+                    key.SetValue(ValueName, $"\"{exe}\"");
+                }
+            }
+            else
+            {
+                key.DeleteValue(ValueName, throwOnMissingValue: false);
+            }
+
+            return true;
         }
-        else
+        catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or ObjectDisposedException)
         {
-            key.DeleteValue(ValueName, throwOnMissingValue: false);
+            // Best-effort; a locked-down machine shouldn't crash the app over a startup toggle.
+            return false;
         }
     }
 
