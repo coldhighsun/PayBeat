@@ -10,6 +10,7 @@ namespace PayBeat.App.Services;
 public sealed class TrayIconService : IDisposable
 {
     private readonly MenuItem _flexMenuItem;
+    private readonly Icon? _icon;
     private readonly MenuItem _miniMenuItem;
     private readonly MenuItem _noneMenuItem;
     private readonly MenuItem _normalMenuItem;
@@ -49,9 +50,10 @@ public sealed class TrayIconService : IDisposable
 
         _restrictedItems = [displayModeMenuItem, separator1, settingsMenuItem, aboutMenuItem, separator2];
 
+        _icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
         _notifyIcon = new NotifyIcon
         {
-            Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!),
+            Icon = _icon,
             Text = TooltipText(),
             ContextMenuStrip = contextMenu,
             Visible = true
@@ -103,6 +105,7 @@ public sealed class TrayIconService : IDisposable
         _viewModel.NotificationRequested -= OnNotificationRequested;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
+        _icon?.Dispose();
     }
 
     private static string Text(string key) =>

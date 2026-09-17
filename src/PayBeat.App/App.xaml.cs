@@ -220,7 +220,7 @@ public partial class App
             {
                 var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
                 MessageBox.Show(
-                    string.Format((string)FindResource("Error.HotkeyConflict")!, key),
+                    string.Format(LocalizationService.Get("Error.HotkeyConflict"), key),
                     "PayBeat",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -249,7 +249,7 @@ public partial class App
         {
             var key = HotkeyService.Format(s.HotkeyModifiers, s.HotkeyVirtualKey);
             MessageBox.Show(
-                string.Format((string)FindResource("Error.HotkeyConflict")!, key),
+                string.Format(LocalizationService.Get("Error.HotkeyConflict"), key),
                 "PayBeat",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -355,7 +355,7 @@ public partial class App
         }
 
         MessageBox.Show(
-            (string)FindResource("Error.AlreadyRunning")!,
+            LocalizationService.Get("Error.AlreadyRunning"),
             "PayBeat",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
