@@ -26,11 +26,7 @@ public partial class AboutWindow
 
     private async Task CheckForUpdatesAsync()
     {
-        var info = await new UpdateCheckService().GetLatestReleaseAsync();
-        _settingsService.Save(_settingsService.Load() with
-        {
-            LastUpdateCheckUtc = DateTimeOffset.UtcNow
-        });
+        var info = await new UpdateCheckService(_settingsService).GetLatestReleaseAsync(bypassThrottle: true);
 
         if (info != null)
         {
