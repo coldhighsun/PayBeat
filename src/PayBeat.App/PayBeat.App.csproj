@@ -15,5 +15,9 @@
     <Resource Include="Resources\Icons\PayBeat.ico" />
     <Resource Include="Resources\Screenshots\*.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitHubReleaseUpdater" />
+  </ItemGroup>
     
 </Project>

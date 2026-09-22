@@ -95,7 +95,7 @@ public partial class App
         }
 
         _trayIconService = new TrayIconService(_mainVm!, ActivateMainWindow);
-        CheckForUpdatesOnStartup(settings);
+        CheckForUpdatesOnStartup();
     }
 
     // Run restore after first render because clamping depends on measured window size.
@@ -179,22 +179,13 @@ public partial class App
 
     /// <summary>
     /// Fires a best-effort, fire-and-forget update check, throttled to once per 24 hours via
-    /// <see cref="SalarySettings.LastUpdateCheckUtc"/>.
+    /// <see cref="SettingsLastCheckStore"/>.
     /// </summary>
-    private void CheckForUpdatesOnStartup(SalarySettings settings)
+    private void CheckForUpdatesOnStartup()
     {
-        if (settings.LastUpdateCheckUtc is { } last && DateTimeOffset.UtcNow - last < TimeSpan.FromHours(24))
-        {
-            return;
-        }
-
         _ = Task.Run(async () =>
         {
-            var info = await new UpdateCheckService().GetLatestReleaseAsync();
-            _settingsService!.Save(_settingsService.Load() with
-            {
-                LastUpdateCheckUtc = DateTimeOffset.UtcNow
-            });
+            var info = await new UpdateCheckService(_settingsService!).GetLatestReleaseAsync();
             if (info != null)
             {
                 Dispatcher.Invoke(() => _mainVm!.NotifyUpdateAvailable(info.Version, info.HtmlUrl));

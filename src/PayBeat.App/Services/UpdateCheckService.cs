@@ -1,6 +1,4 @@
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
+using GitHubReleaseUpdater;
 using PayBeat.App.Helpers;
 
 namespace PayBeat.App.Services;
@@ -10,59 +8,56 @@ public sealed record UpdateInfo(string Version, string HtmlUrl);
 
 /// <summary>
 /// Checks the project's GitHub Releases feed for a newer stable version than the running build.
-/// Best-effort only: any network, parsing, or version-comparison failure results in a null return.
+/// Best-effort only: any check failure results in a null return. Throttled to once per
+/// <see cref="MinimumCheckInterval"/> via <see cref="SettingsLastCheckStore"/>, unless bypassed.
 /// </summary>
-public sealed class UpdateCheckService
+public sealed class UpdateCheckService(SettingsService settingsService)
 {
-    private const string LatestReleaseUrl = "https://api.github.com/repos/coldhighsun/PayBeat/releases/latest";
+    private static readonly TimeSpan MinimumCheckInterval = TimeSpan.FromHours(24);
 
-    private static readonly HttpClient HttpClient = CreateHttpClient();
+    private const string RepoOwner = "coldhighsun";
+    private const string RepoName = "PayBeat";
+
+    /// <summary>
+    /// Backing store for the check throttle, reused across calls so skip-version state (once a UI
+    /// exists to set it) survives from one check to the next.
+    /// </summary>
+    private readonly SettingsLastCheckStore _lastCheckStore = new(settingsService);
 
     /// <summary>
     /// Returns the latest stable release if it is newer than <see cref="AppVersion.Current"/>,
-    /// or <c>null</c> if there is no newer release or the check failed.
+    /// or <c>null</c> if there is no newer release, the check was throttled, or the check failed.
+    /// A failed check still records the attempt, so it is throttled the same as a successful one.
     /// </summary>
-    public async Task<UpdateInfo?> GetLatestReleaseAsync(CancellationToken cancellationToken = default)
+    /// <param name="bypassThrottle">
+    /// True for a user-initiated "check now" that should ignore <see cref="MinimumCheckInterval"/>.
+    /// </param>
+    public async Task<UpdateInfo?> GetLatestReleaseAsync(bool bypassThrottle = false, CancellationToken cancellationToken = default)
     {
-        try
+        using var updater = new ReleaseUpdater(new UpdaterOptions
         {
-            using var response = await HttpClient.GetAsync(LatestReleaseUrl, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
+            Owner = RepoOwner,
+            Repo = RepoName,
+            CurrentVersion = AppVersion.Current,
+            LastCheckStore = _lastCheckStore,
+            MinimumCheckInterval = MinimumCheckInterval,
+        });
 
-            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var json = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-
-            var tagName = json.RootElement.GetProperty("tag_name").GetString();
-            var htmlUrl = json.RootElement.GetProperty("html_url").GetString();
-            if (string.IsNullOrEmpty(tagName) || string.IsNullOrEmpty(htmlUrl))
-            {
-                return null;
-            }
-
-            var latestVersionText = tagName.StartsWith('v') ? tagName[1..] : tagName;
-            if (!Version.TryParse(latestVersionText, out var latestVersion)
-                || !Version.TryParse(AppVersion.Current, out var currentVersion)
-                || latestVersion <= currentVersion)
-            {
-                return null;
-            }
-
-            return new UpdateInfo(latestVersionText, htmlUrl);
+        var check = await updater.CheckForUpdateAsync(bypassThrottle: bypassThrottle, cancellationToken: cancellationToken);
+        if (!check.Success)
+        {
+            // ReleaseUpdater only records the check time on success; record it here too so a
+            // failure (offline, rate-limited, ...) is throttled the same as a successful check
+            // instead of retrying on every app launch.
+            await _lastCheckStore.SetLastCheckedAtAsync(DateTimeOffset.UtcNow, cancellationToken);
+            return null;
         }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException or KeyNotFoundException or InvalidOperationException)
+
+        if (!check.IsUpdateAvailable || check.Update!.Release.HtmlUrl is not { } htmlUrl)
         {
             return null;
         }
-    }
 
-    private static HttpClient CreateHttpClient()
-    {
-        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("PayBeat", AppVersion.Current));
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        return client;
+        return new UpdateInfo(check.Update.Version.ToString(), htmlUrl);
     }
 }
