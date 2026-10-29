@@ -1,166 +1,70 @@
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Media;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform;
 
 namespace PayBeat.App.Helpers;
 
 /// <summary>
-/// Win32 P/Invoke helpers for multi-monitor awareness. Handles DPI-aware position restore
-/// (match by device name, fall back to nearest monitor) and window clamping to screen work area.
+/// Multi-monitor helpers built on Avalonia's <see cref="Screens"/>. Handles position restore
+/// (match by saved screen name, fall back to the nearest monitor) and window pixel metrics.
 /// </summary>
 internal static class ScreenHelper
 {
-    private const uint MonitorDefaultToNearest = 0x00000002;
-
-    private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
-
     /// <summary>
-    /// Finds the best screen bounds (in WPF logical units) for restoring a saved position.
-    /// Matches by device name first; falls back to the nearest monitor to the saved position.
-    /// Uses rcMonitor (full screen including taskbar) so the window may overlap the taskbar.
+    /// Finds the screen to restore a saved position on. Matches by display name first; falls back
+    /// to the screen containing (or nearest to) <paramref name="savedPoint"/>, then the primary screen.
     /// </summary>
-    public static Rect FindScreenBoundsForRestore(double wpfLeft, double wpfTop, string? deviceName, Visual visual)
+    /// <param name="window">Any window, used to reach the screen list.</param>
+    /// <param name="savedPoint">The saved top-left position in pixels.</param>
+    /// <param name="displayName">The saved screen name, or <see langword="null"/>.</param>
+    /// <returns>The chosen screen, or <see langword="null"/> when no screens are available.</returns>
+    public static Screen? FindScreenForRestore(Window window, PixelPoint savedPoint, string? displayName)
     {
-        if (deviceName != null)
-        {
-            var hByName = FindMonitorByDeviceName(deviceName);
-            if (hByName != IntPtr.Zero)
-            {
-                return GetScreenBoundsWpf(hByName, visual);
-            }
-        }
-
-        var dpi = GetDpiScale(visual);
-        var pt = new POINT
-        {
-            X = (int)(wpfLeft * dpi.X),
-            Y = (int)(wpfTop * dpi.Y)
-        };
-        var hNearest = MonitorFromPoint(pt, MonitorDefaultToNearest);
-        return GetScreenBoundsWpf(hNearest, visual);
-    }
-
-    /// <summary>
-    /// Returns the full bounds (in WPF logical units) of the monitor the WPF window is on.
-    /// Uses rcMonitor (full screen including taskbar) so the window may overlap the taskbar.
-    /// </summary>
-    public static Rect GetCurrentScreenBounds(Window window)
-    {
-        var hwnd = new WindowInteropHelper(window).Handle;
-        var hMonitor = hwnd != IntPtr.Zero
-            ? MonitorFromWindow(hwnd, MonitorDefaultToNearest)
-            : GetPrimaryMonitor();
-
-        return GetScreenBoundsWpf(hMonitor, window);
-    }
-
-    /// <summary>
-    /// Returns the device name of the monitor the WPF window is on.
-    /// </summary>
-    public static string? GetCurrentScreenDeviceName(Window window)
-    {
-        var hwnd = new WindowInteropHelper(window).Handle;
-        if (hwnd == IntPtr.Zero)
+        var screens = window.Screens;
+        var all = screens.All;
+        if (all.Count == 0)
         {
             return null;
         }
 
-        var hMonitor = MonitorFromWindow(hwnd, MonitorDefaultToNearest);
-        return GetDeviceName(hMonitor);
-    }
-
-    [DllImport("user32.dll")]
-    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
-
-    private static IntPtr FindMonitorByDeviceName(string deviceName)
-    {
-        var result = IntPtr.Zero;
-        EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero,
-            (hMon, _, ref _, _) =>
-            {
-                if (GetDeviceName(hMon) == deviceName)
-                {
-                    result = hMon;
-                    return false;
-                }
-                return true;
-            },
-            IntPtr.Zero);
-        return result;
-    }
-
-    private static string? GetDeviceName(IntPtr hMonitor)
-    {
-        var info = GetMonitorInfoEx(hMonitor);
-        return string.IsNullOrEmpty(info.szDevice) ? null : info.szDevice;
-    }
-
-    private static (double X, double Y) GetDpiScale(Visual visual)
-    {
-        var source = PresentationSource.FromVisual(visual);
-        if (source?.CompositionTarget != null)
+        if (displayName is not null)
         {
-            var m = source.CompositionTarget.TransformToDevice;
-            return (m.M11, m.M22);
+            var byName = all.FirstOrDefault(s => string.Equals(s.DisplayName, displayName, StringComparison.Ordinal));
+            if (byName is not null)
+            {
+                return byName;
+            }
         }
 
-        return (1.0, 1.0);
+        var nearest = WindowPlacement.NearestIndex(all.Select(s => s.Bounds).ToList(), savedPoint);
+        return nearest >= 0 ? all[nearest] : screens.Primary;
     }
 
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX lpmi);
+    /// <summary>
+    /// Returns the screen the window is currently on, falling back to the primary screen.
+    /// </summary>
+    /// <param name="window">The window.</param>
+    /// <returns>The current screen, or <see langword="null"/> when no screens are available.</returns>
+    public static Screen? GetCurrentScreen(Window window) =>
+        window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
 
-    private static MONITORINFOEX GetMonitorInfoEx(IntPtr hMonitor)
+    /// <summary>
+    /// Returns the name identifying the screen the window is on, used to restore the monitor later.
+    /// </summary>
+    /// <param name="window">The window.</param>
+    /// <returns>The screen display name, or <see langword="null"/> when unknown.</returns>
+    public static string? GetCurrentScreenName(Window window) =>
+        string.IsNullOrEmpty(GetCurrentScreen(window)?.DisplayName) ? null : GetCurrentScreen(window)!.DisplayName;
+
+    /// <summary>
+    /// Returns the window's size in device pixels.
+    /// </summary>
+    /// <param name="window">The window.</param>
+    /// <returns>The pixel size, or zero when the window has not been measured.</returns>
+    public static PixelSize GetPixelSize(Window window)
     {
-        var info = new MONITORINFOEX { cbSize = Marshal.SizeOf<MONITORINFOEX>() };
-        GetMonitorInfo(hMonitor, ref info);
-        return info;
-    }
-
-    private static IntPtr GetPrimaryMonitor()
-    {
-        return MonitorFromPoint(new POINT { X = 0, Y = 0 }, MonitorDefaultToNearest);
-    }
-
-    private static Rect GetScreenBoundsWpf(IntPtr hMonitor, Visual visual)
-    {
-        var info = GetMonitorInfoEx(hMonitor);
-        var dpi = GetDpiScale(visual);
-        var r = info.rcMonitor;
-        return new Rect(
-            r.Left / dpi.X,
-            r.Top / dpi.Y,
-            (r.Right - r.Left) / dpi.X,
-            (r.Bottom - r.Top) / dpi.Y);
-    }
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr MonitorFromPoint(POINT pt, uint dwFlags);
-
-    [DllImport("user32.dll")]
-    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct MONITORINFOEX
-    {
-        public int cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
-        public uint dwFlags;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string szDevice;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
-    {
-        public int X, Y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int Left, Top, Right, Bottom;
+        var frame = window.FrameSize ?? window.ClientSize;
+        var scale = window.RenderScaling;
+        return new PixelSize((int)Math.Ceiling(frame.Width * scale), (int)Math.Ceiling(frame.Height * scale));
     }
 }

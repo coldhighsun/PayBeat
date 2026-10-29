@@ -1,0 +1,139 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PayBeat.App.Views.AboutWindow"
+        Title="{DynamicResource About.WindowTitle}"
+        Icon="avares://PayBeat/Resources/Icons/PayBeat.png"
+        Width="340"
+        SizeToContent="Height"
+        WindowDecorations="None"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent">
+
+    <Window.Styles>
+        <Style Selector="Button.closeIcon">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="Button.closeIcon:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Background="{DynamicResource BaseBrush}"
+            CornerRadius="12"
+            BorderBrush="{DynamicResource OverlayBrush}"
+            BorderThickness="1">
+
+        <DockPanel Margin="28,24">
+
+            <!-- Close button -->
+            <Button DockPanel.Dock="Top"
+                    Classes="closeIcon"
+                    HorizontalAlignment="Right"
+                    Width="28" Height="28"
+                    Content="✕"
+                    Margin="0,0,-4,0"
+                    Click="CloseButton_Click"/>
+
+            <!-- App icon + name -->
+            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0,8,0,20">
+                <Image Source="avares://PayBeat/Resources/Icons/PayBeat.png"
+                       Width="56" Height="56"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12"/>
+                <TextBlock Text="PayBeat"
+                           Foreground="{DynamicResource TextBrush}"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock x:Name="VersionText"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+                <TextBlock x:Name="UpdateStatusText"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           Margin="0,4,0,0"/>
+                <Button x:Name="UpdateStatusLink"
+                        Classes="link"
+                        IsVisible="False"
+                        FontSize="11"
+                        HorizontalAlignment="Center"
+                        Margin="0,4,0,0"
+                        Click="UpdateLink_Click"/>
+            </StackPanel>
+
+            <!-- Description -->
+            <TextBlock DockPanel.Dock="Top"
+                       Text="{DynamicResource About.Description}"
+                       Foreground="{DynamicResource SubtextBrush}"
+                       FontSize="13"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20"/>
+
+            <!-- Separator -->
+            <Border DockPanel.Dock="Top"
+                    Height="1"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Margin="0,0,0,16"/>
+
+            <!-- Author row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.Author}"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"/>
+                <TextBlock Grid.Column="1"
+                           Text="coldhighsun"
+                           Foreground="{DynamicResource TextBrush}"
+                           FontSize="12"/>
+            </Grid>
+
+            <!-- License row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.License}"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"/>
+                <TextBlock Grid.Column="1"
+                           Text="MIT"
+                           Foreground="{DynamicResource TextBrush}"
+                           FontSize="12"/>
+            </Grid>
+
+            <!-- GitHub row -->
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,20" ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource About.GitHub}"
+                           Foreground="{DynamicResource MutedBrush}"
+                           FontSize="12"/>
+                <Button Grid.Column="1"
+                        Classes="link"
+                        Content="github.com/coldhighsun/PayBeat"
+                        Tag="https://github.com/coldhighsun/PayBeat"
+                        Click="GitHubLink_Click"/>
+            </Grid>
+
+            <!-- Close button -->
+            <Button DockPanel.Dock="Top"
+                    Content="{DynamicResource About.Close}"
+                    HorizontalAlignment="Center"
+                    Padding="32,10"
+                    Background="{DynamicResource SurfaceBrush}"
+                    Foreground="{DynamicResource TextBrush}"
+                    FontSize="13"
+                    Click="CloseButton_Click"/>
+
+        </DockPanel>
+    </Border>
+</Window>

@@ -1,7 +1,7 @@
+using Avalonia.Threading;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Services;
-using PayBeat.App.Views;
 
 namespace PayBeat.App.ViewModels;
 
@@ -9,9 +9,13 @@ namespace PayBeat.App.ViewModels;
 /// Primary view model for the floating widget. Owns the refresh timer, drives earned/progress
 /// state, and exposes commands for display mode switching and settings.
 /// </summary>
-public class MainViewModel : ViewModelBase, IDisposable
+public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
 {
     private readonly SettingsService _settingsService;
+    /// <summary>
+    /// Opens application windows and shuts the app down on behalf of the commands.
+    /// </summary>
+    private readonly IWindowService _windowService;
     private readonly DispatcherTimer _timer;
     private decimal _earned;
     private TimeSpan _elapsed;
@@ -29,16 +33,18 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// and performs an immediate <see cref="Refresh"/> to populate the initial display.
     /// </summary>
     /// <param name="settingsService">Service used to load and save salary settings.</param>
-    public MainViewModel(SettingsService settingsService)
+    /// <param name="windowService">Service used to open application windows and shut the app down.</param>
+    public MainViewModel(SettingsService settingsService, IWindowService windowService)
     {
         _settingsService = settingsService;
+        _windowService = windowService;
         _settings = _settingsService.Load();
         _notifiedDate = DateOnly.FromDateTime(DateTime.Now);
         _nextMilestoneThreshold = _settings.MilestoneAmount;
 
-        OpenSettingsCommand = new RelayCommand(OpenSettings);
-        OpenAboutCommand = new RelayCommand(OpenAbout);
-        ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
+        OpenSettingsCommand = new RelayCommand(_windowService.OpenSettings);
+        OpenAboutCommand = new RelayCommand(_windowService.OpenAbout);
+        ExitCommand = new RelayCommand(_windowService.Shutdown);
         SetNormalModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Normal));
         SetMiniModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.Mini));
         SetNoneModeCommand = new RelayCommand(() => SetDisplayMode(DisplayMode.None));
@@ -55,7 +61,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     public event Action? HotkeySettingsChanged;
 
     /// <summary>
-    /// Raised when a milestone, end-of-day, or update-available reminder should be shown as a tray
+    /// Raised when a milestone, end-of-day, or update-available reminder should be shown as a toast
     /// notification. The third parameter is an optional URL to open if the notification is clicked
     /// (currently only set for "update available"; <see langword="null"/> for all others).
     /// </summary>
@@ -92,6 +98,16 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// width so the window does not grow as earnings increase.
     /// </summary>
     public string MiniWidthTemplate => FormatAmount(_settings.DailySalary);
+
+    /// <summary>
+    /// Daily salary formatted with two decimals using the current culture.
+    /// </summary>
+    public string DailySalaryFormatted => DailySalary.ToString("N2");
+
+    /// <summary>
+    /// Workday completion formatted as a percentage with two decimals using the current culture.
+    /// </summary>
+    public string ProgressFormatted => Progress.ToString("P2");
 
     /// <summary>Time elapsed since work start, clamped to the workday window. Setting this also notifies <see cref="ElapsedFormatted"/>.</summary>
     public TimeSpan Elapsed
@@ -144,7 +160,11 @@ public class MainViewModel : ViewModelBase, IDisposable
     public double Progress
     {
         get => _progress;
-        private set => SetField(ref _progress, value);
+        private set
+        {
+            SetField(ref _progress, value);
+            OnPropertyChanged(nameof(ProgressFormatted));
+        }
     }
 
     /// <summary>Time remaining until work end, clamped to the workday window. Setting this also notifies <see cref="RemainingFormatted"/>.</summary>
@@ -198,10 +218,10 @@ public class MainViewModel : ViewModelBase, IDisposable
         _timer.Stop();
     }
 
-    /// <summary>Resumes end-of-day/milestone tray notifications after a prior <see cref="SuspendNotifications"/> call.</summary>
+    /// <summary>Resumes end-of-day/milestone toast notifications after a prior <see cref="SuspendNotifications"/> call.</summary>
     public void ResumeNotifications() => _notificationsSuspended = false;
 
-    /// <summary>Suppresses end-of-day/milestone tray notifications while the widget is hidden.</summary>
+    /// <summary>Suppresses end-of-day/milestone toast notifications while the widget is hidden.</summary>
     public void SuspendNotifications() => _notificationsSuspended = true;
 
     /// <summary>
@@ -215,6 +235,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(WorkStart));
         OnPropertyChanged(nameof(WorkEnd));
         OnPropertyChanged(nameof(DailySalary));
+        OnPropertyChanged(nameof(DailySalaryFormatted));
         OnPropertyChanged(nameof(Currency));
         OnPropertyChanged(nameof(MiniWidthTemplate));
         OnPropertyChanged(nameof(DisplayMode));
@@ -241,22 +262,6 @@ public class MainViewModel : ViewModelBase, IDisposable
     private string FormatAmount(decimal amount) =>
         $"{_settings.Currency}{amount:N2}";
 
-    private void OpenAbout()
-    {
-        foreach (Window w in Application.Current.Windows)
-        {
-            if (w is AboutWindow existing)
-            {
-                existing.Activate();
-                return;
-            }
-        }
-
-        var win = new AboutWindow(_settingsService);
-        ApplyTopmostIfNeeded(win);
-        win.Show();
-    }
-
     /// <summary>
     /// Raises <see cref="NotificationRequested"/> with a localized "update available" message that
     /// opens <paramref name="htmlUrl"/> (the release page) if clicked.
@@ -266,36 +271,6 @@ public class MainViewModel : ViewModelBase, IDisposable
             LocalizationService.Get("Notification.UpdateAvailableTitle"),
             string.Format(LocalizationService.Get("Notification.UpdateAvailableBody"), version),
             htmlUrl);
-
-    private void OpenSettings()
-    {
-        foreach (Window w in Application.Current.Windows)
-        {
-            if (w is SettingsWindow existing)
-            {
-                existing.Activate();
-                return;
-            }
-        }
-
-        var win = new SettingsWindow
-        {
-            DataContext = new SettingsViewModel(_settingsService, this)
-        };
-        ApplyTopmostIfNeeded(win);
-        win.Show();
-    }
-
-    // MainWindow stays pinned to HWND_TOPMOST while AlwaysOnTop is on (see TopmostHelper),
-    // which would otherwise bury this dialog behind it in fullscreen Flex mode.
-    private static void ApplyTopmostIfNeeded(Window win)
-    {
-        if (Application.Current.MainWindow is { Topmost: true } mainWindow)
-        {
-            win.Owner = mainWindow;
-            win.Topmost = true;
-        }
-    }
 
     private void Refresh()
     {
@@ -346,7 +321,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             // A single long tick (e.g. after sleep/resume) can jump past several milestones at
             // once; collapse them into one notification for the highest threshold reached
-            // instead of firing a balloon tip per crossed multiple.
+            // instead of firing a toast per crossed multiple.
             var reachedThreshold = _nextMilestoneThreshold;
             while (Earned >= reachedThreshold + _settings.MilestoneAmount)
             {

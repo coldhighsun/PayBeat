@@ -1,8 +1,9 @@
+using System.Collections;
+using System.ComponentModel;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
+using PayBeat.App.Platform;
 using PayBeat.App.Services;
-using PayBeat.App.Views;
-using System.ComponentModel;
 
 namespace PayBeat.App.ViewModels;
 
@@ -18,11 +19,33 @@ public record ThemeOption(string Code, string Name);
 
 /// <summary>
 /// View model for the settings window. Validates and saves user preferences,
-/// then calls <see cref="MainViewModel.ReloadSettings"/> to apply changes immediately.
+/// then calls <see cref="ISettingsApplier.ReloadSettings"/> to apply changes immediately.
 /// </summary>
-public class SettingsViewModel : ViewModelBase, IDataErrorInfo
+public class SettingsViewModel : ViewModelBase, INotifyDataErrorInfo
 {
-    private readonly MainViewModel _mainVm;
+    /// <summary>
+    /// Receives a reload request after the settings were saved.
+    /// </summary>
+    private readonly ISettingsApplier _applier;
+
+    /// <summary>
+    /// Platform service that manages the "run at startup" registration.
+    /// </summary>
+    private readonly IStartupService _startupService;
+
+    /// <summary>
+    /// Closes the settings window and pauses the global hotkey.
+    /// </summary>
+    private readonly IWindowService _windowService;
+
+    /// <summary>
+    /// Applies the chosen language and theme.
+    /// </summary>
+    private readonly IAppearanceService _appearanceService;
+
+    /// <summary>
+    /// Loads and persists the settings.
+    /// </summary>
     private readonly SettingsService _service;
     private bool _alwaysOnTop;
     private string _currencyText;
@@ -52,11 +75,17 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     /// currently persisted settings.
     /// </summary>
     /// <param name="service">Service used to load and persist settings.</param>
-    /// <param name="mainVm">Main view model; <see cref="MainViewModel.ReloadSettings"/> is called after saving.</param>
-    public SettingsViewModel(SettingsService service, MainViewModel mainVm)
+    /// <param name="applier">Receives <see cref="ISettingsApplier.ReloadSettings"/> after saving.</param>
+    /// <param name="startupService">Platform service that manages the "run at startup" registration.</param>
+    /// <param name="windowService">Service used to close the settings window and pause the global hotkey.</param>
+    /// <param name="appearanceService">Service that applies the chosen language and theme.</param>
+    public SettingsViewModel(SettingsService service, ISettingsApplier applier, IStartupService startupService, IWindowService windowService, IAppearanceService appearanceService)
     {
+        _appearanceService = appearanceService;
         _service = service;
-        _mainVm = mainVm;
+        _applier = applier;
+        _startupService = startupService;
+        _windowService = windowService;
 
         var s = service.Load();
         _dailySalaryText = s.DailySalary.ToString("G29");
@@ -71,7 +100,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         _theme = s.Theme;
         _hotkeyModifiers = s.HotkeyModifiers;
         _hotkeyVirtualKey = s.HotkeyVirtualKey;
-        _initialRunAtStartup = StartupService.IsEnabled();
+        _initialRunAtStartup = _startupService.IsEnabled();
         _runAtStartup = _initialRunAtStartup ?? false;
         _lunchBreakEnabled = s.LunchBreakEnabled;
         _lunchBreakStart = s.LunchBreakStart;
@@ -82,9 +111,52 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         _enableMilestoneNotifications = s.EnableMilestoneNotifications;
         _milestoneAmountText = s.MilestoneAmount.ToString("G29");
 
+        AvailableLanguages =
+        [
+            new("auto", LocalizationService.Get("Settings.LanguageAuto")),
+            new("en", "English"),
+            new("zh-CN", "中文"),
+        ];
+        AvailableThemes =
+        [
+            new("auto", LocalizationService.Get("Settings.ThemeAuto")),
+            new("light", LocalizationService.Get("Settings.ThemeLight")),
+            new("dark", LocalizationService.Get("Settings.ThemeDark")),
+        ];
+
         SaveCommand = new RelayCommand(Save, CanSave);
         CancelCommand = new RelayCommand(CloseWindow);
     }
+
+    /// <inheritdoc/>
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+    /// <summary>
+    /// Whether the platform supports registering the app to run at startup; hides the checkbox otherwise.
+    /// </summary>
+    public bool IsStartupSupported => _startupService.IsSupported;
+
+    /// <summary>
+    /// Whether the platform supports a global hotkey; hides the hotkey section otherwise.
+    /// </summary>
+    public bool IsHotkeySupported => _windowService.IsHotkeySupported;
+
+    /// <summary>
+    /// Whether any per-field validation error is currently present.
+    /// </summary>
+    public bool HasErrors => ValidateDailySalary() is not null
+        || (EnableEndOfDayReminder && ValidateEndOfDayReminderMinutes() is not null)
+        || (EnableMilestoneNotifications && ValidateMilestoneAmount() is not null);
+
+    /// <summary>
+    /// Suspends the global hotkey while the hotkey box captures key input.
+    /// </summary>
+    public void SuspendHotkey() => _windowService.SuspendHotkey();
+
+    /// <summary>
+    /// Resumes the global hotkey after capture ends.
+    /// </summary>
+    public void ResumeHotkey() => _windowService.ResumeHotkey();
 
     /// <summary>Binds to the Always on Top checkbox in the settings window.</summary>
     public bool AlwaysOnTop
@@ -97,23 +169,13 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     public IReadOnlyList<LanguageOption> AvailableLanguages
     {
         get;
-    } =
-        [
-        new("auto", "Auto"),
-        new("en", "English"),
-        new("zh-CN", "中文"),
-    ];
+    }
 
     /// <summary>Fixed list of theme options shown in the theme dropdown.</summary>
     public IReadOnlyList<ThemeOption> AvailableThemes
     {
         get;
-    } =
-        [
-        new("auto", "Auto"),
-        new("light", "Light"),
-        new("dark", "Dark"),
-    ];
+    }
 
     /// <summary>Closes the settings window without saving.</summary>
     public ICommand CancelCommand
@@ -193,9 +255,6 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Unused; per-field errors are reported via the indexer instead.</summary>
-    string IDataErrorInfo.Error => string.Empty;
-
     /// <summary>Validation error message shown below the Save button; empty string when there is no error.</summary>
     public string ErrorMessage
     {
@@ -204,7 +263,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     } = string.Empty;
 
     /// <summary>Human-readable hotkey string (e.g. <c>Ctrl+Alt+X</c>) shown in the hotkey field.</summary>
-    public string HotkeyDisplayText => HotkeyService.Format(HotkeyModifiers, HotkeyVirtualKey);
+    public string HotkeyDisplayText => HotkeyKeyMap.Format(HotkeyModifiers, HotkeyVirtualKey);
 
     /// <summary>
     /// Win32 modifier flags for the hotkey. Setting this raises <see cref="HotkeyDisplayText"/> change.
@@ -343,8 +402,19 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     public double Opacity
     {
         get => _opacity;
-        set => SetField(ref _opacity, Math.Clamp(value, 0.1, 1.0));
+        set
+        {
+            if (SetField(ref _opacity, Math.Clamp(value, 0.1, 1.0)))
+            {
+                OnPropertyChanged(nameof(OpacityFormatted));
+            }
+        }
     }
+
+    /// <summary>
+    /// Idle opacity formatted as a whole-number percentage using the current culture.
+    /// </summary>
+    public string OpacityFormatted => Opacity.ToString("P0");
 
     /// <summary>Earnings refresh interval in seconds, clamped to [1, 60].</summary>
     public int RefreshInterval
@@ -353,7 +423,7 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         set => SetField(ref _refreshInterval, Math.Clamp(value, 1, 60));
     }
 
-    /// <summary>Whether the app is registered to launch at Windows startup.</summary>
+    /// <summary>Whether the app is registered to launch at system startup.</summary>
     public bool RunAtStartup
     {
         get => _runAtStartup;
@@ -402,28 +472,23 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
     }
 
-    /// <summary>Per-field validation error shown as a bubble popup next to the offending input.</summary>
-    string IDataErrorInfo.this[string columnName] => columnName switch
+    /// <inheritdoc/>
+    public IEnumerable GetErrors(string? propertyName)
     {
-        nameof(DailySalaryText) => ValidateDailySalary() ?? string.Empty,
-        nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() ?? string.Empty : string.Empty,
-        nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() ?? string.Empty : string.Empty,
-        _ => string.Empty,
-    };
+        var error = propertyName switch
+        {
+            nameof(DailySalaryText) => ValidateDailySalary(),
+            nameof(EndOfDayReminderMinutesText) => EnableEndOfDayReminder ? ValidateEndOfDayReminderMinutes() : null,
+            nameof(MilestoneAmountText) => EnableMilestoneNotifications ? ValidateMilestoneAmount() : null,
+            _ => null,
+        };
+
+        return error is null ? Array.Empty<string>() : new[] { error };
+    }
 
     private bool CanSave() => Validate() is null;
 
-    private void CloseWindow()
-    {
-        foreach (Window w in Application.Current.Windows)
-        {
-            if (w is SettingsWindow)
-            {
-                w.Close();
-                break;
-            }
-        }
-    }
+    private void CloseWindow() => _windowService.CloseSettings();
 
     /// <summary>
     /// Updates the bottom-of-window error message and Save availability. Only schedule-related errors are
@@ -434,6 +499,9 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
     {
         ErrorMessage = ValidateSchedule() ?? string.Empty;
         ((RelayCommand)SaveCommand).RaiseCanExecuteChanged();
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(DailySalaryText)));
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(EndOfDayReminderMinutesText)));
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(MilestoneAmountText)));
     }
 
     private void Save()
@@ -481,15 +549,14 @@ public class SettingsViewModel : ViewModelBase, IDataErrorInfo
         }
 
         if (_runAtStartup != (_initialRunAtStartup ?? _runAtStartup) &&
-            !StartupService.SetEnabled(_runAtStartup))
+            !_startupService.SetEnabled(_runAtStartup))
         {
             ErrorMessage = LocalizationService.Get("Error.StartupToggleFailed");
             return;
         }
 
-        LocalizationService.Apply(Language);
-        ThemeService.Apply(Theme);
-        _mainVm.ReloadSettings();
+        _appearanceService.Apply(Language, Theme);
+        _applier.ReloadSettings();
 
         CloseWindow();
     }

@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PayBeat.App.Views.MessageWindow"
+        Width="340"
+        SizeToContent="Height"
+        CanResize="False"
+        ShowInTaskbar="True"
+        Topmost="True"
+        WindowDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://PayBeat/Resources/Icons/PayBeat.png">
+
+    <Border Background="{DynamicResource BaseBrush}"
+            BorderBrush="{DynamicResource OverlayBrush}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="28,24">
+        <StackPanel Spacing="20">
+            <TextBlock x:Name="TitleText"
+                       Foreground="{DynamicResource TextBrush}"
+                       FontSize="16"
+                       FontWeight="Bold"/>
+            <TextBlock x:Name="MessageText"
+                       Foreground="{DynamicResource SubtextBrush}"
+                       FontSize="13"
+                       TextWrapping="Wrap"/>
+            <Button Content="OK"
+                    HorizontalAlignment="Right"
+                    Padding="28,8"
+                    Background="{DynamicResource BlueBrush}"
+                    Foreground="{DynamicResource BaseBrush}"
+                    FontWeight="SemiBold"
+                    Click="OkButton_Click"/>
+        </StackPanel>
+    </Border>
+</Window>

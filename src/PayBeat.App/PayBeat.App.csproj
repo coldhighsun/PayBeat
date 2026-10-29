@@ -1,23 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\Icons\PayBeat.ico</ApplicationIcon>
     <AssemblyName>PayBeat</AssemblyName>
     <RootNamespace>PayBeat.App</RootNamespace>
     <PublishSingleFile>true</PublishSingleFile>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Icons\PayBeat.ico" />
-    <Resource Include="Resources\Screenshots\*.png" />
+    <AvaloniaResource Include="Resources\Icons\PayBeat.ico" />
+    <AvaloniaResource Include="Resources\Icons\PayBeat.png" />
+    <AvaloniaResource Include="Resources\Screenshots\*.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="GitHubReleaseUpdater" />
   </ItemGroup>
-    
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PayBeat.App.Tests" />
+  </ItemGroup>
+
+  <!-- The native SkiaSharp/HarfBuzz packages ship ~100 MB of .pdb files; they are not needed at runtime. -->
+  <Target Name="RemoveNativePdbsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
+
 </Project>

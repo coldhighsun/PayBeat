@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PayBeat.App.Views.Controls.TimePickerControl">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.colon">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.colon:disabled">
+            <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+        </Style>
+        <Style Selector="TextBox.digit">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style Selector="Button.step">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="7"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource SubtextBrush}"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource OverlayBrush}" BorderThickness="1" CornerRadius="5">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="4,2">
+
+            <!-- Hour -->
+            <StackPanel>
+                <Button x:Name="HourUp" Classes="step" Content="▲" Click="HourUp_Click"/>
+                <TextBox x:Name="HourBox"
+                         Classes="digit"
+                         Width="24" Height="22"
+                         TextAlignment="Center"
+                         VerticalContentAlignment="Center"
+                         FontSize="13"
+                         MaxLength="2"/>
+                <Button x:Name="HourDown" Classes="step" Content="▼" Click="HourDown_Click"/>
+            </StackPanel>
+
+            <TextBlock Text=":" FontSize="14" FontWeight="Bold"
+                       VerticalAlignment="Center" Margin="1,0"
+                       Classes="colon"/>
+
+            <!-- Minute -->
+            <StackPanel>
+                <Button x:Name="MinuteUp" Classes="step" Content="▲" Click="MinuteUp_Click"/>
+                <TextBox x:Name="MinuteBox"
+                         Classes="digit"
+                         Width="24" Height="22"
+                         TextAlignment="Center"
+                         VerticalContentAlignment="Center"
+                         FontSize="13"
+                         MaxLength="2"/>
+                <Button x:Name="MinuteDown" Classes="step" Content="▼" Click="MinuteDown_Click"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</UserControl>

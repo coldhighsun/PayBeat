@@ -1,0 +1,195 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Catppuccin palette: Mocha (dark) and Latte (light), selected by the requested theme variant -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <Color x:Key="BaseColor">#1E1E2E</Color>
+            <Color x:Key="SurfaceColor">#313244</Color>
+            <Color x:Key="OverlayColor">#45475A</Color>
+            <Color x:Key="TextColor">#CDD6F4</Color>
+            <Color x:Key="SubtextColor">#9399B2</Color>
+            <Color x:Key="MutedColor">#6C7086</Color>
+            <Color x:Key="GreenColor">#A6E3A1</Color>
+            <Color x:Key="BlueColor">#89B4FA</Color>
+            <Color x:Key="RedColor">#F38BA8</Color>
+            <Color x:Key="CaptureBackgroundColor">#1C3A5E</Color>
+            <Color x:Key="FlexGradientMidColor">#181825</Color>
+
+            <SolidColorBrush x:Key="BaseBrush" Color="#1E1E2E"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#313244"/>
+            <SolidColorBrush x:Key="OverlayBrush" Color="#45475A"/>
+            <SolidColorBrush x:Key="TextBrush" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="SubtextBrush" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MutedBrush" Color="#6C7086"/>
+            <SolidColorBrush x:Key="GreenBrush" Color="#A6E3A1"/>
+            <SolidColorBrush x:Key="BlueBrush" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="RedBrush" Color="#F38BA8"/>
+            <SolidColorBrush x:Key="CaptureBackgroundBrush" Color="#1C3A5E"/>
+
+            <!-- Accent color used by Fluent controls (check marks, focus, selection) -->
+            <Color x:Key="SystemAccentColor">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorLight1">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorLight2">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorLight3">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorDark1">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorDark2">#89B4FA</Color>
+            <Color x:Key="SystemAccentColorDark3">#89B4FA</Color>
+
+            <!-- Fluent control overrides so stock controls use the palette -->
+            <SolidColorBrush x:Key="TextControlBackground" Color="#313244"/>
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#313244"/>
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#313244"/>
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#313244"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#313244"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#45475A"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#45475A"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#45475A"/>
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#45475A"/>
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#45475A"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundBorderBrushFocused" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPointerOver" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPressed" Color="#89B4FA"/>
+            <SolidColorBrush x:Key="TextControlForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundFocused" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxItemForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundPointerOver" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundPressed" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#6C7086"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#6C7086"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#6C7086"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="#9399B2"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundPressed" Color="#45475A"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#45475A"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#45475A"/>
+            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <Color x:Key="BaseColor">#EFF1F5</Color>
+            <Color x:Key="SurfaceColor">#E6E9EF</Color>
+            <Color x:Key="OverlayColor">#CCD0DA</Color>
+            <Color x:Key="TextColor">#4C4F69</Color>
+            <Color x:Key="SubtextColor">#6C6F85</Color>
+            <Color x:Key="MutedColor">#8C8FA1</Color>
+            <Color x:Key="GreenColor">#40A02B</Color>
+            <Color x:Key="BlueColor">#1E66F5</Color>
+            <Color x:Key="RedColor">#D20F39</Color>
+            <Color x:Key="CaptureBackgroundColor">#DCE8FF</Color>
+            <Color x:Key="FlexGradientMidColor">#DCE0E8</Color>
+
+            <SolidColorBrush x:Key="BaseBrush" Color="#EFF1F5"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="OverlayBrush" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="TextBrush" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="SubtextBrush" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MutedBrush" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="GreenBrush" Color="#40A02B"/>
+            <SolidColorBrush x:Key="BlueBrush" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="RedBrush" Color="#D20F39"/>
+            <SolidColorBrush x:Key="CaptureBackgroundBrush" Color="#DCE8FF"/>
+
+            <!-- Accent color used by Fluent controls (check marks, focus, selection) -->
+            <Color x:Key="SystemAccentColor">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorLight1">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorLight2">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorLight3">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorDark1">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorDark2">#1E66F5</Color>
+            <Color x:Key="SystemAccentColorDark3">#1E66F5</Color>
+
+            <!-- Fluent control overrides so stock controls use the palette -->
+            <SolidColorBrush x:Key="TextControlBackground" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundBorderBrushFocused" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPointerOver" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPressed" Color="#1E66F5"/>
+            <SolidColorBrush x:Key="TextControlForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundFocused" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxItemForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundPointerOver" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="ComboBoxItemForegroundPressed" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundPressed" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#CCD0DA"/>
+            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>
