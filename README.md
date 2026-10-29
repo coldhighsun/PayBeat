@@ -44,14 +44,16 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 ## Requirements
 
 - Windows 10 / 11 (x64)
-- Portable download: [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) must be installed
+- Portable download: [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) must be installed
 - Self-contained download: no runtime installation needed, everything is bundled
+
+PayBeat is built on [Avalonia](https://avaloniaui.net/), so the code base is cross-platform. Official release packages are Windows-only for now; macOS and Linux builds are untested; the platform-specific features (global hotkey, "run at startup", z-order enforcement) fall back to no-ops there.
 
 ## Download
 
 Grab the latest release from the [Releases page](https://github.com/coldhighsun/PayBeat/releases/latest). Three `win-x64` packages are published per version:
 
-- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — smaller, requires the .NET 10 Desktop Runtime
+- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — smaller, requires the .NET 10 Runtime
 - `PayBeat-<version>-portable-standalone-win-x64.zip` — larger, runs standalone with no prerequisites
 - `PayBeat-<version>-setup-win-x64.exe` — self-contained installer (no runtime prerequisite); installs per-user, adds a Start Menu shortcut, and registers for uninstall
 
@@ -141,14 +143,16 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 ## 系统要求
 
 - Windows 10 / 11（x64）
-- 便携版：需安装 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
+- 便携版：需安装 [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
 - 独立版：无需安装任何运行时，开箱即用
+
+PayBeat 基于 [Avalonia](https://avaloniaui.net/) 构建，代码本身是跨平台的。目前官方发布包仅提供 Windows 版本；macOS / Linux 版本尚未测试；平台相关功能（全局热键、开机自启动、置顶强化）在这些平台上会降级为空实现。
 
 ## 下载
 
 前往 [Releases 页面](https://github.com/coldhighsun/PayBeat/releases/latest) 下载最新版本。每个版本会发布三个 `win-x64` 安装包：
 
-- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — 体积较小，需预装 .NET 10 Desktop Runtime
+- `PayBeat-<version>-portable-runtime-required-win-x64.zip` — 体积较小，需预装 .NET 10 Runtime
 - `PayBeat-<version>-portable-standalone-win-x64.zip` — 体积较大，内置运行时，无需任何前置依赖
 - `PayBeat-<version>-setup-win-x64.exe` — 内置运行时的安装程序，无需前置依赖；按当前用户安装，创建开始菜单快捷方式并支持卸载
 

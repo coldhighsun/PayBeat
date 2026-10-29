@@ -1,0 +1,172 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Flat Button: custom template so Fluent's hover/pressed backgrounds do not override local colors -->
+    <Style Selector="Button">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="Button:pointerover">
+        <Setter Property="Opacity" Value="0.82"/>
+    </Style>
+    <Style Selector="Button:pressed">
+        <Setter Property="Opacity" Value="0.65"/>
+    </Style>
+    <Style Selector="Button:disabled">
+        <Setter Property="Opacity" Value="0.4"/>
+    </Style>
+
+    <!-- Link-style button used for hyperlinks in the About window -->
+    <Style Selector="Button.link">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- Flat TextBox -->
+    <Style Selector="TextBox">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+    </Style>
+    <Style Selector="TextBox:error">
+        <Setter Property="BorderBrush" Value="{DynamicResource RedBrush}"/>
+    </Style>
+
+    <!-- Borderless digit box used inside the time picker -->
+    <Style Selector="TextBox.digit">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="TextBox.digit /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="TextBox.digit:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+    </Style>
+
+    <!-- ComboBox -->
+    <Style Selector="ComboBox">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MaxDropDownHeight" Value="200"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OverlayBrush}"/>
+    </Style>
+    <Style Selector="ComboBoxItem">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="10,7"/>
+    </Style>
+
+    <!-- ProgressBar -->
+    <Style Selector="ProgressBar">
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="CornerRadius" Value="2"/>
+    </Style>
+    <!-- Fluent gives horizontal progress bars a 200 px minimum width, which would stretch the mini widget -->
+    <Style Selector="ProgressBar:horizontal">
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+    </Style>
+
+    <!-- At fractional scaling (e.g. 150%) the popup window can end up a pixel shorter than the menu content, which
+         makes Fluent's menu ScrollViewer show up/down scroll arrows. The menus are short, so never scroll them. -->
+    <Style Selector="ContextMenu ScrollViewer, MenuItem ScrollViewer">
+        <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <!-- Tooltip showing a display-mode preview -->
+    <Style Selector="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource OverlayBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="MaxWidth" Value="Infinity"/>
+        <Setter Property="MaxHeight" Value="Infinity"/>
+    </Style>
+
+    <!-- Settings tab headers: underline marks the selected tab -->
+    <Style Selector="TabItem.settings">
+        <Setter Property="Foreground" Value="{DynamicResource SubtextBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="TabBorder"
+                        Background="Transparent"
+                        BorderThickness="0,0,0,2"
+                        BorderBrush="Transparent"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Header}"
+                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabItem.settings:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
+    <Style Selector="TabItem.settings:selected">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="TabItem.settings:selected /template/ Border#TabBorder">
+        <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+    </Style>
+    <Style Selector="TabControl.settings">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <!-- Section header used to group related settings within a tab -->
+    <Style Selector="TextBlock.sectionHeader">
+        <Setter Property="Foreground" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <!-- Settings field label -->
+    <Style Selector="TextBlock.fieldLabel">
+        <Setter Property="Foreground" Value="{DynamicResource SubtextBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Settings check boxes and radio buttons -->
+    <Style Selector="CheckBox, RadioButton">
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+</Styles>

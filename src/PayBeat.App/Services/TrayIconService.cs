@@ -1,83 +1,120 @@
 using System.ComponentModel;
-using System.Diagnostics;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform;
 using PayBeat.App.ViewModels;
-using MenuItem = System.Windows.Forms.ToolStripMenuItem;
 
 namespace PayBeat.App.Services;
 
 /// <summary>
-/// Manages the tray icon and its context menu, including the "Show" and "Exit" items.
+/// Manages the tray icon and its context menu (display modes, settings, about and exit).
+/// Notifications are shown by <see cref="ToastService"/>, not by the tray icon.
 /// </summary>
 public sealed class TrayIconService : IDisposable
 {
-    private readonly MenuItem _flexMenuItem;
-    private readonly Icon? _icon;
-    private readonly MenuItem _miniMenuItem;
-    private readonly MenuItem _noneMenuItem;
-    private readonly MenuItem _normalMenuItem;
-    private readonly NotifyIcon _notifyIcon;
-    private readonly ToolStripItem[] _restrictedItems;
-    private readonly MainViewModel _viewModel;
-    private bool _isHidden;
-    private string? _pendingClickUrl;
+    /// <summary>
+    /// Location of the tray icon image.
+    /// </summary>
+    private const string IconUri = "avares://PayBeat/Resources/Icons/PayBeat.png";
 
-    /// <summary>Creates and shows the tray icon.</summary>
+    /// <summary>
+    /// Menu item that switches to flex mode.
+    /// </summary>
+    private readonly NativeMenuItem _flexMenuItem;
+
+    /// <summary>
+    /// Menu item that switches to mini mode.
+    /// </summary>
+    private readonly NativeMenuItem _miniMenuItem;
+
+    /// <summary>
+    /// Menu item that hides the widget.
+    /// </summary>
+    private readonly NativeMenuItem _noneMenuItem;
+
+    /// <summary>
+    /// Menu item that switches to normal mode.
+    /// </summary>
+    private readonly NativeMenuItem _normalMenuItem;
+
+    /// <summary>
+    /// The native tray icon.
+    /// </summary>
+    private readonly TrayIcon _trayIcon;
+
+    /// <summary>
+    /// The complete context menu.
+    /// </summary>
+    private readonly NativeMenu _fullMenu;
+
+    /// <summary>
+    /// The Exit-only context menu shown while the widget is hidden via the global hotkey.
+    /// </summary>
+    private readonly NativeMenu _exitOnlyMenu;
+
+    /// <summary>
+    /// Source of the display-mode state and commands the tray menu invokes.
+    /// </summary>
+    private readonly MainViewModel _viewModel;
+
+    /// <summary>
+    /// Whether the widget is currently hidden via the global hotkey.
+    /// </summary>
+    private bool _isHidden;
+
+    /// <summary>
+    /// Creates and shows the tray icon.
+    /// </summary>
     /// <param name="viewModel">Source of the display-mode state and commands the tray menu invokes.</param>
-    /// <param name="onActivate">Invoked when the user left-clicks the tray icon.</param>
+    /// <param name="onActivate">Invoked when the user clicks the tray icon.</param>
     public TrayIconService(MainViewModel viewModel, Action onActivate)
     {
         _viewModel = viewModel;
 
-        _normalMenuItem = new MenuItem(Text("Menu.Normal"), null, (_, _) => _viewModel.SetNormalModeCommand.Execute(null));
-        _miniMenuItem = new MenuItem(Text("Menu.Mini"), null, (_, _) => _viewModel.SetMiniModeCommand.Execute(null));
-        _noneMenuItem = new MenuItem(Text("Menu.None"), null, (_, _) => _viewModel.SetNoneModeCommand.Execute(null));
-        _flexMenuItem = new MenuItem(Text("Menu.Flex"), null, (_, _) => _viewModel.SetFlexModeCommand.Execute(null));
+        _flexMenuItem = CreateCheckItem("Menu.Flex", _viewModel.SetFlexModeCommand);
+        _normalMenuItem = CreateCheckItem("Menu.Normal", _viewModel.SetNormalModeCommand);
+        _miniMenuItem = CreateCheckItem("Menu.Mini", _viewModel.SetMiniModeCommand);
+        _noneMenuItem = CreateCheckItem("Menu.None", _viewModel.SetNoneModeCommand);
 
-        var displayModeMenuItem = new MenuItem(Text("Menu.DisplayMode"));
-        displayModeMenuItem.DropDownItems.AddRange([_flexMenuItem, _normalMenuItem, _miniMenuItem, _noneMenuItem]);
-
-        var separator1 = new ToolStripSeparator();
-        var settingsMenuItem = new MenuItem(Text("Menu.Settings"), null, (_, _) => _viewModel.OpenSettingsCommand.Execute(null));
-        var aboutMenuItem = new MenuItem(Text("Menu.About"), null, (_, _) => _viewModel.OpenAboutCommand.Execute(null));
-        var separator2 = new ToolStripSeparator();
-
-        var contextMenu = new ContextMenuStrip();
-        contextMenu.Items.Add(displayModeMenuItem);
-        contextMenu.Items.Add(separator1);
-        contextMenu.Items.Add(settingsMenuItem);
-        contextMenu.Items.Add(aboutMenuItem);
-        contextMenu.Items.Add(separator2);
-        contextMenu.Items.Add(new MenuItem(Text("Menu.Exit"), null, (_, _) => _viewModel.ExitCommand.Execute(null)));
-        contextMenu.Opening += (_, _) => UpdateDisplayModeChecks();
-
-        _restrictedItems = [displayModeMenuItem, separator1, settingsMenuItem, aboutMenuItem, separator2];
-
-        _icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
-        _notifyIcon = new NotifyIcon
+        var displayModeMenuItem = new NativeMenuItem(LocalizationService.Get("Menu.DisplayMode"))
         {
-            Icon = _icon,
-            Text = TooltipText(),
-            ContextMenuStrip = contextMenu,
-            Visible = true
+            Menu = [_flexMenuItem, _normalMenuItem, _miniMenuItem, _noneMenuItem],
         };
-        _notifyIcon.MouseClick += (_, e) =>
+        var separator1 = new NativeMenuItemSeparator();
+        var settingsMenuItem = CreateItem("Menu.Settings", _viewModel.OpenSettingsCommand);
+        var aboutMenuItem = CreateItem("Menu.About", _viewModel.OpenAboutCommand);
+        var separator2 = new NativeMenuItemSeparator();
+
+        _fullMenu =
+        [
+            displayModeMenuItem,
+            separator1,
+            settingsMenuItem,
+            aboutMenuItem,
+            separator2,
+            CreateItem("Menu.Exit", _viewModel.ExitCommand),
+        ];
+        _exitOnlyMenu = [CreateItem("Menu.Exit", _viewModel.ExitCommand)];
+
+        _trayIcon = new TrayIcon
         {
-            if (e.Button == MouseButtons.Left && !_isHidden)
+            Icon = new WindowIcon(AssetLoader.Open(new Uri(IconUri))),
+            ToolTipText = TooltipText(),
+            Menu = _fullMenu,
+            IsVisible = true,
+        };
+        _trayIcon.Clicked += (_, _) =>
+        {
+            if (!_isHidden)
             {
                 onActivate();
             }
         };
-        _notifyIcon.MouseDoubleClick += (_, e) =>
-        {
-            if (e.Button == MouseButtons.Left && !_isHidden)
-            {
-                _viewModel.OpenSettingsCommand.Execute(null);
-            }
-        };
-        _notifyIcon.BalloonTipClicked += OnBalloonTipClicked;
 
+        TrayIcon.SetIcons(Application.Current!, [_trayIcon]);
+
+        UpdateDisplayModeChecks();
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
-        _viewModel.NotificationRequested += OnNotificationRequested;
     }
 
     /// <summary>
@@ -88,76 +125,67 @@ public sealed class TrayIconService : IDisposable
     public void SetHidden(bool isHidden)
     {
         _isHidden = isHidden;
-        foreach (var item in _restrictedItems)
-        {
-            item.Visible = !isHidden;
-        }
-        _notifyIcon.Text = isHidden ? HiddenTooltipText() : TooltipText();
-        if (isHidden)
-        {
-            // NotifyIcon has no HideBalloonTip API; toggling Visible dismisses any pending balloon tip.
-            _notifyIcon.Visible = false;
-            _notifyIcon.Visible = true;
-            _pendingClickUrl = null;
-        }
+        _trayIcon.Menu = isHidden ? _exitOnlyMenu : _fullMenu;
+        _trayIcon.ToolTipText = isHidden ? LocalizationService.Get("Tray.HiddenTooltip") : TooltipText();
     }
 
     /// <inheritdoc/>
     public void Dispose()
     {
         _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
-        _viewModel.NotificationRequested -= OnNotificationRequested;
-        _notifyIcon.BalloonTipClicked -= OnBalloonTipClicked;
-        _notifyIcon.Visible = false;
-        _notifyIcon.Dispose();
-        _icon?.Dispose();
-    }
-
-    private static string Text(string key) =>
-        Application.Current.TryFindResource(key) as string ?? key;
-
-    private void OnNotificationRequested(string title, string body, string? url)
-    {
-        _pendingClickUrl = url;
-        _notifyIcon.ShowBalloonTip(3000, title, body, ToolTipIcon.Info);
+        _trayIcon.IsVisible = false;
+        _trayIcon.Dispose();
     }
 
     /// <summary>
-    /// Opens the URL associated with the most recently shown balloon tip (currently only set for
-    /// "update available" notifications) when the user clicks it.
+    /// Creates a plain menu item bound to <paramref name="command"/>.
     /// </summary>
-    private void OnBalloonTipClicked(object? sender, EventArgs e)
-    {
-        if (_pendingClickUrl is not { } url)
+    private static NativeMenuItem CreateItem(string resourceKey, ICommand command) =>
+        new(LocalizationService.Get(resourceKey)) { Command = command };
+
+    /// <summary>
+    /// Creates a checkable menu item bound to <paramref name="command"/>. The check mark is driven
+    /// by <see cref="UpdateDisplayModeChecks"/>, so a click never toggles it on its own.
+    /// </summary>
+    private static NativeMenuItem CreateCheckItem(string resourceKey, ICommand command) =>
+        new(LocalizationService.Get(resourceKey))
         {
-            return;
-        }
+            Command = command,
+            ToggleType = MenuItemToggleType.CheckBox,
+        };
 
-        _pendingClickUrl = null;
-        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-    }
-
+    /// <summary>
+    /// Keeps the tooltip and check marks in sync with the view model.
+    /// </summary>
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.EarnedFormatted) && !_isHidden)
         {
-            _notifyIcon.Text = TooltipText();
+            _trayIcon.ToolTipText = TooltipText();
+        }
+        else if (e.PropertyName == nameof(MainViewModel.DisplayMode))
+        {
+            UpdateDisplayModeChecks();
         }
     }
 
-    private static string HiddenTooltipText() => Text("Tray.HiddenTooltip");
-
+    /// <summary>
+    /// Returns the live earnings text used as the tooltip, truncated to the Win32 limit of 63 characters.
+    /// </summary>
     private string TooltipText()
     {
         var text = _viewModel.EarnedFormatted;
         return text.Length > 63 ? text[..63] : text;
     }
 
+    /// <summary>
+    /// Updates the display-mode check marks from the view model.
+    /// </summary>
     private void UpdateDisplayModeChecks()
     {
-        _normalMenuItem.Checked = _viewModel.IsNormalMode;
-        _miniMenuItem.Checked = _viewModel.IsMiniMode;
-        _noneMenuItem.Checked = _viewModel.IsNoneMode;
-        _flexMenuItem.Checked = _viewModel.IsFlexMode;
+        _normalMenuItem.IsChecked = _viewModel.IsNormalMode;
+        _miniMenuItem.IsChecked = _viewModel.IsMiniMode;
+        _noneMenuItem.IsChecked = _viewModel.IsNoneMode;
+        _flexMenuItem.IsChecked = _viewModel.IsFlexMode;
     }
 }

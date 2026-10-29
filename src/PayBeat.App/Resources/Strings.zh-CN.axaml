@@ -1,0 +1,107 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Context menu -->
+    <x:String x:Key="Menu.DisplayMode">显示模式</x:String>
+    <x:String x:Key="Menu.Normal">标准</x:String>
+    <x:String x:Key="Menu.Mini">迷你</x:String>
+    <x:String x:Key="Menu.None">无</x:String>
+    <x:String x:Key="Menu.Flex">显摆</x:String>
+    <x:String x:Key="Menu.Settings">设置</x:String>
+    <x:String x:Key="Menu.About">关于</x:String>
+    <x:String x:Key="Menu.Exit">退出</x:String>
+
+    <!-- Normal view labels -->
+    <x:String x:Key="View.WorkStart">上班 </x:String>
+    <x:String x:Key="View.WorkEnd">下班 </x:String>
+    <x:String x:Key="View.DailySalary">日薪</x:String>
+
+    <!-- Flex view labels -->
+    <x:String x:Key="View.Elapsed">已工作</x:String>
+    <x:String x:Key="View.Remaining">剩余</x:String>
+    <x:String x:Key="View.WorkWindow">工作时间</x:String>
+
+    <!-- Settings window -->
+    <x:String x:Key="Settings.WindowTitle">PayBeat 设置</x:String>
+    <x:String x:Key="Settings.Title">设置</x:String>
+    <x:String x:Key="Settings.Cancel">取消</x:String>
+    <x:String x:Key="Settings.Save">保存</x:String>
+
+    <!-- Salary tab -->
+    <x:String x:Key="Settings.Tab.Salary">薪资计算</x:String>
+    <x:String x:Key="Settings.Section.Salary">薪资</x:String>
+    <x:String x:Key="Settings.Section.Schedule">工作日程</x:String>
+    <x:String x:Key="Settings.Section.Refresh">刷新</x:String>
+    <x:String x:Key="Settings.DailySalary">日薪</x:String>
+    <x:String x:Key="Settings.WorkHours">工作时间</x:String>
+    <x:String x:Key="Settings.RefreshInterval">刷新间隔</x:String>
+    <x:String x:Key="Settings.Seconds"> 秒</x:String>
+    <x:String x:Key="Settings.LunchBreakEnabled">扣除午休时间</x:String>
+    <x:String x:Key="Settings.LunchBreakStart">午休开始</x:String>
+    <x:String x:Key="Settings.LunchBreakEnd">午休结束</x:String>
+    <x:String x:Key="Settings.WorkOnWeekends">周末也计薪</x:String>
+
+    <!-- Notifications tab -->
+    <x:String x:Key="Settings.Tab.Notifications">提醒</x:String>
+    <x:String x:Key="Settings.EnableEndOfDayReminder">下班提醒</x:String>
+    <x:String x:Key="Settings.EndOfDayReminderMinutes">提前提醒（分钟）</x:String>
+    <x:String x:Key="Settings.EnableMilestoneNotifications">收入里程碑提醒</x:String>
+    <x:String x:Key="Settings.MilestoneAmount">每达到</x:String>
+
+    <!-- Display tab -->
+    <x:String x:Key="Settings.Tab.Display">显示</x:String>
+    <x:String x:Key="Settings.DisplayMode">显示方式</x:String>
+    <x:String x:Key="Settings.Normal">标准</x:String>
+    <x:String x:Key="Settings.Mini">迷你</x:String>
+    <x:String x:Key="Settings.None">无</x:String>
+    <x:String x:Key="Settings.Flex">显摆</x:String>
+    <x:String x:Key="Settings.Opacity">透明度</x:String>
+    <x:String x:Key="Settings.AlwaysOnTop">窗口始终置顶</x:String>
+
+    <!-- System tab -->
+    <x:String x:Key="Settings.Tab.System">系统</x:String>
+    <x:String x:Key="Settings.RunAtStartup">开机自动启动</x:String>
+    <x:String x:Key="Settings.Language">语言</x:String>
+    <x:String x:Key="Settings.LanguageAuto">自动</x:String>
+    <x:String x:Key="Settings.Theme">主题</x:String>
+    <x:String x:Key="Settings.ThemeAuto">自动</x:String>
+    <x:String x:Key="Settings.ThemeLight">浅色</x:String>
+    <x:String x:Key="Settings.ThemeDark">深色</x:String>
+    <x:String x:Key="Settings.Hotkey">显示/隐藏快捷键</x:String>
+    <x:String x:Key="Settings.HotkeyHint">点击后输入快捷键组合</x:String>
+    <x:String x:Key="Settings.HotkeyCapturing">请输入快捷键组合...</x:String>
+
+    <!-- About window -->
+    <x:String x:Key="About.WindowTitle">关于 PayBeat</x:String>
+    <x:String x:Key="About.Description">一款轻量悬浮组件，实时显示你的当日薪资进度。</x:String>
+    <x:String x:Key="About.Author">作者</x:String>
+    <x:String x:Key="About.License">许可证</x:String>
+    <x:String x:Key="About.GitHub">GitHub</x:String>
+    <x:String x:Key="About.Close">关闭</x:String>
+    <x:String x:Key="About.Update.Checking">正在检查更新...</x:String>
+    <x:String x:Key="About.Update.UpToDate">已是最新版本</x:String>
+    <x:String x:Key="About.Update.Available">发现新版本：v{0}</x:String>
+
+    <!-- Validation errors -->
+    <x:String x:Key="Error.SalaryPositive">日薪须大于 0</x:String>
+    <x:String x:Key="Error.SalaryTooLarge">日薪不能超过 99,999,999</x:String>
+    <x:String x:Key="Error.WorkEndAfterStart">上班和下班时间不能相同</x:String>
+    <x:String x:Key="Error.AlreadyRunning">PayBeat 已在运行中。</x:String>
+    <x:String x:Key="Error.HotkeyConflict">快捷键 {0} 注册失败，可能已被其他程序占用。</x:String>
+    <x:String x:Key="Error.LunchBreakInvalid">午休时间必须在工作时间内，且结束时间须晚于开始时间</x:String>
+    <x:String x:Key="Error.MilestoneAmountPositive">里程碑金额须大于 0</x:String>
+    <x:String x:Key="Error.MilestoneAmountTooLarge">里程碑金额不能超过日薪总额</x:String>
+    <x:String x:Key="Error.EndOfDayReminderMinutesInvalid">提醒分钟数须为 1 到 60 之间的整数</x:String>
+    <x:String x:Key="Error.SettingsSaveFailed">设置保存失败，请确认设置文件未被锁定或设为只读后重试。</x:String>
+    <x:String x:Key="Error.StartupToggleFailed">"开机启动"设置更新失败，您可能没有权限在此设备上修改该设置。</x:String>
+
+    <!-- Tray notifications -->
+    <x:String x:Key="Tray.HiddenTooltip">我爱上班！</x:String>
+    <x:String x:Key="Notification.MilestoneTitle">收入里程碑</x:String>
+    <x:String x:Key="Notification.MilestoneBody">今天已赚到 {0}！</x:String>
+    <x:String x:Key="Notification.EndOfDayTitle">快下班了</x:String>
+    <x:String x:Key="Notification.EndOfDayBody">还有 {0} 分钟下班。</x:String>
+    <x:String x:Key="Notification.UpdateAvailableTitle">发现新版本</x:String>
+    <x:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} 已发布，打开"关于"窗口下载。</x:String>
+
+</ResourceDictionary>

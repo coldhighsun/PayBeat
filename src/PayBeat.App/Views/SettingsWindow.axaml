@@ -1,0 +1,336 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:PayBeat.App.Views.Controls"
+        x:Class="PayBeat.App.Views.SettingsWindow"
+        Title="{DynamicResource Settings.WindowTitle}"
+        Icon="avares://PayBeat/Resources/Icons/PayBeat.png"
+        Width="400"
+        Height="640"
+        WindowDecorations="None"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent">
+
+    <Window.Styles>
+        <!-- Hotkey box highlighted while it is capturing a key combination -->
+        <Style Selector="TextBox.capturing">
+            <Setter Property="Foreground" Value="{DynamicResource BlueBrush}"/>
+        </Style>
+        <Style Selector="TextBox.capturing /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{DynamicResource CaptureBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+        </Style>
+    </Window.Styles>
+
+    <Border x:Name="RootBorder"
+            Focusable="True"
+            Background="{DynamicResource BaseBrush}"
+            CornerRadius="12"
+            BorderBrush="{DynamicResource OverlayBrush}"
+            BorderThickness="1">
+
+        <DockPanel Margin="28,20" LastChildFill="True">
+
+            <!-- Title -->
+            <TextBlock DockPanel.Dock="Top"
+                       Text="{DynamicResource Settings.Title}"
+                       Foreground="{DynamicResource TextBrush}"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0,0,0,16"/>
+
+            <!-- Error -->
+            <TextBlock DockPanel.Dock="Bottom"
+                       Text="{Binding ErrorMessage}"
+                       Foreground="{DynamicResource RedBrush}"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       MinHeight="16"/>
+
+            <!-- Buttons -->
+            <StackPanel DockPanel.Dock="Bottom"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,20,0,0">
+                <Button Content="{DynamicResource Settings.Cancel}"
+                        Command="{Binding CancelCommand}"
+                        Margin="0,0,10,0"
+                        Padding="20,10"
+                        Background="{DynamicResource SurfaceBrush}"
+                        Foreground="{DynamicResource TextBrush}"/>
+                <Button Content="{DynamicResource Settings.Save}"
+                        Command="{Binding SaveCommand}"
+                        Padding="20,10"
+                        Background="{DynamicResource BlueBrush}"
+                        Foreground="{DynamicResource BaseBrush}"
+                        FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <!-- Tab control -->
+            <TabControl x:Name="SettingsTabs" Classes="settings">
+
+                <!-- ── Salary Calculation ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Salary}" Classes="settings">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,20,0,0">
+                        <StackPanel>
+
+                            <!-- ── Group: Salary ── -->
+                            <TextBlock Text="{DynamicResource Settings.Section.Salary}" Classes="sectionHeader"/>
+
+                            <!-- Daily Salary -->
+                            <TextBlock Text="{DynamicResource Settings.DailySalary}"
+                                       Classes="fieldLabel"
+                                       Margin="0,0,0,4"/>
+                            <Grid Margin="0,0,0,16" ColumnDefinitions="56,8,*">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding CurrencyText, UpdateSourceTrigger=PropertyChanged}"
+                                         Padding="10,8"/>
+                                <TextBox x:Name="SalaryBox"
+                                         Grid.Column="2"
+                                         Text="{Binding DailySalaryText, UpdateSourceTrigger=PropertyChanged}"
+                                         TextAlignment="Right"
+                                         Padding="10,8"
+                                         MaxLength="11"/>
+                            </Grid>
+
+                            <!-- ── Group: Work Schedule ── -->
+                            <TextBlock Text="{DynamicResource Settings.Section.Schedule}" Classes="sectionHeader"/>
+
+                            <!-- Work Hours -->
+                            <Grid Margin="0,0,0,10" ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{DynamicResource Settings.WorkHours}"
+                                           Classes="fieldLabel"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <controls:TimePickerControl SelectedTime="{Binding WorkStart}"/>
+                                    <TextBlock Text="–" Foreground="{DynamicResource MutedBrush}" FontSize="13" VerticalAlignment="Center" Margin="6,0"/>
+                                    <controls:TimePickerControl SelectedTime="{Binding WorkEnd}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Lunch break -->
+                            <Grid Margin="0,0,0,10" ColumnDefinitions="*,Auto">
+                                <CheckBox Grid.Column="0"
+                                          Content="{DynamicResource Settings.LunchBreakEnabled}"
+                                          IsChecked="{Binding LunchBreakEnabled}"
+                                          VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            IsEnabled="{Binding LunchBreakEnabled}">
+                                    <controls:TimePickerControl SelectedTime="{Binding LunchBreakStart}"/>
+                                    <TextBlock Text="–" Foreground="{DynamicResource MutedBrush}" FontSize="13" VerticalAlignment="Center" Margin="6,0"/>
+                                    <controls:TimePickerControl SelectedTime="{Binding LunchBreakEnd}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Weekend earning -->
+                            <CheckBox Content="{DynamicResource Settings.WorkOnWeekends}"
+                                      IsChecked="{Binding WorkOnWeekends}"
+                                      Margin="0,0,0,16"/>
+
+                            <!-- ── Group: Refresh ── -->
+                            <TextBlock Text="{DynamicResource Settings.Section.Refresh}" Classes="sectionHeader"/>
+
+                            <!-- Refresh Interval -->
+                            <Grid Margin="0,0,0,2" ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{DynamicResource Settings.RefreshInterval}"
+                                           Classes="fieldLabel"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <TextBlock Text="{Binding RefreshInterval}"
+                                               Foreground="{DynamicResource GreenBrush}"
+                                               FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{DynamicResource Settings.Seconds}"
+                                               Foreground="{DynamicResource GreenBrush}"
+                                               FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                            <Slider Minimum="1"
+                                    Maximum="60"
+                                    Value="{Binding RefreshInterval}"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── Notifications ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Notifications}" Classes="settings">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,20,0,0">
+                        <StackPanel>
+
+                            <!-- End of day reminder -->
+                            <CheckBox Content="{DynamicResource Settings.EnableEndOfDayReminder}"
+                                      IsChecked="{Binding EnableEndOfDayReminder}"
+                                      Margin="0,0,0,8"/>
+                            <Grid Margin="0,0,0,16" ColumnDefinitions="*,8,80" IsEnabled="{Binding EnableEndOfDayReminder}">
+                                <TextBlock Grid.Column="0"
+                                           Text="{DynamicResource Settings.EndOfDayReminderMinutes}"
+                                           Classes="fieldLabel"/>
+                                <TextBox x:Name="EndOfDayMinutesBox"
+                                         Grid.Column="2"
+                                         Text="{Binding EndOfDayReminderMinutesText, UpdateSourceTrigger=PropertyChanged}"
+                                         TextAlignment="Right"
+                                         Padding="10,8"
+                                         MaxLength="2"/>
+                            </Grid>
+
+                            <!-- Milestone notifications -->
+                            <CheckBox Content="{DynamicResource Settings.EnableMilestoneNotifications}"
+                                      IsChecked="{Binding EnableMilestoneNotifications}"
+                                      Margin="0,0,0,8"/>
+                            <Grid ColumnDefinitions="*,8,80" IsEnabled="{Binding EnableMilestoneNotifications}">
+                                <TextBlock Grid.Column="0"
+                                           Text="{DynamicResource Settings.MilestoneAmount}"
+                                           Classes="fieldLabel"/>
+                                <TextBox x:Name="MilestoneBox"
+                                         Grid.Column="2"
+                                         Text="{Binding MilestoneAmountText, UpdateSourceTrigger=PropertyChanged}"
+                                         TextAlignment="Right"
+                                         Padding="10,8"
+                                         MaxLength="11"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── Display ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.Display}" Classes="settings">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,20,0,0">
+                        <StackPanel>
+
+                            <!-- Display mode -->
+                            <TextBlock Text="{DynamicResource Settings.DisplayMode}"
+                                       Classes="fieldLabel"
+                                       Margin="0,0,0,8"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                <RadioButton Content="{DynamicResource Settings.Flex}"
+                                             GroupName="DisplayMode"
+                                             IsChecked="{Binding IsFlexMode}"
+                                             Margin="0,0,20,0"
+                                             ToolTip.ShowDelay="200">
+                                    <ToolTip.Tip>
+                                        <Image Source="avares://PayBeat/Resources/Screenshots/flex.png" Width="600" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                                    </ToolTip.Tip>
+                                </RadioButton>
+                                <RadioButton Content="{DynamicResource Settings.Normal}"
+                                             GroupName="DisplayMode"
+                                             IsChecked="{Binding IsNormalMode}"
+                                             Margin="0,0,20,0"
+                                             ToolTip.ShowDelay="200">
+                                    <ToolTip.Tip>
+                                        <Image x:Name="NormalPreview" Source="avares://PayBeat/Resources/Screenshots/normal.png" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    </ToolTip.Tip>
+                                </RadioButton>
+                                <RadioButton Content="{DynamicResource Settings.Mini}"
+                                             GroupName="DisplayMode"
+                                             IsChecked="{Binding IsMiniMode}"
+                                             Margin="0,0,20,0"
+                                             ToolTip.ShowDelay="200">
+                                    <ToolTip.Tip>
+                                        <Image x:Name="MiniPreview" Source="avares://PayBeat/Resources/Screenshots/mini.png" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    </ToolTip.Tip>
+                                </RadioButton>
+                                <RadioButton Content="{DynamicResource Settings.None}"
+                                             GroupName="DisplayMode"
+                                             IsChecked="{Binding IsNoneMode}"/>
+                            </StackPanel>
+
+                            <!-- Opacity -->
+                            <Grid Margin="0,0,0,4" ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="{DynamicResource Settings.Opacity}"
+                                           Classes="fieldLabel"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding OpacityFormatted}"
+                                           Foreground="{DynamicResource GreenBrush}"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                            <Slider Minimum="0.1"
+                                    Maximum="1.0"
+                                    Value="{Binding Opacity}"
+                                    TickFrequency="0.05"
+                                    IsSnapToTickEnabled="True"
+                                    Margin="0,0,0,16"/>
+
+                            <!-- Always on top -->
+                            <CheckBox Content="{DynamicResource Settings.AlwaysOnTop}"
+                                      IsChecked="{Binding AlwaysOnTop}"
+                                      Margin="0,0,0,16"/>
+
+                            <!-- Theme -->
+                            <TextBlock Text="{DynamicResource Settings.Theme}"
+                                       Classes="fieldLabel"
+                                       Margin="0,0,0,6"/>
+                            <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                      SelectedValue="{Binding Theme}"
+                                      SelectedValueBinding="{Binding Code}"
+                                      Padding="10,8"
+                                      HorizontalAlignment="Stretch"
+                                      HorizontalContentAlignment="Left">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ── System ── -->
+                <TabItem Header="{DynamicResource Settings.Tab.System}" Classes="settings">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,20,0,0">
+                        <StackPanel>
+
+                            <!-- Run at startup -->
+                            <CheckBox Content="{DynamicResource Settings.RunAtStartup}"
+                                      IsChecked="{Binding RunAtStartup}"
+                                      IsVisible="{Binding IsStartupSupported}"
+                                      Margin="0,0,0,16"/>
+
+                            <!-- Hotkey -->
+                            <StackPanel IsVisible="{Binding IsHotkeySupported}">
+                                <TextBlock Text="{DynamicResource Settings.Hotkey}"
+                                           Classes="fieldLabel"
+                                           Margin="0,0,0,6"/>
+                                <TextBox x:Name="HotkeyBox"
+                                         Text="{Binding HotkeyDisplayText, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         Padding="10,8"
+                                         Cursor="IBeam"/>
+                                <TextBlock Text="{DynamicResource Settings.HotkeyHint}"
+                                           Foreground="{DynamicResource MutedBrush}"
+                                           FontSize="11"
+                                           Margin="0,4,0,16"/>
+                            </StackPanel>
+
+                            <!-- Language -->
+                            <TextBlock Text="{DynamicResource Settings.Language}"
+                                       Classes="fieldLabel"
+                                       Margin="0,0,0,6"/>
+                            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                      SelectedValue="{Binding Language}"
+                                      SelectedValueBinding="{Binding Code}"
+                                      Padding="10,8"
+                                      HorizontalAlignment="Stretch"
+                                      HorizontalContentAlignment="Left"
+                                      Margin="0,0,0,16">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Border>
+</Window>

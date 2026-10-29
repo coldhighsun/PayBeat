@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:PayBeat.App.Views"
+        x:Class="PayBeat.App.Views.MainWindow"
+        Title="PayBeat"
+        Icon="avares://PayBeat/Resources/Icons/PayBeat.png"
+        WindowDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="Manual"
+        Topmost="{Binding AlwaysOnTop}">
+
+    <!-- The three display modes are stacked; only the active one is visible (and measured). -->
+    <Panel x:Name="RootHost"
+           Background="Transparent"
+           RenderTransformOrigin="50%,50%">
+        <Panel.RenderTransform>
+            <ScaleTransform/>
+        </Panel.RenderTransform>
+
+        <Panel.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="{DynamicResource Menu.DisplayMode}">
+                    <MenuItem Header="{DynamicResource Menu.Flex}"
+                              ToggleType="CheckBox"
+                              IsChecked="{Binding IsFlexMode, Mode=OneWay}"
+                              Command="{Binding SetFlexModeCommand}"/>
+                    <MenuItem Header="{DynamicResource Menu.Normal}"
+                              ToggleType="CheckBox"
+                              IsChecked="{Binding IsNormalMode, Mode=OneWay}"
+                              Command="{Binding SetNormalModeCommand}"/>
+                    <MenuItem Header="{DynamicResource Menu.Mini}"
+                              ToggleType="CheckBox"
+                              IsChecked="{Binding IsMiniMode, Mode=OneWay}"
+                              Command="{Binding SetMiniModeCommand}"/>
+                    <MenuItem Header="{DynamicResource Menu.None}"
+                              ToggleType="CheckBox"
+                              IsChecked="{Binding IsNoneMode, Mode=OneWay}"
+                              Command="{Binding SetNoneModeCommand}"/>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="{DynamicResource Menu.Settings}" Command="{Binding OpenSettingsCommand}"/>
+                <MenuItem Header="{DynamicResource Menu.About}" Command="{Binding OpenAboutCommand}"/>
+                <Separator/>
+                <MenuItem Header="{DynamicResource Menu.Exit}" Command="{Binding ExitCommand}"/>
+            </ContextMenu>
+        </Panel.ContextMenu>
+
+        <views:NormalView IsVisible="{Binding IsNormalMode}"/>
+        <views:MiniView IsVisible="{Binding IsMiniMode}"/>
+        <views:FlexView IsVisible="{Binding IsFlexMode}"/>
+    </Panel>
+</Window>

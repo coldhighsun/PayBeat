@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PayBeat.App.Views.MiniView">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.miniAmount">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource BaseBrush}"
+            CornerRadius="8"
+            BorderBrush="{DynamicResource OverlayBrush}"
+            BorderThickness="1">
+
+        <StackPanel>
+            <Grid Margin="12,7,12,6">
+                <!-- Invisible but measured: reserves the width of the maximum (full daily salary) amount. -->
+                <TextBlock Text="{Binding MiniWidthTemplate}"
+                           Classes="miniAmount"
+                           Opacity="0"/>
+                <TextBlock Text="{Binding EarnedFormatted}"
+                           Classes="miniAmount"
+                           Foreground="{DynamicResource GreenBrush}"
+                           HorizontalAlignment="Right"/>
+            </Grid>
+
+            <!-- A stock ProgressBar must not be used here: its indicator width (progress * available width) counts
+                 towards the desired width, which makes an auto-sized window shrink in steps from its initial size.
+                 The fill is scaled with a render transform instead, which never takes part in layout; the scale
+                 follows the view model's Progress (see MiniView.axaml.cs). -->
+            <Border Height="3"
+                    CornerRadius="2"
+                    ClipToBounds="True"
+                    Background="{DynamicResource SurfaceBrush}">
+                <Border x:Name="ProgressFill"
+                        Background="{DynamicResource BlueBrush}"
+                        RenderTransformOrigin="0%,50%">
+                    <Border.RenderTransform>
+                        <ScaleTransform ScaleX="0"/>
+                    </Border.RenderTransform>
+                </Border>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -11,9 +11,27 @@ namespace PayBeat.App.Services;
 /// </summary>
 public class SettingsService
 {
-    private static readonly string FilePath =
+    /// <summary>
+    /// Default location of the settings file under the per-user application data folder.
+    /// </summary>
+    private static readonly string DefaultFilePath =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                      "PayBeat", "settings.json");
+
+    /// <summary>
+    /// Full path of the settings file this instance reads from and writes to.
+    /// </summary>
+    private readonly string _filePath;
+
+    /// <summary>
+    /// Creates a settings service bound to <paramref name="filePath"/>, or to the per-user
+    /// default location when it is <see langword="null"/>.
+    /// </summary>
+    /// <param name="filePath">Optional override of the settings file path (used by tests).</param>
+    public SettingsService(string? filePath = null)
+    {
+        _filePath = filePath ?? DefaultFilePath;
+    }
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -40,13 +58,13 @@ public class SettingsService
             return cached;
         }
 
-        if (!File.Exists(FilePath))
+        if (!File.Exists(_filePath))
         {
             return _cache = new SalarySettings();
         }
         try
         {
-            var json = File.ReadAllText(FilePath);
+            var json = File.ReadAllText(_filePath);
             var settings = JsonSerializer.Deserialize<SalarySettings>(json, Options) ?? new SalarySettings();
             return _cache = Normalize(settings);
         }
@@ -89,8 +107,8 @@ public class SettingsService
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, Options));
+            Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
+            File.WriteAllText(_filePath, JsonSerializer.Serialize(settings, Options));
             _cache = settings;
             return true;
         }
@@ -107,11 +125,11 @@ public class SettingsService
     /// backup) so a load failure doesn't silently destroy the user's saved position/preferences.
     /// Swallows failures — this is a best-effort safety net, not a critical path.
     /// </summary>
-    private static void BackupCorruptFile()
+    private void BackupCorruptFile()
     {
         try
         {
-            File.Copy(FilePath, FilePath + ".bak", overwrite: true);
+            File.Copy(_filePath, _filePath + ".bak", overwrite: true);
         }
         catch
         {
