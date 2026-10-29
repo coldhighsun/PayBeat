@@ -2,6 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <UserControl.Resources>
+        <Style x:Key="MiniAmountText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Resources>
+
     <Border Background="{DynamicResource BaseBrush}"
             CornerRadius="8"
             BorderBrush="{DynamicResource OverlayBrush}"
@@ -11,13 +19,16 @@
         </Border.Effect>
 
         <StackPanel>
-            <TextBlock Text="{Binding EarnedFormatted}"
-                       Foreground="{DynamicResource GreenBrush}"
-                       FontFamily="Segoe UI"
-                       FontSize="15"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       Margin="12,7,12,6"/>
+            <Grid Margin="12,7,12,6">
+                <!-- Invisible but measured: reserves the width of the maximum (full daily salary) amount. -->
+                <TextBlock Text="{Binding MiniWidthTemplate}"
+                           Style="{StaticResource MiniAmountText}"
+                           Visibility="Hidden"/>
+                <TextBlock Text="{Binding EarnedFormatted}"
+                           Style="{StaticResource MiniAmountText}"
+                           Foreground="{DynamicResource GreenBrush}"
+                           HorizontalAlignment="Right"/>
+            </Grid>
 
             <ProgressBar Value="{Binding Progress, Mode=OneWay}"
                          Minimum="0"
