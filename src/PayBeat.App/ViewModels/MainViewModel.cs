@@ -85,8 +85,13 @@ public class MainViewModel : ViewModelBase, IDisposable
     }
 
     /// <summary>Earned amount formatted as <c>{Currency}{Amount:N2}</c> (e.g. <c>¥123.45</c>).</summary>
-    public string EarnedFormatted =>
-        $"{_settings.Currency}{Earned:N2}";
+    public string EarnedFormatted => FormatAmount(Earned);
+
+    /// <summary>
+    /// Widest possible earnings text (the full daily salary), used by the mini view to reserve a constant
+    /// width so the window does not grow as earnings increase.
+    /// </summary>
+    public string MiniWidthTemplate => FormatAmount(_settings.DailySalary);
 
     /// <summary>Time elapsed since work start, clamped to the workday window. Setting this also notifies <see cref="ElapsedFormatted"/>.</summary>
     public TimeSpan Elapsed
@@ -211,6 +216,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(WorkEnd));
         OnPropertyChanged(nameof(DailySalary));
         OnPropertyChanged(nameof(Currency));
+        OnPropertyChanged(nameof(MiniWidthTemplate));
         OnPropertyChanged(nameof(DisplayMode));
         OnPropertyChanged(nameof(AlwaysOnTop));
         OnPropertyChanged(nameof(Opacity));
@@ -230,6 +236,10 @@ public class MainViewModel : ViewModelBase, IDisposable
         HotkeySettingsChanged?.Invoke();
         Refresh();
     }
+
+    /// <summary>Formats <paramref name="amount"/> as <c>{Currency}{Amount:N2}</c> using the current currency symbol.</summary>
+    private string FormatAmount(decimal amount) =>
+        $"{_settings.Currency}{amount:N2}";
 
     private void OpenAbout()
     {
