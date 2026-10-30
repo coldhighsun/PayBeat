@@ -4,7 +4,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/coldhighsun/PayBeat/total)](https://github.com/coldhighsun/PayBeat/releases)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows)](https://www.microsoft.com/windows)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078D6)](https://github.com/coldhighsun/PayBeat/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/pulls)
@@ -13,13 +13,13 @@
 
 [English](README.md) | **简体中文**
 
-Windows 实时工资进度悬浮组件
+Windows / macOS 实时工资进度悬浮组件
 
 ---
 
 ## 简介
 
-PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天已挣到的工资。  
+PayBeat 是一款桌面悬浮组件（支持 Windows 和 macOS），以秒为单位实时显示当天已挣到的工资。  
 窗口无边框、始终置顶，不占用任务栏，适合放在屏幕角落随时瞥一眼。
 
 ## 功能
@@ -29,14 +29,14 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - Flex 模式为全屏"炫耀"视图，超大金额数字、完整工时统计，配有动态背景动画
 - 每种模式独立记忆上次所在位置（支持多显示器）
 - 系统托盘图标，右键菜单可切换显示模式、打开设置 / 关于、退出；左键点击会将悬浮窗置于最前并闪烁放大提示
-- 全局热键一键显示 / 隐藏（默认 `Ctrl+Alt+X`）
+- 全局热键一键显示 / 隐藏（默认 `Ctrl+Alt+X`，仅 Windows）
 - 可选午休扣除时段，可选周末计薪
 - 托盘气泡通知：下班提醒、赚钱里程碑提醒、新版本提醒——点击新版本提醒气泡可直接打开发布页面
 - 启动时检查 GitHub Releases 是否有新版本（每天最多检查一次）
 - 支持中英文界面，随系统语言自动切换
 - 支持浅色 / 深色主题，随系统外观设置自动切换
-- 可设置透明度、刷新间隔、货币符号；数字格式跟随 Windows 系统区域设置（千分位/小数点分隔符）
-- 支持开机自启
+- 可设置透明度、刷新间隔、货币符号；数字格式跟随系统区域设置（千分位/小数点分隔符）
+- 支持开机自启（仅 Windows）
 
 ## 界面截图
 
@@ -46,7 +46,7 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 
 ## 系统要求
 
-- Windows 10 / 11（x64）
+- Windows 10 / 11（x64），或 macOS 14+（Apple 芯片或 Intel，实验性）
 - 便携版：需安装 [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
 - 独立版：无需安装任何运行时，开箱即用
 
@@ -117,7 +117,7 @@ ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 | 透明度 | 0.8 | 鼠标不悬停时的窗口不透明度（0.1–1.0） |
 | 主题 | Auto | 界面配色（Auto / Light / Dark），Auto 跟随系统外观设置 |
 | 全局热键 | Ctrl+Alt+X | 显示 / 隐藏全部窗口 |
-| 开机自启 | 关 | 登录 Windows 后自动启动 |
+| 开机自启 | 关 | 登录系统后自动启动（仅 Windows） |
 | 扣除午休 | 关 | 从计薪时段中排除一段每日午休时间（默认 12:00–13:00） |
 | 周末计薪 | 关 | 关闭时，周六、周日不计薪 |
 | 下班提醒 | 关 | 下班前若干分钟发送托盘气泡提醒（默认 5 分钟） |

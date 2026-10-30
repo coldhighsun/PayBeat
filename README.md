@@ -4,7 +4,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/releases/latest)
 [![GitHub All Releases](https://img.shields.io/github/downloads/coldhighsun/PayBeat/total)](https://github.com/coldhighsun/PayBeat/releases)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows)](https://www.microsoft.com/windows)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078D6)](https://github.com/coldhighsun/PayBeat/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/coldhighsun/PayBeat)](https://github.com/coldhighsun/PayBeat/pulls)
@@ -13,13 +13,13 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-Real-time salary progress widget for Windows
+Real-time salary progress widget for Windows and macOS
 
 ---
 
 ## Introduction
 
-PayBeat is a borderless, always-on-top Windows widget that shows your real-time daily earnings down to the second. It lives in a corner of your screen and stays out of your way.
+PayBeat is a borderless, always-on-top desktop widget (Windows and macOS) that shows your real-time daily earnings down to the second. It lives in a corner of your screen and stays out of your way.
 
 ## Features
 
@@ -28,14 +28,14 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 - Flex mode is a fullscreen "show-off" view with a huge earnings figure, full workday stats, and a decorative animated background
 - Each mode remembers its last position independently, with multi-monitor support
 - System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
-- Global hotkey to show / hide all windows (default `Ctrl+Alt+X`)
+- Global hotkey to show / hide all windows (default `Ctrl+Alt+X`, Windows only)
 - Optional lunch break deduction and weekend earnings
 - Tray balloon notifications for an end-of-day reminder, earnings milestones, and available updates — clicking an update notification opens its release page
 - Checks GitHub Releases for updates on startup (throttled to once per day)
 - English and Simplified Chinese UI, auto-detected from the OS locale
-- Light and dark themes, auto-detected from the Windows appearance setting
-- Configurable opacity, refresh interval, and currency symbol; numbers follow your Windows region format (decimal/thousands separators)
-- Optional Windows startup registration
+- Light and dark themes, auto-detected from the OS appearance setting
+- Configurable opacity, refresh interval, and currency symbol; numbers follow your system region format (decimal/thousands separators)
+- Optional run-at-startup registration (Windows only)
 
 ## Screenshots
 
@@ -45,7 +45,7 @@ PayBeat is a borderless, always-on-top Windows widget that shows your real-time 
 
 ## Requirements
 
-- Windows 10 / 11 (x64)
+- Windows 10 / 11 (x64), or macOS 14+ (Apple Silicon or Intel, experimental)
 - Portable download: [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) must be installed
 - Self-contained download: no runtime installation needed, everything is bundled
 
@@ -114,9 +114,9 @@ Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-
 | Display mode | Normal | Initial widget size (None / Normal / Mini / Flex) |
 | Refresh interval | 1 s | UI update frequency (1–60 seconds) |
 | Opacity | 0.8 | Window opacity when the mouse is not hovering (0.1–1.0) |
-| Theme | Auto | UI color theme (Auto / Light / Dark); Auto follows the Windows appearance setting |
+| Theme | Auto | UI color theme (Auto / Light / Dark); Auto follows the OS appearance setting |
 | Global hotkey | Ctrl+Alt+X | Toggle visibility of all windows |
-| Run at startup | Off | Launch automatically when Windows starts |
+| Run at startup | Off | Launch automatically at login (Windows only) |
 | Deduct lunch break | Off | Excludes a daily break window from earnings (default 12:00–13:00) |
 | Earn on weekends | Off | When off, Saturdays and Sundays earn nothing |
 | End-of-day reminder | Off | Tray balloon a configurable number of minutes before work end (default 5) |
