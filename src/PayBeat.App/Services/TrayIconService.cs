@@ -15,7 +15,7 @@ public sealed class TrayIconService : IDisposable
     /// <summary>
     /// Location of the tray icon image.
     /// </summary>
-    private const string IconUri = "avares://PayBeat/Resources/Icons/PayBeat.png";
+    private const string IconUri = "avares://PayBeat/Resources/Icons/PayBeat.ico";
 
     /// <summary>
     /// Menu item that switches to flex mode.
