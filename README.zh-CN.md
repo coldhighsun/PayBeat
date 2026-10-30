@@ -50,7 +50,7 @@ PayBeat 是一款 Windows 桌面悬浮组件，以秒为单位实时显示当天
 - 便携版：需安装 [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
 - 独立版：无需安装任何运行时，开箱即用
 
-PayBeat 基于 [Avalonia](https://avaloniaui.net/) 构建，代码本身是跨平台的。目前官方发布包仅提供 Windows 版本；macOS / Linux 版本尚未测试；平台相关功能（全局热键、开机自启动、置顶强化）在这些平台上会降级为空实现。
+PayBeat 基于 [Avalonia](https://avaloniaui.net/) 构建，代码本身是跨平台的。目前官方发布包提供 Windows 版本和实验性（未经充分测试）的 macOS 版本；Linux 版本尚未测试。平台相关功能（全局热键、开机自启动、置顶强化）在非 Windows 平台上会降级为空实现。
 
 ## 下载
 
@@ -59,6 +59,19 @@ PayBeat 基于 [Avalonia](https://avaloniaui.net/) 构建，代码本身是跨�
 - `PayBeat-<version>-portable-runtime-required-win-x64.zip` — 体积较小，需预装 .NET 10 Runtime
 - `PayBeat-<version>-portable-standalone-win-x64.zip` — 体积较大，内置运行时，无需任何前置依赖
 - `PayBeat-<version>-setup-win-x64.exe` — 内置运行时的安装程序，无需前置依赖；按当前用户安装，创建开始菜单快捷方式并支持卸载
+
+实验性的 macOS 包（内置运行时的 `.app`，不显示 Dock 图标，仅常驻菜单栏）：
+
+- `PayBeat-<version>-macos-osx-arm64.zip` — Apple 芯片
+- `PayBeat-<version>-macos-osx-x64.zip` — Intel
+
+macOS 版未经过公证，首次打开会被 Gatekeeper 拦截。解压后，可右键点击 `PayBeat.app` 选择“打开”，或执行一次以下命令清除隔离标记：
+
+```bash
+xattr -cr PayBeat.app
+```
+
+macOS 上不支持“开机自启”，请在“系统设置 → 通用 → 登录项”中手动添加 `PayBeat.app`。
 
 ## 构建
 
@@ -80,7 +93,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-c
 ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 ```
 
-产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-runtime-required-win-x64.zip`、`PayBeat-<version>-portable-standalone-win-x64.zip` 和 `PayBeat-<version>-setup-win-x64.exe` 三个发布包。
+产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-runtime-required-win-x64.zip`、`PayBeat-<version>-portable-standalone-win-x64.zip` 和 `PayBeat-<version>-setup-win-x64.exe` 三个发布包，另有两个 macOS `.app` 压缩包，由 `scripts/build-mac-app.sh <osx-arm64|osx-x64> <version> <output.zip>` 生成（需在 Mac 上运行）。
 
 ## 使用
 
