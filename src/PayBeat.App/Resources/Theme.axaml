@@ -93,6 +93,38 @@
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#45475A"/>
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#45475A"/>
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#45475A"/>
+
+            <!-- Menu (context menu / submenu) colors -->
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#313244"/>
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutSeparatorBackground" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundDisabled" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackground" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundPointerOver" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundPressed" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundDisabled" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForeground" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundPointerOver" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundPressed" Color="#CDD6F4"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevron" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronPointerOver" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronPressed" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronSubMenuOpened" Color="#9399B2"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronDisabled" Color="#6C7086"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundSubMenuOpened" Color="#45475A"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundSubMenuOpened" Color="#CDD6F4"/>
             <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
             <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
         </ResourceDictionary>
@@ -187,6 +219,38 @@
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#CCD0DA"/>
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#CCD0DA"/>
             <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#CCD0DA"/>
+
+            <!-- Menu (context menu / submenu) colors -->
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#E6E9EF"/>
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutSeparatorBackground" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundDisabled" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackground" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundPointerOver" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundPressed" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundDisabled" Color="Transparent"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForeground" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundPointerOver" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundPressed" Color="#4C4F69"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevron" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronPointerOver" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronPressed" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronSubMenuOpened" Color="#6C6F85"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemChevronDisabled" Color="#8C8FA1"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemBackgroundSubMenuOpened" Color="#CCD0DA"/>
+            <SolidColorBrush x:Key="MenuFlyoutSubItemForegroundSubMenuOpened" Color="#4C4F69"/>
             <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
             <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
         </ResourceDictionary>
