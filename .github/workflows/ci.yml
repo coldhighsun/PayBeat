@@ -28,8 +28,37 @@ jobs:
       - name: Test
         run: dotnet test -c Release --no-build
 
-  release:
+  package-mac:
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        rid: [osx-arm64, osx-x64]
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # MinVer needs full history for version calculation
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build .app bundle
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          scripts/build-mac-app.sh "${{ matrix.rid }}" "$version" "PayBeat-${GITHUB_REF_NAME}-macos-${{ matrix.rid }}.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.rid }}
+          path: PayBeat-*-macos-*.zip
+          if-no-files-found: error
+
+  release:
+    needs: [build, package-mac]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: windows-latest
     permissions:
@@ -79,6 +108,13 @@ jobs:
           $setupName = Get-ChildItem "installer-output\*.exe" | Select-Object -First 1 -ExpandProperty Name
           echo "SETUP_NAME=installer-output/$setupName" >> $env:GITHUB_ENV
 
+      - name: Download macOS packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: macos-*
+          path: macos-packages
+          merge-multiple: true
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
@@ -87,5 +123,6 @@ jobs:
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME_SELFCONTAINED }}
             ${{ env.SETUP_NAME }}
+            macos-packages/*.zip
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}
