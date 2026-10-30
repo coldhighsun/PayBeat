@@ -52,7 +52,7 @@ public partial class AboutWindow : Window
 
         if (info != null)
         {
-            UpdateStatusText.Text = string.Empty;
+            UpdateStatusText.IsVisible = false;
             _updateUrl = info.HtmlUrl;
             UpdateStatusLink.Content = string.Format(LocalizationService.Get("About.Update.Available"), info.Version);
             UpdateStatusLink.IsVisible = true;

@@ -42,34 +42,35 @@
                     Click="CloseButton_Click"/>
 
             <!-- App icon + name -->
-            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center" Margin="0,8,0,20">
-                <Image Source="avares://PayBeat/Resources/Icons/PayBeat.png"
-                       Width="56" Height="56"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,12"/>
-                <TextBlock Text="PayBeat"
-                           Foreground="{DynamicResource TextBrush}"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"/>
-                <TextBlock x:Name="VersionText"
-                           Foreground="{DynamicResource MutedBrush}"
-                           FontSize="12"
-                           HorizontalAlignment="Center"
-                           Margin="0,4,0,0"/>
-                <TextBlock x:Name="UpdateStatusText"
-                           Foreground="{DynamicResource MutedBrush}"
-                           FontSize="11"
-                           HorizontalAlignment="Center"
-                           Margin="0,4,0,0"/>
-                <Button x:Name="UpdateStatusLink"
-                        Classes="link"
-                        IsVisible="False"
-                        FontSize="11"
-                        HorizontalAlignment="Center"
-                        Margin="0,4,0,0"
-                        Click="UpdateLink_Click"/>
-            </StackPanel>
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="0,8,0,20">
+                <Image Grid.Column="0"
+                       Source="avares://PayBeat/Resources/Icons/PayBeat.png"
+                       Width="88" Height="88"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="PayBeat"
+                               Foreground="{DynamicResource TextBrush}"
+                               FontSize="24"
+                               FontWeight="Bold"/>
+                    <TextBlock x:Name="VersionText"
+                               Foreground="{DynamicResource MutedBrush}"
+                               FontSize="12"
+                               Margin="0,4,0,0"/>
+                    <TextBlock x:Name="UpdateStatusText"
+                               Foreground="{DynamicResource MutedBrush}"
+                               FontSize="11"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"/>
+                    <Button x:Name="UpdateStatusLink"
+                            Classes="link"
+                            IsVisible="False"
+                            FontSize="11"
+                            HorizontalAlignment="Left"
+                            Margin="0,4,0,0"
+                            Click="UpdateLink_Click"/>
+                </StackPanel>
+            </Grid>
 
             <!-- Description -->
             <TextBlock DockPanel.Dock="Top"
