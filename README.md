@@ -45,7 +45,7 @@ PayBeat is a borderless, always-on-top desktop widget (Windows and macOS) that s
 
 ## Requirements
 
-- Windows 10 / 11 (x64), or macOS 14+ (Apple Silicon or Intel, experimental)
+- Windows 10 / 11 (x64), or macOS 14+ (Apple Silicon only, experimental)
 - Portable download: [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) must be installed
 - Self-contained download: no runtime installation needed, everything is bundled
 
@@ -59,12 +59,11 @@ Grab the latest release from the [Releases page](https://github.com/coldhighsun/
 - `PayBeat-<version>-portable-standalone-win-x64.zip` — larger, runs standalone with no prerequisites
 - `PayBeat-<version>-setup-win-x64.exe` — self-contained installer (no runtime prerequisite); installs per-user, adds a Start Menu shortcut, and registers for uninstall
 
-Experimental macOS packages (self-contained `.app` bundles, no Dock icon — the app lives in the menu bar):
+Experimental macOS packages (self-contained `.app` bundles in `.dmg` images, no Dock icon — the app lives in the menu bar):
 
-- `PayBeat-<version>-macos-osx-arm64.zip` — Apple Silicon
-- `PayBeat-<version>-macos-osx-x64.zip` — Intel
+- `PayBeat-<version>-macos-osx-arm64.dmg` — Apple Silicon
 
-The macOS app is not notarized, so Gatekeeper blocks it on first launch. Unzip, then either right-click `PayBeat.app` and choose **Open**, or clear the quarantine flag once:
+The macOS app is not notarized, so Gatekeeper blocks it on first launch. Open the `.dmg`, drag `PayBeat.app` to Applications, then either right-click `PayBeat.app` and choose **Open**, or clear the quarantine flag once:
 
 ```bash
 xattr -cr PayBeat.app
@@ -92,7 +91,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-c
 ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 ```
 
-Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-<version>-portable-runtime-required-win-x64.zip`, a `PayBeat-<version>-portable-standalone-win-x64.zip`, and a `PayBeat-<version>-setup-win-x64.exe` release artifact, plus two macOS `.app` zips built by `scripts/build-mac-app.sh <osx-arm64|osx-x64> <version> <output.zip>` (run it on a Mac).
+Output goes to `artifacts/bin/PayBeat.App/release/`. CI tags produce a `PayBeat-<version>-portable-runtime-required-win-x64.zip`, a `PayBeat-<version>-portable-standalone-win-x64.zip`, and a `PayBeat-<version>-setup-win-x64.exe` release artifact, plus an Apple Silicon macOS `.dmg` built by `scripts/build-mac-app.sh <osx-arm64> <version> <output.dmg>` (run it on a Mac).
 
 ## Usage
 

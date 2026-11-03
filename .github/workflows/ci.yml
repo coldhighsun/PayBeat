@@ -34,7 +34,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        rid: [osx-arm64, osx-x64]
+        rid: [osx-arm64]
 
     steps:
       - uses: actions/checkout@v7
@@ -49,12 +49,12 @@ jobs:
       - name: Build .app bundle
         run: |
           version="${GITHUB_REF_NAME#v}"
-          scripts/build-mac-app.sh "${{ matrix.rid }}" "$version" "PayBeat-${GITHUB_REF_NAME}-macos-${{ matrix.rid }}.zip"
+          scripts/build-mac-app.sh "${{ matrix.rid }}" "$version" "PayBeat-${GITHUB_REF_NAME}-macos-${{ matrix.rid }}.dmg"
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-${{ matrix.rid }}
-          path: PayBeat-*-macos-*.zip
+          path: PayBeat-*-macos-*.dmg
           if-no-files-found: error
 
   release:
@@ -123,6 +123,6 @@ jobs:
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME_SELFCONTAINED }}
             ${{ env.SETUP_NAME }}
-            macos-packages/*.zip
+            macos-packages/*.dmg
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}

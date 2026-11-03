@@ -46,7 +46,7 @@ PayBeat 是一款桌面悬浮组件（支持 Windows 和 macOS），以秒为单
 
 ## 系统要求
 
-- Windows 10 / 11（x64），或 macOS 14+（Apple 芯片或 Intel，实验性）
+- Windows 10 / 11（x64），或 macOS 14+（仅 Apple 芯片，实验性）
 - 便携版：需安装 [.NET 10 Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
 - 独立版：无需安装任何运行时，开箱即用
 
@@ -60,12 +60,11 @@ PayBeat 基于 [Avalonia](https://avaloniaui.net/) 构建，代码本身是跨�
 - `PayBeat-<version>-portable-standalone-win-x64.zip` — 体积较大，内置运行时，无需任何前置依赖
 - `PayBeat-<version>-setup-win-x64.exe` — 内置运行时的安装程序，无需前置依赖；按当前用户安装，创建开始菜单快捷方式并支持卸载
 
-实验性的 macOS 包（内置运行时的 `.app`，不显示 Dock 图标，仅常驻菜单栏）：
+实验性的 macOS 包（内置运行时的 `.app`（`.dmg` 镜像），不显示 Dock 图标，仅常驻菜单栏）：
 
-- `PayBeat-<version>-macos-osx-arm64.zip` — Apple 芯片
-- `PayBeat-<version>-macos-osx-x64.zip` — Intel
+- `PayBeat-<version>-macos-osx-arm64.dmg` — Apple 芯片
 
-macOS 版未经过公证，首次打开会被 Gatekeeper 拦截。解压后，可右键点击 `PayBeat.app` 选择“打开”，或执行一次以下命令清除隔离标记：
+macOS 版未经过公证，首次打开会被 Gatekeeper 拦截。打开 `.dmg` 并将 `PayBeat.app` 拖入“应用程序”后，可右键点击 `PayBeat.app` 选择“打开”，或执行一次以下命令清除隔离标记：
 
 ```bash
 xattr -cr PayBeat.app
@@ -93,7 +92,7 @@ dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-c
 ISCC.exe installer\PayBeat.iss /DAppVersion=1.2.3
 ```
 
-产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-runtime-required-win-x64.zip`、`PayBeat-<version>-portable-standalone-win-x64.zip` 和 `PayBeat-<version>-setup-win-x64.exe` 三个发布包，另有两个 macOS `.app` 压缩包，由 `scripts/build-mac-app.sh <osx-arm64|osx-x64> <version> <output.zip>` 生成（需在 Mac 上运行）。
+产物输出至 `artifacts/bin/PayBeat.App/release/`。CI 打标签时会同时生成 `PayBeat-<version>-portable-runtime-required-win-x64.zip`、`PayBeat-<version>-portable-standalone-win-x64.zip` 和 `PayBeat-<version>-setup-win-x64.exe` 三个发布包，另有一个 Apple 芯片的 macOS `.dmg` 镜像，由 `scripts/build-mac-app.sh <osx-arm64> <version> <output.dmg>` 生成（需在 Mac 上运行）。
 
 ## 使用
 

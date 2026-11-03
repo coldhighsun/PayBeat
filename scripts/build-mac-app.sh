@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Builds PayBeat.app (a menu-bar style app without a Dock icon) and zips it.
-# Usage: scripts/build-mac-app.sh <rid: osx-arm64|osx-x64> <version> <output-zip>
+# Builds PayBeat.app (a menu-bar style app without a Dock icon) and packs it into a .dmg.
+# Usage: scripts/build-mac-app.sh <rid: osx-arm64|osx-x64> <version> <output-dmg>
 set -euo pipefail
 
 rid="${1:?runtime identifier required (osx-arm64 or osx-x64)}"
 version="${2:?version required, e.g. 1.2.3}"
-zip_path="${3:?output zip path required}"
+dmg_path="${3:?output dmg path required}"
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 work="$(mktemp -d)"
@@ -54,5 +54,12 @@ chmod +x "$macos/PayBeat"
 # Ad-hoc signature: required for arm64 binaries to run; not a substitute for notarization.
 codesign --force --deep --sign - "$app"
 
-# ditto keeps permissions and the bundle structure intact (plain zip can break signatures).
-ditto -c -k --keepParent "$app" "$zip_path"
+# Stage the app next to an /Applications shortcut so users can drag-and-drop to install.
+# ditto keeps permissions and the bundle structure intact.
+staging="$work/dmg"
+mkdir -p "$staging"
+ditto "$app" "$staging/PayBeat.app"
+ln -s /Applications "$staging/Applications"
+
+rm -f "$dmg_path"
+hdiutil create -volname "PayBeat" -srcfolder "$staging" -fs HFS+ -format UDZO -ov "$dmg_path"
