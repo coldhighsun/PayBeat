@@ -51,7 +51,7 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           scripts/build-mac-app.sh "${{ matrix.rid }}" "$version" "PayBeat-${GITHUB_REF_NAME}-macos-${{ matrix.rid }}.dmg"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-${{ matrix.rid }}
           path: PayBeat-*-macos-*.dmg
@@ -109,7 +109,7 @@ jobs:
           echo "SETUP_NAME=installer-output/$setupName" >> $env:GITHUB_ENV
 
       - name: Download macOS packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: macos-*
           path: macos-packages
