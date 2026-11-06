@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="PayBeat.App.Views.ToastWindow"
-        MinWidth="160"
         MaxWidth="320"
         SizeToContent="WidthAndHeight"
         CanResize="False"

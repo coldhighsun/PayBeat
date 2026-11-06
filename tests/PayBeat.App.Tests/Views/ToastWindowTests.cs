@@ -10,7 +10,7 @@ namespace PayBeat.App.Tests.Views;
 public class ToastWindowTests
 {
     /// <summary>
-    /// Verifies a toast sizes its width to its content and stays within its own min/max width limits.
+    /// Verifies a toast sizes its width to its content and stays within its max width limit.
     /// </summary>
     [AvaloniaFact]
     public void Show_ShortVersusLongText_WidthFollowsContentAndStaysWithinLimits()
@@ -32,7 +32,7 @@ public class ToastWindowTests
             var longWidth = longToast.Bounds.Width;
 
             shortWidth.Should().BeLessThan(longWidth);
-            shortWidth.Should().BeGreaterThanOrEqualTo(shortToast.MinWidth);
+            shortWidth.Should().BeGreaterThan(0);
             longWidth.Should().BeLessThanOrEqualTo(longToast.MaxWidth);
         }
         finally
@@ -43,17 +43,17 @@ public class ToastWindowTests
     }
 
     /// <summary>
-    /// Verifies the declared width limits are sane: a positive minimum below the maximum.
+    /// Verifies the toast declares no minimum width, only a maximum.
     /// </summary>
     [AvaloniaFact]
-    public void Constructor_Default_DeclaresMinWidthBelowMaxWidth()
+    public void Constructor_Default_DeclaresNoMinWidth()
     {
         var toast = new ToastWindow();
 
         try
         {
-            toast.MinWidth.Should().BeGreaterThan(0);
-            toast.MinWidth.Should().BeLessThan(toast.MaxWidth);
+            toast.MinWidth.Should().Be(0);
+            toast.MaxWidth.Should().BeGreaterThan(0);
         }
         finally
         {
