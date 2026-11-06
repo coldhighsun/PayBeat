@@ -1,16 +1,16 @@
 # PayBeat
 
-[![CI / Release](https://img.shields.io/github/actions/workflow/status/coldhighsun/PayBeat/ci.yml?style=flat-square&label=CI%20%2F%20Release)](https://github.com/coldhighsun/PayBeat/actions/workflows/ci.yml)
-[![Latest Release](https://img.shields.io/github/v/release/coldhighsun/PayBeat?style=flat-square&label=release)](https://github.com/coldhighsun/PayBeat/releases/latest)
-[![Pre-release](https://img.shields.io/github/v/release/coldhighsun/PayBeat?include_prereleases&sort=semver&style=flat-square&label=pre-release)](https://github.com/coldhighsun/PayBeat/releases)
-[![Downloads](https://img.shields.io/github/downloads/coldhighsun/PayBeat/total?style=flat-square&label=downloads)](https://github.com/coldhighsun/PayBeat/releases)
-[![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078D6?style=flat-square)](https://github.com/coldhighsun/PayBeat/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Issues](https://img.shields.io/github/issues/coldhighsun/PayBeat?style=flat-square&label=issues)](https://github.com/coldhighsun/PayBeat/issues)
-[![Pull requests](https://img.shields.io/github/issues-pr/coldhighsun/PayBeat?style=flat-square&label=PRs)](https://github.com/coldhighsun/PayBeat/pulls)
-[![Last commit](https://img.shields.io/github/last-commit/coldhighsun/PayBeat?style=flat-square&label=last%20commit)](https://github.com/coldhighsun/PayBeat/commits/main)
-[![Stars](https://img.shields.io/github/stars/coldhighsun/PayBeat?style=flat-square&label=stars)](https://github.com/coldhighsun/PayBeat/stargazers)
+[![CI / Release](https://img.shields.io/github/actions/workflow/status/coldhighsun/PayBeat/ci.yml?label=CI%20%2F%20Release)](https://github.com/coldhighsun/PayBeat/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/coldhighsun/PayBeat?label=release)](https://github.com/coldhighsun/PayBeat/releases/latest)
+[![Pre-release](https://img.shields.io/github/v/release/coldhighsun/PayBeat?include_prereleases&sort=semver&label=pre-release)](https://github.com/coldhighsun/PayBeat/releases)
+[![Downloads](https://img.shields.io/github/downloads/coldhighsun/PayBeat/total?label=downloads)](https://github.com/coldhighsun/PayBeat/releases)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com/download/dotnet/10.0)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078D6)](https://github.com/coldhighsun/PayBeat/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/coldhighsun/PayBeat?label=issues)](https://github.com/coldhighsun/PayBeat/issues)
+[![Pull requests](https://img.shields.io/github/issues-pr/coldhighsun/PayBeat?label=PRs)](https://github.com/coldhighsun/PayBeat/pulls)
+[![Last commit](https://img.shields.io/github/last-commit/coldhighsun/PayBeat?label=last%20commit)](https://github.com/coldhighsun/PayBeat/commits/main)
+[![Stars](https://img.shields.io/github/stars/coldhighsun/PayBeat?style=flat&label=stars)](https://github.com/coldhighsun/PayBeat/stargazers)
 
 [English](README.md) | **简体中文**
 
