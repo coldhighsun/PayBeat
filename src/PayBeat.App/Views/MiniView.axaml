@@ -18,10 +18,10 @@
             <Grid Margin="12,7,12,7">
                 <!-- Invisible but measured: reserves the width of the maximum (full daily salary) amount. -->
                 <TextBlock Text="{Binding MiniWidthTemplate}"
-                           Classes="miniAmount"
+                           Classes="miniAmount numeric"
                            Opacity="0"/>
                 <TextBlock Text="{Binding EarnedFormatted}"
-                           Classes="miniAmount"
+                           Classes="miniAmount numeric"
                            Foreground="{DynamicResource GreenBrush}"
                            HorizontalAlignment="Right"/>
             </Grid>

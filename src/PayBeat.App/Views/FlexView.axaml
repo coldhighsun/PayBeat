@@ -37,6 +37,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="FontSize" Value="26"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontFeatures" Value="+tnum"/>
         </Style>
     </UserControl.Styles>
 
@@ -84,6 +85,7 @@
 
             <!-- Huge earned amount; the glow effect color is assigned in code-behind. -->
             <TextBlock x:Name="AmountText"
+                       Classes="numeric"
                        Text="{Binding EarnedFormatted}"
                        Foreground="{DynamicResource GreenBrush}"
                        FontSize="160"

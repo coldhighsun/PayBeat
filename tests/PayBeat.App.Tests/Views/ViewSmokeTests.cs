@@ -275,6 +275,32 @@ public sealed class ViewSmokeTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies the live amount in every display mode uses tabular digits so it does not jitter.
+    /// </summary>
+    /// <param name="mode">Display mode under test.</param>
+    [AvaloniaTheory]
+    [InlineData(DisplayMode.Normal)]
+    [InlineData(DisplayMode.Mini)]
+    [InlineData(DisplayMode.Flex)]
+    public void MainWindow_AmountText_UsesTabularDigits(DisplayMode mode)
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = mode, DailySalary = 596.25m, Currency = "$" });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var amount = window.GetVisualDescendants().OfType<TextBlock>()
+            .First(t => t.IsEffectivelyVisible && t.Text == viewModel.EarnedFormatted);
+
+        amount.FontFeatures.Should().NotBeNull();
+        amount.FontFeatures!.Select(f => f.Tag).Should().Contain("tnum");
+        window.Close();
+    }
+
+    /// <summary>
     /// Verifies the message window renders its text.
     /// </summary>
     [AvaloniaFact]

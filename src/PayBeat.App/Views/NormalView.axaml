@@ -20,6 +20,7 @@
 
             <!-- Earned amount -->
             <TextBlock Text="{Binding EarnedFormatted}"
+                       Classes="numeric"
                        Foreground="{DynamicResource GreenBrush}"
                        FontSize="40"
                        FontWeight="Bold"
