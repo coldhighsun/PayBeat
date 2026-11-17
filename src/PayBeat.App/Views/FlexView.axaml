@@ -28,19 +28,15 @@
                 </Animation>
             </Style.Animations>
         </Style>
-        <Style Selector="TextBlock#AmountText">
-            <Style.Animations>
-                <Animation Duration="0:0:1.6" IterationCount="INFINITE" PlaybackDirection="Alternate" Easing="SineEaseInOut">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="ScaleTransform.ScaleX" Value="1.0"/>
-                        <Setter Property="ScaleTransform.ScaleY" Value="1.0"/>
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="ScaleTransform.ScaleX" Value="1.03"/>
-                        <Setter Property="ScaleTransform.ScaleY" Value="1.03"/>
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
+        <Style Selector="TextBlock.statLabel">
+            <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.statValue">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
     </UserControl.Styles>
 
@@ -72,10 +68,11 @@
                  Fill="{DynamicResource GreenBrush}"
                  Opacity="0.08">
             <Ellipse.Effect>
-                <BlurEffect Radius="140"/>
+                <BlurEffect Radius="90"/>
             </Ellipse.Effect>
         </Ellipse>
 
+        <Viewbox Stretch="Uniform" Margin="48">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
             <!-- Header -->
@@ -92,12 +89,7 @@
                        FontSize="160"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"
-                       Margin="0,4,0,0"
-                       RenderTransformOrigin="50%,50%">
-                <TextBlock.RenderTransform>
-                    <ScaleTransform/>
-                </TextBlock.RenderTransform>
-            </TextBlock>
+                       Margin="0,4,0,0"/>
 
             <!-- Progress bar + percentage -->
             <ProgressBar Value="{Binding Progress, Mode=OneWay}"
@@ -119,45 +111,46 @@
 
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{DynamicResource View.Elapsed}"
-                               Foreground="{DynamicResource MutedBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                               Classes="statLabel"/>
                     <TextBlock Text="{Binding ElapsedFormatted, Mode=OneWay}"
-                               Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"
+                               Classes="statValue"
                                HorizontalAlignment="Center" Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="{DynamicResource View.Remaining}"
-                               Foreground="{DynamicResource MutedBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                               Classes="statLabel"/>
                     <TextBlock Text="{Binding RemainingFormatted, Mode=OneWay}"
-                               Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"
+                               Classes="statValue"
                                HorizontalAlignment="Center" Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="{DynamicResource View.DailySalary}"
-                               Foreground="{DynamicResource MutedBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                               Classes="statLabel"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
                         <TextBlock Text="{Binding Currency, Mode=OneWay}"
-                                   Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"/>
+                                   Classes="statValue"/>
                         <TextBlock Text="{Binding DailySalaryFormatted, Mode=OneWay}"
-                                   Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"/>
+                                   Classes="statValue"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="3">
                     <TextBlock Text="{DynamicResource View.WorkWindow}"
-                               Foreground="{DynamicResource MutedBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                               Classes="statLabel"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
                         <TextBlock Text="{Binding WorkStart, StringFormat=HH:mm, Mode=OneWay}"
-                                   Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"/>
+                                   Classes="statValue"/>
                         <TextBlock Text="–"
-                                   Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"/>
+                                   Classes="statValue"/>
                         <TextBlock Text="{Binding WorkEnd, StringFormat=HH:mm, Mode=OneWay}"
-                                   Foreground="{DynamicResource TextBrush}" FontSize="26" FontWeight="SemiBold"/>
+                                   Classes="statValue"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
 
         </StackPanel>
+        </Viewbox>
     </Grid>
 </UserControl>

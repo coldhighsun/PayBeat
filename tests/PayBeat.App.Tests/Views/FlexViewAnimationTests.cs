@@ -34,10 +34,10 @@ public sealed class FlexViewAnimationTests : IDisposable
     }
 
     /// <summary>
-    /// Verifies the amount scale, glow and background pulse change while the Flex view is visible.
+    /// Verifies the glow and background pulse change while the Flex view is visible.
     /// </summary>
     [AvaloniaFact]
-    public void FlexView_Visible_AnimatesAmountGlowAndBackground()
+    public void FlexView_Visible_AnimatesGlowAndBackground()
     {
         LocalizationService.Apply("en");
         ThemeService.Apply("dark");
@@ -50,20 +50,15 @@ public sealed class FlexViewAnimationTests : IDisposable
         window.Width = 1280;
         window.Height = 720;
         var flexView = window.GetVisualDescendants().OfType<FlexView>().Single();
-        var amount = flexView.FindControl<TextBlock>("AmountText")!;
         var glow = flexView.FindControl<Avalonia.Controls.Shapes.Ellipse>("GlowEllipse")!;
         var pulse = flexView.FindControl<Border>("PulseOverlay")!;
 
         Dispatcher.UIThread.RunJobs();
-        var scale = (ScaleTransform)amount.RenderTransform!;
-        var initialScale = scale.ScaleX;
         var initialGlow = glow.Opacity;
         var initialPulse = pulse.Opacity;
 
         AdvanceAnimations(TimeSpan.FromMilliseconds(600));
 
-        scale.ScaleX.Should().NotBe(initialScale);
-        scale.ScaleY.Should().NotBe(initialScale);
         glow.Opacity.Should().NotBe(initialGlow);
         pulse.Opacity.Should().NotBe(initialPulse);
         window.Close();

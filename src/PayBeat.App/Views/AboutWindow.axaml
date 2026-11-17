@@ -11,22 +11,8 @@
         TransparencyLevelHint="Transparent"
         Background="Transparent">
 
-    <Window.Styles>
-        <Style Selector="Button.closeIcon">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Padding" Value="0"/>
-        </Style>
-        <Style Selector="Button.closeIcon:pointerover">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-            <Setter Property="Opacity" Value="1"/>
-        </Style>
-    </Window.Styles>
-
     <Border Background="{DynamicResource BaseBrush}"
-            CornerRadius="12"
+            CornerRadius="{DynamicResource RadiusLg}"
             BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1">
 
@@ -34,9 +20,8 @@
 
             <!-- Close button -->
             <Button DockPanel.Dock="Top"
-                    Classes="closeIcon"
+                    Classes="icon"
                     HorizontalAlignment="Right"
-                    Width="28" Height="28"
                     Content="✕"
                     Margin="0,0,-4,0"
                     Click="CloseButton_Click"/>
@@ -129,10 +114,8 @@
             <Button DockPanel.Dock="Top"
                     Content="{DynamicResource About.Close}"
                     HorizontalAlignment="Center"
-                    Padding="32,10"
-                    Background="{DynamicResource SurfaceBrush}"
-                    Foreground="{DynamicResource TextBrush}"
-                    FontSize="13"
+                    Classes="secondary"
+                    Padding="32,9"
                     Click="CloseButton_Click"/>
 
         </DockPanel>

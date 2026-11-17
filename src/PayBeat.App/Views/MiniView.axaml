@@ -10,12 +10,12 @@
     </UserControl.Styles>
 
     <Border Background="{DynamicResource BaseBrush}"
-            CornerRadius="8"
+            CornerRadius="{DynamicResource RadiusMd}"
             BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1">
 
         <StackPanel>
-            <Grid Margin="12,7,12,6">
+            <Grid Margin="12,7,12,7">
                 <!-- Invisible but measured: reserves the width of the maximum (full daily salary) amount. -->
                 <TextBlock Text="{Binding MiniWidthTemplate}"
                            Classes="miniAmount"
@@ -30,7 +30,7 @@
                  towards the desired width, which makes an auto-sized window shrink in steps from its initial size.
                  The fill is scaled with a render transform instead, which never takes part in layout; the scale
                  follows the view model's Progress (see MiniView.axaml.cs). -->
-            <Border Height="3"
+            <Border Height="4"
                     CornerRadius="2"
                     ClipToBounds="True"
                     Background="{DynamicResource SurfaceBrush}">

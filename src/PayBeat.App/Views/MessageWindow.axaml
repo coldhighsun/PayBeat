@@ -15,7 +15,7 @@
     <Border Background="{DynamicResource BaseBrush}"
             BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="{DynamicResource RadiusLg}"
             Padding="28,24">
         <StackPanel Spacing="20">
             <TextBlock x:Name="TitleText"
@@ -26,12 +26,10 @@
                        Foreground="{DynamicResource SubtextBrush}"
                        FontSize="13"
                        TextWrapping="Wrap"/>
-            <Button Content="OK"
+            <Button Content="{DynamicResource Message.Ok}"
                     HorizontalAlignment="Right"
-                    Padding="28,8"
-                    Background="{DynamicResource BlueBrush}"
-                    Foreground="{DynamicResource BaseBrush}"
-                    FontWeight="SemiBold"
+                    Classes="primary"
+                    IsDefault="True"
                     Click="OkButton_Click"/>
         </StackPanel>
     </Border>

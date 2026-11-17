@@ -32,6 +32,9 @@
     <x:String x:Key="Settings.Section.Salary">SALARY</x:String>
     <x:String x:Key="Settings.Section.Schedule">WORK SCHEDULE</x:String>
     <x:String x:Key="Settings.Section.Refresh">REFRESH</x:String>
+    <x:String x:Key="Settings.Section.Reminders">REMINDERS</x:String>
+    <x:String x:Key="Settings.Section.Widget">WIDGET</x:String>
+    <x:String x:Key="Settings.Section.General">GENERAL</x:String>
     <x:String x:Key="Settings.DailySalary">Daily Salary</x:String>
     <x:String x:Key="Settings.WorkHours">Work Hours</x:String>
     <x:String x:Key="Settings.RefreshInterval">Refresh Interval</x:String>
@@ -78,6 +81,7 @@
     <x:String x:Key="About.License">License</x:String>
     <x:String x:Key="About.GitHub">GitHub</x:String>
     <x:String x:Key="About.Close">Close</x:String>
+    <x:String x:Key="Message.Ok">OK</x:String>
     <x:String x:Key="About.Update.Checking">Checking for updates...</x:String>
     <x:String x:Key="About.Update.UpToDate">You're up to date</x:String>
     <x:String x:Key="About.Update.Available">Update available: v{0}</x:String>
