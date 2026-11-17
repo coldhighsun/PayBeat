@@ -6,7 +6,6 @@
     <ApplicationIcon>Resources\Icons\PayBeat.ico</ApplicationIcon>
     <AssemblyName>PayBeat</AssemblyName>
     <RootNamespace>PayBeat.App</RootNamespace>
-    <PublishSingleFile>true</PublishSingleFile>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 

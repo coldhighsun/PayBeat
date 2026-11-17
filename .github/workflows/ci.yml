@@ -74,10 +74,14 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish
-        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --no-self-contained -o publish/
+      - name: Publish (single file)
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -o publish/
 
-      - name: Publish (self-contained)
+      - name: Publish (self-contained, single file)
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish-standalone/
+
+      # The installer packages a regular (multi-file) self-contained publish, not a single file.
+      - name: Publish (self-contained, for installer)
         run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -o publish-selfcontained/
 
       - name: Zip artifact
@@ -93,7 +97,7 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}"
           $zipNameSelfContained = "PayBeat-$version-portable-standalone-win-x64.zip"
-          Compress-Archive -Path "publish-selfcontained/*" -DestinationPath $zipNameSelfContained
+          Compress-Archive -Path "publish-standalone/*" -DestinationPath $zipNameSelfContained
           echo "ZIP_NAME_SELFCONTAINED=$zipNameSelfContained" >> $env:GITHUB_ENV
 
       - name: Install Inno Setup
