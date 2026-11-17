@@ -275,4 +275,14 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
+    <!-- Keyboard focus ring for check boxes and radio buttons (only shown for keyboard navigation) -->
+    <Style Selector="CheckBox:focus-visible /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+    <Style Selector="RadioButton:focus-visible /template/ Ellipse#OuterEllipse">
+        <Setter Property="Stroke" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+    </Style>
+
 </Styles>

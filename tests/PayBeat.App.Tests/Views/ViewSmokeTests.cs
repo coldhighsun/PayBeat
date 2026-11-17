@@ -245,6 +245,36 @@ public sealed class ViewSmokeTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies keyboard focus draws a visible ring on check boxes, radio buttons and tab headers.
+    /// </summary>
+    [AvaloniaFact]
+    public void SettingsWindow_KeyboardFocus_ShowsFocusRing()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        var viewModel = new SettingsViewModel(settings, new FakeSettingsApplier(), new FakeStartupService(), new FakeWindowService(), new FakeAppearanceService());
+        var window = new SettingsWindow { DataContext = viewModel };
+
+        window.Show();
+        var tabs = window.FindControl<TabControl>("SettingsTabs")!;
+        tabs.SelectedIndex = 2;
+        Dispatcher.UIThread.RunJobs();
+        var radio = window.GetVisualDescendants().OfType<RadioButton>().First(r => r.IsVisible);
+        var checkBox = window.GetVisualDescendants().OfType<CheckBox>().First(c => c.IsVisible);
+
+        radio.Focus(Avalonia.Input.NavigationMethod.Tab);
+        Dispatcher.UIThread.RunJobs();
+        var ring = radio.GetVisualDescendants().OfType<Avalonia.Controls.Shapes.Ellipse>().First(e => e.Name == "OuterEllipse");
+        ring.StrokeThickness.Should().Be(2);
+
+        checkBox.Focus(Avalonia.Input.NavigationMethod.Tab);
+        Dispatcher.UIThread.RunJobs();
+        var box = checkBox.GetVisualDescendants().OfType<Border>().First(b => b.Name == "NormalRectangle");
+        box.BorderThickness.Left.Should().Be(2);
+        window.Close();
+    }
+
+    /// <summary>
     /// Verifies the message window renders its text.
     /// </summary>
     [AvaloniaFact]
