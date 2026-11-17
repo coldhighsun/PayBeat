@@ -59,6 +59,86 @@ public static class WindowPlacement
         new(area.Right - size.Width - margin, area.Bottom - size.Height - margin);
 
     /// <summary>
+    /// Detects which edge of <paramref name="area"/> a window is docked to. Returns the edge the window is
+    /// closest to, or has been pushed past, when that gap is within <paramref name="threshold"/> pixels, or
+    /// <see cref="DockEdge.None"/>. A window dragged against the screen edge by its body sticks out beyond the edge
+    /// (the pointer cannot leave the screen), so overshoot counts as docked as long as the window still overlaps the area.
+    /// </summary>
+    /// <param name="position">Top-left corner of the window.</param>
+    /// <param name="size">Window size in pixels.</param>
+    /// <param name="area">Screen bounds the window may dock to.</param>
+    /// <param name="threshold">Maximum gap, in pixels, that still counts as docked.</param>
+    /// <returns>The docked edge, or <see cref="DockEdge.None"/>.</returns>
+    public static DockEdge DetectDockEdge(PixelPoint position, PixelSize size, PixelRect area, int threshold)
+    {
+        if (!new PixelRect(position, size).Intersects(area))
+        {
+            return DockEdge.None;
+        }
+
+        var best = DockEdge.None;
+        var bestGap = int.MaxValue;
+
+        // Signed gaps: negative when the window sticks out beyond the edge.
+        void Consider(DockEdge edge, int gap)
+        {
+            if (gap <= threshold && gap < bestGap)
+            {
+                best = edge;
+                bestGap = gap;
+            }
+        }
+
+        Consider(DockEdge.Left, position.X - area.X);
+        Consider(DockEdge.Right, area.Right - (position.X + size.Width));
+        Consider(DockEdge.Top, position.Y - area.Y);
+        Consider(DockEdge.Bottom, area.Bottom - (position.Y + size.Height));
+        return best;
+    }
+
+    /// <summary>
+    /// Returns the position that places the window flush against <paramref name="edge"/> of
+    /// <paramref name="area"/>, keeping it fully inside the area on the other axis.
+    /// </summary>
+    /// <param name="edge">The edge to dock to.</param>
+    /// <param name="position">Current top-left corner of the window.</param>
+    /// <param name="size">Window size in pixels.</param>
+    /// <param name="area">Screen bounds.</param>
+    /// <returns>The docked top-left corner.</returns>
+    public static PixelPoint DockedPosition(DockEdge edge, PixelPoint position, PixelSize size, PixelRect area)
+    {
+        var clamped = Clamp(position, size, area);
+        return edge switch
+        {
+            DockEdge.Left => new PixelPoint(area.X, clamped.Y),
+            DockEdge.Right => new PixelPoint(area.Right - size.Width, clamped.Y),
+            DockEdge.Top => new PixelPoint(clamped.X, area.Y),
+            DockEdge.Bottom => new PixelPoint(clamped.X, area.Bottom - size.Height),
+            _ => clamped,
+        };
+    }
+
+    /// <summary>
+    /// Returns the position that slides a docked window off-screen across <paramref name="edge"/>,
+    /// leaving only a <paramref name="strip"/>-pixel sliver visible.
+    /// </summary>
+    /// <param name="edge">The edge the window is docked to.</param>
+    /// <param name="docked">The docked (fully visible) top-left corner.</param>
+    /// <param name="size">Window size in pixels.</param>
+    /// <param name="area">Screen bounds.</param>
+    /// <param name="strip">Visible sliver thickness in pixels.</param>
+    /// <returns>The hidden top-left corner.</returns>
+    public static PixelPoint HiddenPosition(DockEdge edge, PixelPoint docked, PixelSize size, PixelRect area, int strip) =>
+        edge switch
+        {
+            DockEdge.Left => new PixelPoint(area.X + strip - size.Width, docked.Y),
+            DockEdge.Right => new PixelPoint(area.Right - strip, docked.Y),
+            DockEdge.Top => new PixelPoint(docked.X, area.Y + strip - size.Height),
+            DockEdge.Bottom => new PixelPoint(docked.X, area.Bottom - strip),
+            _ => docked,
+        };
+
+    /// <summary>
     /// Returns the squared distance from <paramref name="point"/> to the closest point of
     /// <paramref name="rect"/> (zero when the point lies inside).
     /// </summary>

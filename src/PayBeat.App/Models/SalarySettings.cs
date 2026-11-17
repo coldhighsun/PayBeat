@@ -39,6 +39,11 @@ public record SalarySettings
     public bool AlwaysOnTop { get; init; } = true;
 
     /// <summary>
+    /// Whether the widget slides off-screen when docked to a screen edge and reappears on hover.
+    /// </summary>
+    public bool AutoHideAtEdge { get; init; } = true;
+
+    /// <summary>
     /// Timer tick interval in seconds for refreshing the earnings display.
     /// </summary>
     public int RefreshInterval { get; init; } = 1;

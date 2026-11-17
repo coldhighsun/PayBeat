@@ -70,6 +70,9 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
     /// <summary>Whether the window should stay above all other windows.</summary>
     public bool AlwaysOnTop => _settings.AlwaysOnTop;
 
+    /// <summary>Whether the window hides itself when docked to a screen edge.</summary>
+    public bool AutoHideAtEdge => _settings.AutoHideAtEdge;
+
     /// <summary>Currency symbol shown before the earnings amount.</summary>
     public string Currency => _settings.Currency;
 
@@ -240,6 +243,7 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
         OnPropertyChanged(nameof(MiniWidthTemplate));
         OnPropertyChanged(nameof(DisplayMode));
         OnPropertyChanged(nameof(AlwaysOnTop));
+        OnPropertyChanged(nameof(AutoHideAtEdge));
         OnPropertyChanged(nameof(Opacity));
         OnPropertyChanged(nameof(IsNormalMode));
         OnPropertyChanged(nameof(IsMiniMode));

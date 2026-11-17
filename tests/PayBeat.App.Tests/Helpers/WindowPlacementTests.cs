@@ -15,6 +15,113 @@ public class WindowPlacementTests
     private static readonly PixelRect Screen = new(0, 0, 1920, 1080);
 
     /// <summary>
+    /// Verifies each screen edge is detected when the window is within the threshold.
+    /// </summary>
+    [Theory]
+    [InlineData(5, 400, DockEdge.Left)]
+    [InlineData(1715, 400, DockEdge.Right)]
+    [InlineData(800, 4, DockEdge.Top)]
+    [InlineData(800, 975, DockEdge.Bottom)]
+    public void DetectDockEdge_WindowNearEdge_ReturnsThatEdge(int x, int y, DockEdge expected)
+    {
+        var size = new PixelSize(200, 100);
+
+        WindowPlacement.DetectDockEdge(new PixelPoint(x, y), size, Screen, 12).Should().Be(expected);
+    }
+
+    /// <summary>
+    /// Verifies a window pushed past an edge, as happens when dragging it by its body against the screen
+    /// border, still counts as docked to that edge.
+    /// </summary>
+    [Theory]
+    [InlineData(-100, 400, DockEdge.Left)]
+    [InlineData(1820, 400, DockEdge.Right)]
+    [InlineData(800, -60, DockEdge.Top)]
+    [InlineData(800, 1040, DockEdge.Bottom)]
+    public void DetectDockEdge_WindowOvershootsEdge_ReturnsThatEdge(int x, int y, DockEdge expected)
+    {
+        var size = new PixelSize(200, 100);
+
+        WindowPlacement.DetectDockEdge(new PixelPoint(x, y), size, Screen, 12).Should().Be(expected);
+    }
+
+    /// <summary>
+    /// Verifies a window that no longer overlaps the area is never reported as docked.
+    /// </summary>
+    [Fact]
+    public void DetectDockEdge_WindowFullyOutside_ReturnsNone()
+    {
+        var result = WindowPlacement.DetectDockEdge(new PixelPoint(-500, 400), new PixelSize(200, 100), Screen, 12);
+
+        result.Should().Be(DockEdge.None);
+    }
+
+    /// <summary>
+    /// Verifies no edge is reported when the window is farther than the threshold from all edges.
+    /// </summary>
+    [Fact]
+    public void DetectDockEdge_WindowInMiddle_ReturnsNone()
+    {
+        var result = WindowPlacement.DetectDockEdge(new PixelPoint(800, 400), new PixelSize(200, 100), Screen, 12);
+
+        result.Should().Be(DockEdge.None);
+    }
+
+    /// <summary>
+    /// Verifies the closer edge wins when the window is near a corner.
+    /// </summary>
+    [Fact]
+    public void DetectDockEdge_NearCorner_ReturnsClosestEdge()
+    {
+        var result = WindowPlacement.DetectDockEdge(new PixelPoint(10, 3), new PixelSize(200, 100), Screen, 12);
+
+        result.Should().Be(DockEdge.Top);
+    }
+
+    /// <summary>
+    /// Verifies docking snaps the window flush to the edge and keeps the other axis.
+    /// </summary>
+    [Theory]
+    [InlineData(DockEdge.Left, 0, 400)]
+    [InlineData(DockEdge.Right, 1720, 400)]
+    [InlineData(DockEdge.Top, 800, 0)]
+    [InlineData(DockEdge.Bottom, 800, 980)]
+    public void DockedPosition_Edge_SnapsFlush(DockEdge edge, int expectedX, int expectedY)
+    {
+        var size = new PixelSize(200, 100);
+        var start = edge is DockEdge.Left or DockEdge.Right ? new PixelPoint(5, 400) : new PixelPoint(800, 5);
+
+        var result = WindowPlacement.DockedPosition(edge, start, size, Screen);
+
+        result.Should().Be(new PixelPoint(expectedX, expectedY));
+    }
+
+    /// <summary>
+    /// Verifies the collapsed position leaves only the strip visible on each edge.
+    /// </summary>
+    [Theory]
+    [InlineData(DockEdge.Left, -196, 400)]
+    [InlineData(DockEdge.Right, 1916, 400)]
+    [InlineData(DockEdge.Top, 800, -96)]
+    [InlineData(DockEdge.Bottom, 800, 1076)]
+    public void HiddenPosition_Edge_LeavesOnlyStripVisible(DockEdge edge, int expectedX, int expectedY)
+    {
+        var size = new PixelSize(200, 100);
+        var docked = new PixelPoint(800, 400);
+        docked = edge switch
+        {
+            DockEdge.Left => new PixelPoint(0, 400),
+            DockEdge.Right => new PixelPoint(1720, 400),
+            DockEdge.Top => new PixelPoint(800, 0),
+            _ => new PixelPoint(800, 980),
+        };
+
+        var result = WindowPlacement.HiddenPosition(edge, docked, size, Screen, 4);
+
+        result.Should().Be(new PixelPoint(expectedX, expectedY));
+    }
+
+    /// <summary>
     /// Verifies the pointer keeps its relative spot in the window when the pixel size differs from the grab time.
     /// </summary>
     [Fact]

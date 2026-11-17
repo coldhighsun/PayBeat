@@ -203,6 +203,21 @@ public sealed class SettingsViewModelTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies the auto-hide option is persisted and applied on save.
+    /// </summary>
+    [Fact]
+    public void SaveCommand_AutoHideAtEdgeDisabled_PersistsAndApplies()
+    {
+        var vm = CreateViewModel();
+        vm.AutoHideAtEdge = false;
+
+        vm.SaveCommand.Execute(null);
+
+        _settings.Load().AutoHideAtEdge.Should().BeFalse();
+        _applier.ReloadCount.Should().Be(1);
+    }
+
+    /// <summary>
     /// Verifies a blank currency falls back to the default symbol.
     /// </summary>
     [Fact]

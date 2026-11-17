@@ -220,6 +220,10 @@
                                     <CheckBox Content="{DynamicResource Settings.AlwaysOnTop}" IsChecked="{Binding AlwaysOnTop}" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Border Classes="divider"/>
+                                <Grid Classes="row" ColumnDefinitions="*">
+                                    <CheckBox Content="{DynamicResource Settings.AutoHideAtEdge}" IsChecked="{Binding AutoHideAtEdge}" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Border Classes="divider"/>
                                 <Grid Classes="row" ColumnDefinitions="*,Auto">
                                     <TextBlock Grid.Column="0" Text="{DynamicResource Settings.Theme}" Classes="fieldLabel"/>
                                     <ComboBox Grid.Column="1" Width="160"

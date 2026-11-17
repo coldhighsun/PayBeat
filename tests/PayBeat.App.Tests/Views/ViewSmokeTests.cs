@@ -381,6 +381,217 @@ public sealed class ViewSmokeTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies a window dropped near each screen edge snaps flush to that edge when auto-hide is on.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData(DockEdgeCase.Left)]
+    [InlineData(DockEdgeCase.Right)]
+    [InlineData(DockEdgeCase.Top)]
+    [InlineData(DockEdgeCase.Bottom)]
+    public void MainWindow_AutoHide_DroppedNearEdge_SnapsFlush(DockEdgeCase edge)
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal, AutoHideAtEdge = true });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var area = window.Screens.ScreenFromWindow(window)!.Bounds;
+        var size = PayBeat.App.Helpers.ScreenHelper.GetPixelSize(window);
+        var (start, expected) = edge switch
+        {
+            DockEdgeCase.Left => (new Avalonia.PixelPoint(3, 300), new Avalonia.PixelPoint(area.X, 300)),
+            DockEdgeCase.Right => (new Avalonia.PixelPoint(area.Right - size.Width - 3, 300), new Avalonia.PixelPoint(area.Right - size.Width, 300)),
+            DockEdgeCase.Top => (new Avalonia.PixelPoint(500, 3), new Avalonia.PixelPoint(500, area.Y)),
+            _ => (new Avalonia.PixelPoint(500, area.Bottom - size.Height - 3), new Avalonia.PixelPoint(500, area.Bottom - size.Height)),
+        };
+        window.Position = start;
+
+        window.ApplyAutoHide();
+
+        window.Position.Should().Be(expected);
+    }
+
+    /// <summary>
+    /// Verifies a docked window slides off-screen after the delay when the pointer is not over it.
+    /// </summary>
+    [AvaloniaFact]
+    public void MainWindow_AutoHide_DockedAndPointerAway_CollapsesToStrip()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal, AutoHideAtEdge = true });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var area = window.Screens.ScreenFromWindow(window)!.Bounds;
+        var size = PayBeat.App.Helpers.ScreenHelper.GetPixelSize(window);
+        window.Position = new Avalonia.PixelPoint(area.Right - size.Width - 3, 300);
+        window.ApplyAutoHide();
+
+        window.Collapse();
+
+        window.Position.X.Should().Be(area.Right - 4);
+        window.CapturePosition().Left.Should().Be(area.Right - size.Width);
+    }
+
+    /// <summary>
+    /// Verifies startup restore at an edge hides the window at once, while a window at the default spot is not docked.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public void MainWindow_ApplyAutoHideAtStartup_HidesOnlyRestoredWindow(bool restored, bool expectCollapsed)
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var area = window.Screens.ScreenFromWindow(window)!.Bounds;
+        var size = PayBeat.App.Helpers.ScreenHelper.GetPixelSize(window);
+        var docked = new Avalonia.PixelPoint(area.Right - size.Width, 300);
+        window.Position = docked;
+
+        window.ApplyAutoHide(dock: restored, collapseNow: restored);
+
+        (window.Position != docked).Should().Be(expectCollapsed);
+        window.CapturePosition().Left.Should().Be(docked.X);
+    }
+
+    /// <summary>
+    /// Verifies a tray click brings a window collapsed at a screen edge back to its docked position instead of flashing.
+    /// </summary>
+    [AvaloniaFact]
+    public void MainWindow_ActivateFromTray_CollapsedWindow_RevealsAndReturnsTrue()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal, AutoHideAtEdge = true });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var area = window.Screens.ScreenFromWindow(window)!.Bounds;
+        var size = PayBeat.App.Helpers.ScreenHelper.GetPixelSize(window);
+        var docked = new Avalonia.PixelPoint(area.Right - size.Width, 300);
+        window.Position = docked;
+        window.ApplyAutoHide(dock: true, collapseNow: true);
+        window.Position.Should().NotBe(docked);
+
+        var revealed = window.ActivateFromTray();
+
+        revealed.Should().BeTrue();
+        window.Position.Should().Be(docked);
+    }
+
+    /// <summary>
+    /// Verifies a tray click on a window that is already in sight only flashes it and leaves it where it is.
+    /// </summary>
+    [AvaloniaFact]
+    public void MainWindow_ActivateFromTray_VisibleWindow_ReturnsFalseAndKeepsPosition()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal, AutoHideAtEdge = true });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var position = new Avalonia.PixelPoint(500, 300);
+        window.Position = position;
+
+        var revealed = window.ActivateFromTray();
+
+        revealed.Should().BeFalse();
+        window.Position.Should().Be(position);
+    }
+
+    /// <summary>
+    /// Verifies the default spot is the bottom-right corner of the primary screen's work area, and that a window
+    /// docked and hidden elsewhere returns there.
+    /// </summary>
+    [AvaloniaFact]
+    public void MainWindow_PlaceAtDefault_DockedWindow_MovesToPrimaryCorner()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        settings.Save(new SalarySettings { DisplayMode = DisplayMode.Normal });
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var screen = window.Screens.Primary!;
+        var size = PayBeat.App.Helpers.ScreenHelper.GetPixelSize(window);
+        window.Position = new Avalonia.PixelPoint(screen.Bounds.Right - size.Width - 3, 300);
+        window.ApplyAutoHide();
+        window.Collapse();
+
+        window.PlaceAtDefault();
+
+        var expected = PayBeat.App.Helpers.WindowPlacement.BottomRight(size, screen.WorkingArea, (int)(8 * screen.Scaling));
+        window.Position.Should().Be(expected);
+        window.CapturePosition().Left.Should().Be(expected.X);
+    }
+
+    /// <summary>
+    /// Verifies a saved screen name that no monitor has is reported as missing, while no name or a real name is not.
+    /// </summary>
+    [AvaloniaFact]
+    public void ScreenExists_SavedScreenName_ReportsWhetherMonitorIsPresent()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        using var viewModel = new MainViewModel(settings, new FakeWindowService());
+        var window = new MainWindow(new NullTopmostEnforcer()) { DataContext = viewModel, IsRestoringStartupPosition = true };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var present = window.Screens.All[0].DisplayName;
+
+        PayBeat.App.Helpers.ScreenHelper.ScreenExists(window, null).Should().BeTrue();
+        PayBeat.App.Helpers.ScreenHelper.ScreenExists(window, "NoSuchMonitor-123").Should().BeFalse();
+        if (!string.IsNullOrEmpty(present))
+        {
+            PayBeat.App.Helpers.ScreenHelper.ScreenExists(window, present).Should().BeTrue();
+        }
+    }
+
+    /// <summary>
+    /// Screen edge used by the docking theory data.
+    /// </summary>
+    public enum DockEdgeCase
+    {
+        /// <summary>Left edge.</summary>
+        Left,
+
+        /// <summary>Right edge.</summary>
+        Right,
+
+        /// <summary>Top edge.</summary>
+        Top,
+
+        /// <summary>Bottom edge.</summary>
+        Bottom,
+    }
+
+    /// <summary>
+    /// Verifies the auto-hide setting label exists in every language.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData("en")]
+    [InlineData("zh-CN")]
+    public void Localization_AutoHideAtEdge_Exists(string language)
+    {
+        PrepareApplication(language, "dark");
+
+        LocalizationService.Get("Settings.AutoHideAtEdge").Should().NotBe("Settings.AutoHideAtEdge");
+    }
+
+    /// <summary>
     /// Applies the language and theme the same way production start-up does.
     /// </summary>
     private static void PrepareApplication(string language, string theme)

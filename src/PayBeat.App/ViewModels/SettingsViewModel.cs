@@ -48,6 +48,7 @@ public class SettingsViewModel : ViewModelBase, INotifyDataErrorInfo
     /// </summary>
     private readonly SettingsService _service;
     private bool _alwaysOnTop;
+    private bool _autoHideAtEdge;
     private string _currencyText;
     private string _dailySalaryText;
     private DisplayMode _displayMode;
@@ -94,6 +95,7 @@ public class SettingsViewModel : ViewModelBase, INotifyDataErrorInfo
         _workEnd = s.WorkEnd;
         _displayMode = s.DisplayMode;
         _alwaysOnTop = s.AlwaysOnTop;
+        _autoHideAtEdge = s.AutoHideAtEdge;
         _opacity = s.Opacity;
         _refreshInterval = s.RefreshInterval;
         _language = s.Language;
@@ -157,6 +159,13 @@ public class SettingsViewModel : ViewModelBase, INotifyDataErrorInfo
     /// Resumes the global hotkey after capture ends.
     /// </summary>
     public void ResumeHotkey() => _windowService.ResumeHotkey();
+
+    /// <summary>Binds to the Auto-hide at screen edge checkbox in the settings window.</summary>
+    public bool AutoHideAtEdge
+    {
+        get => _autoHideAtEdge;
+        set => SetField(ref _autoHideAtEdge, value);
+    }
 
     /// <summary>Binds to the Always on Top checkbox in the settings window.</summary>
     public bool AlwaysOnTop
@@ -522,6 +531,7 @@ public class SettingsViewModel : ViewModelBase, INotifyDataErrorInfo
             Currency = string.IsNullOrWhiteSpace(_currencyText) ? "¥" : _currencyText.Trim(),
             DisplayMode = DisplayMode,
             AlwaysOnTop = AlwaysOnTop,
+            AutoHideAtEdge = AutoHideAtEdge,
             Opacity = Opacity,
             RefreshInterval = RefreshInterval,
             Language = Language,
