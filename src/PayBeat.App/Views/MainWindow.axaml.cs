@@ -40,6 +40,79 @@ public partial class MainWindow : Window
     private bool _initialPlacementDone;
 
     /// <summary>
+    /// Delay between the pointer leaving the window and the window sliding away at a docked edge.
+    /// </summary>
+    private static readonly TimeSpan AutoHideDelay = TimeSpan.FromMilliseconds(600);
+
+    /// <summary>
+    /// Distance, in device-independent pixels, within which a dropped window counts as docked to an edge.
+    /// </summary>
+    private const double DockThreshold = 12;
+
+    /// <summary>
+    /// Thickness, in device-independent pixels, of the sliver that stays visible while collapsed.
+    /// </summary>
+    private const double CollapsedStrip = 4;
+
+    /// <summary>
+    /// How often a docked window checks where the pointer is.
+    /// </summary>
+    private static readonly TimeSpan AutoHidePollInterval = TimeSpan.FromMilliseconds(150);
+
+    /// <summary>
+    /// Polls the pointer while the window is docked: collapses it once the pointer stayed away for
+    /// <see cref="AutoHideDelay"/> and brings it out when the pointer reaches the visible sliver. Polling is used
+    /// because enter/leave events are not delivered reliably after a drag with pointer capture.
+    /// </summary>
+    private readonly DispatcherTimer _autoHideTimer;
+
+    /// <summary>
+    /// When the pointer was first seen away from the shown window, or <see langword="null"/> while it is on it.
+    /// </summary>
+    private DateTimeOffset? _pointerAwaySince;
+
+    /// <summary>
+    /// Whether the window was brought out from the tray icon and has to stay out until the pointer has been on it
+    /// and left again, because the pointer is on the tray at that moment.
+    /// </summary>
+    private bool _awaitPointerEnter;
+
+    /// <summary>
+    /// How long the list of screens has to stay unchanged before the window is checked against it.
+    /// </summary>
+    private static readonly TimeSpan ScreensSettleDelay = TimeSpan.FromMilliseconds(500);
+
+    /// <summary>
+    /// Whether the screen-change handler is already attached.
+    /// </summary>
+    private bool _screensWatched;
+
+    /// <summary>
+    /// The pending wait for the screen list to settle, or <see langword="null"/> when none is pending.
+    /// </summary>
+    private IDisposable? _screensSettle;
+
+    /// <summary>
+    /// Edge the window is currently docked to, or <see cref="DockEdge.None"/>.
+    /// </summary>
+    private DockEdge _dockEdge;
+
+    /// <summary>
+    /// Fully visible position of the window at <see cref="_dockEdge"/>.
+    /// </summary>
+    private PixelPoint _dockedPosition;
+
+    /// <summary>
+    /// Whether the window is currently slid off-screen leaving only the sliver visible.
+    /// </summary>
+    private bool _isCollapsed;
+
+    /// <summary>
+    /// Whether the context menu is open, which keeps the window expanded.
+    /// </summary>
+    private bool _isMenuOpen;
+
+    /// <summary>
     /// Initializes the window with the topmost enforcer of the current platform.
     /// </summary>
     public MainWindow()
@@ -58,8 +131,24 @@ public partial class MainWindow : Window
 
         Opened += OnOpened;
         SizeChanged += OnSizeChanged;
-        PointerEntered += (_, _) => Opacity = 1.0;
+        _autoHideTimer = new DispatcherTimer { Interval = AutoHidePollInterval };
+        _autoHideTimer.Tick += (_, _) => OnAutoHideTick();
+        PointerEntered += (_, _) =>
+        {
+            Opacity = 1.0;
+            Expand();
+        };
         PointerExited += (_, _) => RestoreOpacity();
+        if (ContextMenu is { } menu)
+        {
+            menu.Opened += (_, _) => _isMenuOpen = true;
+            menu.Closed += (_, _) =>
+            {
+                _isMenuOpen = false;
+                _pointerAwaySince = null;
+            };
+        }
+
         KeyDown += OnKeyDown;
         PointerPressed += OnPointerPressed;
         Closing += (_, _) => LastKnownPosition = CapturePosition();
@@ -90,8 +179,303 @@ public partial class MainWindow : Window
     /// Returns the window's current position and screen as a persistable value.
     /// </summary>
     /// <returns>The current position.</returns>
-    public WindowPosition CapturePosition() =>
-        new(Position.X, Position.Y, ScreenHelper.GetCurrentScreenName(this));
+    public WindowPosition CapturePosition()
+    {
+        // While collapsed the real position is mostly off-screen; persist the visible docked one.
+        var position = _isCollapsed ? _dockedPosition : Position;
+        return new(position.X, position.Y, ScreenHelper.GetCurrentScreenName(this));
+    }
+
+    /// <summary>
+    /// Docks the window to a nearby screen edge when auto-hide is enabled and collapses it once the
+    /// pointer is away. Clears any docked state when auto-hide does not apply.
+    /// </summary>
+    /// <param name="dock">
+    /// Whether to look for an edge the window rests at. <see langword="false"/> keeps a window at its default spot
+    /// from being docked.
+    /// </param>
+    /// <param name="collapseNow">
+    /// Whether to hide a docked window at once instead of after the usual delay, as at startup.
+    /// </param>
+    public void ApplyAutoHide(bool dock = true, bool collapseNow = false)
+    {
+        if (!IsAutoHideActive)
+        {
+            Expand();
+            _dockEdge = DockEdge.None;
+            UpdateAutoHideWatcher();
+            return;
+        }
+
+        if (dock)
+        {
+            TryDock();
+        }
+
+        UpdateAutoHideWatcher();
+        if (collapseNow)
+        {
+            Collapse();
+        }
+    }
+
+    /// <summary>
+    /// Handles a click on the tray icon: a window that is hidden, either collapsed at a screen edge or not shown at
+    /// all, is brought out; a window that is already in sight flashes instead.
+    /// </summary>
+    /// <returns>
+    /// <see langword="true"/> when a hidden window was brought out; <see langword="false"/> when the window was
+    /// already visible and only flashed.
+    /// </returns>
+    public bool ActivateFromTray()
+    {
+        var wasHidden = !IsVisible || _isCollapsed;
+        if (!IsVisible)
+        {
+            Show();
+        }
+
+        WindowState = WindowState.Normal;
+        Expand();
+        if (wasHidden && _dockEdge != DockEdge.None)
+        {
+            _awaitPointerEnter = true;
+        }
+
+        Activate();
+        if (!wasHidden)
+        {
+            PlayAttentionAnimation();
+        }
+
+        return wasHidden;
+    }
+
+    /// <summary>
+    /// Places the window at the default spot: the bottom-right corner of the primary screen's work area.
+    /// </summary>
+    public void PlaceAtDefault()
+    {
+        if (Screens.Primary is not { } screen)
+        {
+            return;
+        }
+
+        _isCollapsed = false;
+        _dockEdge = DockEdge.None;
+        Position = WindowPlacement.BottomRight(ScreenHelper.GetPixelSize(this), screen.WorkingArea, (int)(8 * screen.Scaling));
+        UpdateAutoHideWatcher();
+    }
+
+    /// <summary>
+    /// Moves the window to the default spot when no screen shows it any more, for example after a monitor was
+    /// unplugged while the window was docked or hidden there.
+    /// </summary>
+    private void EnsureOnScreen()
+    {
+        if (DataContext is MainViewModel { DisplayMode: DisplayMode.Flex or DisplayMode.None })
+        {
+            return;
+        }
+
+        var size = ScreenHelper.GetPixelSize(this);
+        var visible = new PixelRect(_isCollapsed ? _dockedPosition : Position, size);
+        if (size.Width <= 0 || Screens.All.Any(s => s.Bounds.Intersects(visible)))
+        {
+            return;
+        }
+
+        PlaceAtDefault();
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether auto-hide is enabled and the current display mode supports it.
+    /// </summary>
+    private bool IsAutoHideActive =>
+        DataContext is MainViewModel { AutoHideAtEdge: true, DisplayMode: DisplayMode.Normal or DisplayMode.Mini };
+
+    /// <summary>
+    /// Detects the edge the window sits against, snaps flush to it and remembers the docked position.
+    /// Edges shared with another monitor are ignored, since the collapsed window would show up there.
+    /// </summary>
+    private void TryDock()
+    {
+        _dockEdge = DockEdge.None;
+        if (_isCollapsed || ScreenHelper.GetCurrentScreen(this) is not { } screen)
+        {
+            return;
+        }
+
+        var size = ScreenHelper.GetPixelSize(this);
+        if (size.Width <= 0 || size.Height <= 0)
+        {
+            return;
+        }
+
+        var area = screen.Bounds;
+        var edge = WindowPlacement.DetectDockEdge(Position, size, area, (int)(DockThreshold * screen.Scaling));
+        if (edge == DockEdge.None)
+        {
+            return;
+        }
+
+        var docked = WindowPlacement.DockedPosition(edge, Position, size, area);
+        var probe = WindowPlacement.HiddenPosition(edge, docked, size, area, 1);
+        var center = new PixelPoint(probe.X + (size.Width / 2), probe.Y + (size.Height / 2));
+
+        // PixelRect.Contains is inclusive of the right and bottom edges, so probe one pixel further out.
+        var outside = edge switch
+        {
+            DockEdge.Left => new PixelPoint(area.X - 1, center.Y),
+            DockEdge.Right => new PixelPoint(area.Right + 1, center.Y),
+            DockEdge.Top => new PixelPoint(center.X, area.Y - 1),
+            _ => new PixelPoint(center.X, area.Bottom + 1),
+        };
+        if (Screens.All.Any(s => s.Bounds.Contains(outside)))
+        {
+            return;
+        }
+
+        _dockEdge = edge;
+        _dockedPosition = docked;
+        Position = docked;
+    }
+
+    /// <summary>
+    /// Runs the pointer poll only while the window is docked and auto-hide applies.
+    /// </summary>
+    private void UpdateAutoHideWatcher()
+    {
+        _pointerAwaySince = null;
+        _awaitPointerEnter = false;
+        if (_dockEdge != DockEdge.None && IsAutoHideActive)
+        {
+            _autoHideTimer.Start();
+        }
+        else
+        {
+            _autoHideTimer.Stop();
+        }
+    }
+
+    /// <summary>
+    /// Waits for the list of screens to stop changing, then makes sure the window is still on one of them. The system
+    /// can report several incomplete lists while a monitor is plugged in or out, so acting on the first one is unsafe.
+    /// </summary>
+    private void OnScreensChanged(object? sender, EventArgs e)
+    {
+        _screensSettle?.Dispose();
+        _screensSettle = DispatcherTimer.RunOnce(
+            () =>
+            {
+                _screensSettle = null;
+                EnsureOnScreen();
+            },
+            ScreensSettleDelay);
+    }
+
+    /// <summary>
+    /// Brings a collapsed window out when the pointer reaches its sliver, and collapses a shown one after the
+    /// pointer stayed away for <see cref="AutoHideDelay"/>.
+    /// </summary>
+    private void OnAutoHideTick()
+    {
+        if (_dockEdge == DockEdge.None || !IsAutoHideActive)
+        {
+            _autoHideTimer.Stop();
+            return;
+        }
+
+        var onWindow = IsPointerOnWindow();
+        if (_isCollapsed)
+        {
+            if (onWindow)
+            {
+                Expand();
+            }
+
+            return;
+        }
+
+        if (_awaitPointerEnter)
+        {
+            // Brought out from the tray: stay out until the pointer has visited the window.
+            _awaitPointerEnter = !onWindow;
+            _pointerAwaySince = null;
+            return;
+        }
+
+        if (onWindow || _isMenuOpen || IsSettingsOrAboutOpen())
+        {
+            _pointerAwaySince = null;
+            return;
+        }
+
+        _pointerAwaySince ??= DateTimeOffset.UtcNow;
+        if (DateTimeOffset.UtcNow - _pointerAwaySince >= AutoHideDelay)
+        {
+            Collapse();
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the pointer is on the window. Where the system reports the pointer position it decides,
+    /// because <see cref="InputElement.IsPointerOver"/> can stay stale after a drag; elsewhere the event state is used.
+    /// </summary>
+    /// <returns><see langword="true"/> when the pointer is within the window bounds.</returns>
+    private bool IsPointerOnWindow()
+    {
+        if (!PointerProbe.TryGetPosition(out var pointer))
+        {
+            return IsPointerOver;
+        }
+
+        var size = ScreenHelper.GetPixelSize(this);
+        var bounds = new PixelRect(Position, size);
+        return new PixelRect(bounds.X - 1, bounds.Y - 1, bounds.Width + 2, bounds.Height + 2).Contains(pointer);
+    }
+
+    /// <summary>
+    /// Slides the docked window off-screen leaving only a thin sliver, unless the user is interacting with it.
+    /// </summary>
+    internal void Collapse()
+    {
+        if (_isCollapsed || _dockEdge == DockEdge.None || !IsAutoHideActive || IsPointerOnWindow() || _isMenuOpen || IsSettingsOrAboutOpen())
+        {
+            return;
+        }
+
+        if (ScreenHelper.GetCurrentScreen(this) is not { } screen)
+        {
+            return;
+        }
+
+        var size = ScreenHelper.GetPixelSize(this);
+        _isCollapsed = true;
+        Position = WindowPlacement.HiddenPosition(_dockEdge, _dockedPosition, size, screen.Bounds, Math.Max(1, (int)(CollapsedStrip * screen.Scaling)));
+    }
+
+    /// <summary>
+    /// Cancels a pending collapse and brings a collapsed window back to its docked position.
+    /// </summary>
+    private void Expand()
+    {
+        _pointerAwaySince = null;
+        if (!_isCollapsed)
+        {
+            return;
+        }
+
+        _isCollapsed = false;
+        Position = _dockedPosition;
+    }
+
+    /// <summary>
+    /// Returns whether the Settings or About window is currently open.
+    /// </summary>
+    private static bool IsSettingsOrAboutOpen() =>
+        Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+        && desktop.Windows.Any(w => w is SettingsWindow or AboutWindow);
 
     /// <summary>
     /// Sets the position before the window is first shown and suppresses the default placement.
@@ -132,6 +516,11 @@ public partial class MainWindow : Window
     /// </summary>
     public void ClampToCurrentScreen()
     {
+        if (_isCollapsed)
+        {
+            return;
+        }
+
         if (ScreenHelper.GetCurrentScreen(this) is { } screen)
         {
             ClampToWorkArea(screen.Bounds);
@@ -233,6 +622,12 @@ public partial class MainWindow : Window
         if (moved && DataContext is MainViewModel { DisplayMode: DisplayMode.Flex })
         {
             ApplyFlexBounds();
+            return;
+        }
+
+        if (moved)
+        {
+            ApplyAutoHide();
         }
     }
 
@@ -269,16 +664,22 @@ public partial class MainWindow : Window
     /// </summary>
     private void OnOpened(object? sender, EventArgs e)
     {
+        // Re-shown (e.g. via the hotkey) while collapsed: bring it back into view.
+        Expand();
+
+        if (!_screensWatched && Screens is { } screens)
+        {
+            _screensWatched = true;
+            screens.Changed += OnScreensChanged;
+        }
+
         if (_initialPlacementDone || IsRestoringStartupPosition)
         {
             return;
         }
 
         _initialPlacementDone = true;
-        if (Screens.Primary is { } screen)
-        {
-            Position = WindowPlacement.BottomRight(ScreenHelper.GetPixelSize(this), screen.WorkingArea, (int)(8 * screen.Scaling));
-        }
+        PlaceAtDefault();
     }
 
     /// <summary>
@@ -315,6 +716,19 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(MainViewModel.Opacity) && !IsPointerOver)
         {
             RestoreOpacity(sender as MainViewModel);
+        }
+
+        if (e.PropertyName is nameof(MainViewModel.AutoHideAtEdge) or nameof(MainViewModel.DisplayMode))
+        {
+            // Restore a collapsed window first so mode changes and sizing act on the visible position.
+            Expand();
+            _dockEdge = DockEdge.None;
+            UpdateAutoHideWatcher();
+        }
+
+        if (e.PropertyName == nameof(MainViewModel.AutoHideAtEdge))
+        {
+            ApplyAutoHide();
         }
 
         if (e.PropertyName == nameof(MainViewModel.DisplayMode) && sender is MainViewModel vm)
@@ -364,8 +778,7 @@ public partial class MainWindow : Window
         // Don't fight Settings/About for the topmost band - they are shown as owned, topmost
         // windows themselves and would otherwise get buried again the moment they take focus and
         // trigger this foreground-change callback.
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
-            && desktop.Windows.Any(w => w is SettingsWindow or AboutWindow))
+        if (IsSettingsOrAboutOpen())
         {
             return;
         }

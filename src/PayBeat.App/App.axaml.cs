@@ -184,7 +184,11 @@ public partial class App : Application
     /// <summary>
     /// Restores the saved placement once the window is first shown, because clamping depends on its measured size.
     /// </summary>
-    private static void ApplyStartupPlacement(MainWindow mainWindow, SalarySettings settings)
+    /// <returns>
+    /// <see langword="true"/> when a saved position on a still existing screen was restored; <see langword="false"/>
+    /// when the window was placed at the default spot (nothing saved, or the saved screen is gone) or fills a screen.
+    /// </returns>
+    private static bool ApplyStartupPlacement(MainWindow mainWindow, SalarySettings settings)
     {
         if (settings.DisplayMode == DisplayMode.Flex)
         {
@@ -192,12 +196,19 @@ public partial class App : Application
                 ? ScreenHelper.FindScreenForRestore(mainWindow, new PixelPoint((int)flex.Left, (int)flex.Top), flex.ScreenDeviceName)
                 : null;
             mainWindow.ApplyFlexBounds(flexScreen);
-            return;
+            return false;
         }
 
         if (GetSavedPosition(settings, settings.DisplayMode) is not { } pos)
         {
-            return;
+            return false;
+        }
+
+        // The monitor the window was left on is gone: fall back to the default spot on the primary screen.
+        if (!ScreenHelper.ScreenExists(mainWindow, pos.ScreenDeviceName))
+        {
+            mainWindow.PlaceAtDefault();
+            return false;
         }
 
         var point = new PixelPoint((int)pos.Left, (int)pos.Top);
@@ -207,6 +218,8 @@ public partial class App : Application
         {
             mainWindow.ClampToWorkArea(screen.Bounds);
         }
+
+        return true;
     }
 
     /// <summary>
@@ -232,10 +245,7 @@ public partial class App : Application
             return;
         }
 
-        _mainWindow.Show();
-        _mainWindow.WindowState = WindowState.Normal;
-        _mainWindow.Activate();
-        _mainWindow.PlayAttentionAnimation();
+        _mainWindow.ActivateFromTray();
     }
 
     /// <summary>
@@ -315,8 +325,12 @@ public partial class App : Application
         Dispatcher.UIThread.Post(
             () =>
             {
-                ApplyStartupPlacement(_mainWindow, _startupSettings);
+                var restored = ApplyStartupPlacement(_mainWindow, _startupSettings);
                 _mainWindow.IsRestoringStartupPosition = false;
+
+                // A window restored at a screen edge starts hidden there. A window at the default spot is
+                // left in sight, so a first run does not vanish into the edge right away.
+                _mainWindow.ApplyAutoHide(dock: restored, collapseNow: restored);
             },
             DispatcherPriority.Background);
     }

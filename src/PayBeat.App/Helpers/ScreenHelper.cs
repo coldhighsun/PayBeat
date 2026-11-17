@@ -41,6 +41,17 @@ internal static class ScreenHelper
     }
 
     /// <summary>
+    /// Determines whether the screen a position was saved on still exists. Positions saved without a screen
+    /// name (older versions) cannot be checked and count as existing.
+    /// </summary>
+    /// <param name="window">Any window, used to reach the screen list.</param>
+    /// <param name="displayName">The saved screen name, or <see langword="null"/>.</param>
+    /// <returns><see langword="false"/> only when a name was saved and no current screen has it.</returns>
+    public static bool ScreenExists(Window window, string? displayName) =>
+        string.IsNullOrEmpty(displayName)
+        || window.Screens.All.Any(s => string.Equals(s.DisplayName, displayName, StringComparison.Ordinal));
+
+    /// <summary>
     /// Returns the screen the window is currently on, falling back to the primary screen.
     /// </summary>
     /// <param name="window">The window.</param>

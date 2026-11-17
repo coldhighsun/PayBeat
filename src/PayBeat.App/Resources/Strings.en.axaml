@@ -60,6 +60,7 @@
     <x:String x:Key="Settings.Flex">Flex</x:String>
     <x:String x:Key="Settings.Opacity">Opacity</x:String>
     <x:String x:Key="Settings.AlwaysOnTop">Always on Top</x:String>
+    <x:String x:Key="Settings.AutoHideAtEdge">Auto-hide at screen edge</x:String>
 
     <!-- System tab -->
     <x:String x:Key="Settings.Tab.System">System</x:String>

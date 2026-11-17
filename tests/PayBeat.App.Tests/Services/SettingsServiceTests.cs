@@ -51,6 +51,7 @@ public sealed class SettingsServiceTests : IDisposable
             DisplayMode = DisplayMode.Flex,
             WorkStart = new TimeOnly(8, 30),
             HotkeyVirtualKey = 0x41,
+            AutoHideAtEdge = true,
         };
 
         new SettingsService(FilePath).Save(settings).Should().BeTrue();
@@ -60,6 +61,16 @@ public sealed class SettingsServiceTests : IDisposable
         loaded.DisplayMode.Should().Be(DisplayMode.Flex);
         loaded.WorkStart.Should().Be(new TimeOnly(8, 30));
         loaded.HotkeyVirtualKey.Should().Be(0x41);
+        loaded.AutoHideAtEdge.Should().BeTrue();
+    }
+
+    /// <summary>
+    /// Verifies auto-hide is on by default.
+    /// </summary>
+    [Fact]
+    public void Defaults_AutoHideAtEdge_IsEnabled()
+    {
+        new SalarySettings().AutoHideAtEdge.Should().BeTrue();
     }
 
     /// <summary>

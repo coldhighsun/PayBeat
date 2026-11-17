@@ -60,6 +60,7 @@
     <x:String x:Key="Settings.Flex">显摆</x:String>
     <x:String x:Key="Settings.Opacity">透明度</x:String>
     <x:String x:Key="Settings.AlwaysOnTop">窗口始终置顶</x:String>
+    <x:String x:Key="Settings.AutoHideAtEdge">靠边自动隐藏</x:String>
 
     <!-- System tab -->
     <x:String x:Key="Settings.Tab.System">系统</x:String>

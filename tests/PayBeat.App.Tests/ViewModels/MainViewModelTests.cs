@@ -61,6 +61,24 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies reloading settings exposes the auto-hide value and raises its change notification.
+    /// </summary>
+    [AvaloniaFact]
+    public void ReloadSettings_AutoHideChanged_UpdatesPropertyAndNotifies()
+    {
+        var settings = CreateSettings(new SalarySettings { AutoHideAtEdge = false });
+        using var vm = new MainViewModel(settings, new FakeWindowService());
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+        settings.Save(new SalarySettings { AutoHideAtEdge = true });
+
+        vm.ReloadSettings();
+
+        vm.AutoHideAtEdge.Should().BeTrue();
+        changed.Should().Contain(nameof(MainViewModel.AutoHideAtEdge));
+    }
+
+    /// <summary>
     /// Verifies selecting the already active mode does nothing.
     /// </summary>
     [AvaloniaFact]
