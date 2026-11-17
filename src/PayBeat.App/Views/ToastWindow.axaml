@@ -18,14 +18,39 @@
         </Transitions>
     </Window.Transitions>
 
-    <Border Background="{DynamicResource BaseBrush}"
+    <Window.Styles>
+        <!-- Accent color per notification kind (class on the root border) -->
+        <Style Selector="Border#RootBorder.success Border#AccentBar">
+            <Setter Property="Background" Value="{DynamicResource GreenBrush}"/>
+        </Style>
+        <Style Selector="Border#RootBorder.success TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{DynamicResource GreenBrush}"/>
+        </Style>
+        <Style Selector="Border#RootBorder.reminder Border#AccentBar">
+            <Setter Property="Background" Value="{DynamicResource AmberBrush}"/>
+        </Style>
+        <Style Selector="Border#RootBorder.reminder TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{DynamicResource AmberBrush}"/>
+        </Style>
+        <Style Selector="Border#RootBorder.info Border#AccentBar">
+            <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+        </Style>
+        <Style Selector="Border#RootBorder.info TextBlock#TitleText">
+            <Setter Property="Foreground" Value="{DynamicResource BlueBrush}"/>
+        </Style>
+    </Window.Styles>
+
+    <Border x:Name="RootBorder"
+            Background="{DynamicResource BaseBrush}"
             BorderBrush="{DynamicResource OverlayBrush}"
             BorderThickness="1"
-            CornerRadius="10"
-            Padding="16,12"
+            CornerRadius="{DynamicResource RadiusLg}"
+            BoxShadow="0 4 16 0 #50000000"
+            ClipToBounds="True"
             Cursor="Hand">
-        <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Grid.Column="0" Spacing="4">
+        <Grid ColumnDefinitions="4,*,Auto">
+            <Border x:Name="AccentBar" Grid.Column="0" Background="{DynamicResource GreenBrush}"/>
+            <StackPanel Grid.Column="1" Margin="12,12,0,12" Spacing="4">
                 <TextBlock x:Name="TitleText"
                            Foreground="{DynamicResource GreenBrush}"
                            FontSize="14"
@@ -37,14 +62,12 @@
                            TextWrapping="Wrap"/>
             </StackPanel>
             <Button x:Name="CloseButton"
-                    Grid.Column="1"
+                    Grid.Column="2"
                     Content="✕"
+                    Classes="icon"
                     Width="24" Height="24"
-                    Padding="0"
-                    FontSize="11"
+                    Margin="4,10,10,0"
                     VerticalAlignment="Top"
-                    Background="Transparent"
-                    Foreground="{DynamicResource MutedBrush}"
                     Click="CloseButton_Click"/>
         </Grid>
     </Border>

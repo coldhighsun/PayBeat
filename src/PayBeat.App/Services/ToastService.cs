@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using PayBeat.App.Helpers;
+using PayBeat.App.Models;
 using PayBeat.App.ViewModels;
 using PayBeat.App.Views;
 
@@ -80,17 +81,18 @@ public sealed class ToastService : IDisposable
     /// <param name="title">Toast title.</param>
     /// <param name="body">Toast body text.</param>
     /// <param name="url">Optional URL opened when the toast is clicked.</param>
-    private void OnNotificationRequested(string title, string body, string? url)
+    /// <param name="kind">Category that decides the toast accent color.</param>
+    private void OnNotificationRequested(string title, string body, string? url, NotificationKind kind)
     {
-        Dispatcher.UIThread.Post(() => Show(title, body, url));
+        Dispatcher.UIThread.Post(() => Show(title, body, url, kind));
     }
 
     /// <summary>
     /// Shows a toast on the UI thread and wires up its lifetime handling.
     /// </summary>
-    private void Show(string title, string body, string? url)
+    private void Show(string title, string body, string? url, NotificationKind kind)
     {
-        var toast = new ToastWindow(title, body, Lifetime);
+        var toast = new ToastWindow(title, body, Lifetime, kind);
         toast.Clicked += () =>
         {
             if (url is not null)

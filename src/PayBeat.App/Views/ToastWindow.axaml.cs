@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using PayBeat.App.Models;
 
 namespace PayBeat.App.Views;
 
@@ -41,9 +42,11 @@ public partial class ToastWindow : Window
     /// <param name="title">Toast title.</param>
     /// <param name="body">Toast body text.</param>
     /// <param name="lifetime">How long the toast stays before fading out.</param>
-    public ToastWindow(string title, string body, TimeSpan lifetime)
+    /// <param name="kind">Category that decides the accent color of the bar and title.</param>
+    public ToastWindow(string title, string body, TimeSpan lifetime, NotificationKind kind = NotificationKind.Success)
     {
         InitializeComponent();
+        RootBorder.Classes.Add(kind.ToString().ToLowerInvariant());
         TitleText.Text = title;
         BodyText.Text = body;
 

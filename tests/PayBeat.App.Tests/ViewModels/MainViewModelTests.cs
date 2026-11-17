@@ -114,7 +114,7 @@ public sealed class MainViewModelTests : IDisposable
     {
         using var vm = new MainViewModel(CreateSettings(new SalarySettings()), new FakeWindowService());
         string? url = null;
-        vm.NotificationRequested += (_, _, u) => url = u;
+        vm.NotificationRequested += (_, _, u, _) => url = u;
 
         vm.NotifyUpdateAvailable("2.0.0", "https://example.test/release");
 

@@ -65,7 +65,7 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
     /// notification. The third parameter is an optional URL to open if the notification is clicked
     /// (currently only set for "update available"; <see langword="null"/> for all others).
     /// </summary>
-    public event Action<string, string, string?>? NotificationRequested;
+    public event Action<string, string, string?, NotificationKind>? NotificationRequested;
 
     /// <summary>Whether the window should stay above all other windows.</summary>
     public bool AlwaysOnTop => _settings.AlwaysOnTop;
@@ -270,7 +270,8 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
         NotificationRequested?.Invoke(
             LocalizationService.Get("Notification.UpdateAvailableTitle"),
             string.Format(LocalizationService.Get("Notification.UpdateAvailableBody"), version),
-            htmlUrl);
+            htmlUrl,
+            NotificationKind.Info);
 
     private void Refresh()
     {
@@ -331,7 +332,8 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
             NotificationRequested?.Invoke(
                 LocalizationService.Get("Notification.MilestoneTitle"),
                 string.Format(LocalizationService.Get("Notification.MilestoneBody"), $"{_settings.Currency}{reachedThreshold:N2}"),
-                null);
+                null,
+                NotificationKind.Success);
             _nextMilestoneThreshold = NextMilestoneThresholdAbove(Earned, _settings.MilestoneAmount);
         }
 
@@ -342,7 +344,8 @@ public class MainViewModel : ViewModelBase, ISettingsApplier, IDisposable
             NotificationRequested?.Invoke(
                 LocalizationService.Get("Notification.EndOfDayTitle"),
                 string.Format(LocalizationService.Get("Notification.EndOfDayBody"), _settings.EndOfDayReminderMinutes),
-                null);
+                null,
+                NotificationKind.Reminder);
         }
     }
 
