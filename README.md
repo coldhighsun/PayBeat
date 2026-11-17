@@ -1,3 +1,7 @@
+<div align="center">
+
+<img src="src/PayBeat.App/Resources/Icons/PayBeat.png" alt="PayBeat icon" width="128">
+
 # PayBeat
 
 [![CI / Release](https://img.shields.io/github/actions/workflow/status/coldhighsun/PayBeat/ci.yml?label=CI%20%2F%20Release)](https://github.com/coldhighsun/PayBeat/actions/workflows/ci.yml)
@@ -12,11 +16,13 @@
 [![Last commit](https://img.shields.io/github/last-commit/coldhighsun/PayBeat?label=last%20commit)](https://github.com/coldhighsun/PayBeat/commits/main)
 [![Stars](https://img.shields.io/github/stars/coldhighsun/PayBeat?style=flat&label=stars)](https://github.com/coldhighsun/PayBeat/stargazers)
 
-**English** | [简体中文](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
-Real-time salary progress widget for Windows and macOS
+</div>
 
 ---
+
+Real-time salary progress widget for Windows and macOS
 
 ## Introduction
 
