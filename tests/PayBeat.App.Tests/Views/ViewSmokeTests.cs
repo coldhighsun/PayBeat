@@ -150,21 +150,27 @@ public sealed class ViewSmokeTests : IDisposable
     /// Verifies the settings window renders with its view model and every tab.
     /// </summary>
     /// <param name="tabIndex">Index of the tab to select.</param>
+    /// <param name="language">Language code to apply.</param>
+    /// <param name="theme">Theme code to apply.</param>
     [AvaloniaTheory]
-    [InlineData(0)]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    public void SettingsWindow_EachTab_RendersFrame(int tabIndex)
+    [InlineData(0, "en", "dark")]
+    [InlineData(1, "en", "dark")]
+    [InlineData(2, "en", "dark")]
+    [InlineData(3, "en", "dark")]
+    [InlineData(0, "zh-CN", "light")]
+    [InlineData(1, "zh-CN", "light")]
+    [InlineData(2, "zh-CN", "light")]
+    [InlineData(3, "zh-CN", "light")]
+    public void SettingsWindow_EachTab_RendersFrame(int tabIndex, string language, string theme)
     {
-        PrepareApplication("en", "dark");
+        PrepareApplication(language, theme);
         var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
         var viewModel = new SettingsViewModel(settings, new FakeSettingsApplier(), new FakeStartupService(), new FakeWindowService(), new FakeAppearanceService());
         var window = new SettingsWindow { DataContext = viewModel };
 
         window.Show();
         window.FindControl<TabControl>("SettingsTabs")!.SelectedIndex = tabIndex;
-        var frame = Render(window, $"settings-{tabIndex}");
+        var frame = Render(window, $"settings-{tabIndex}-{language}-{theme}");
 
         frame.Should().NotBeNull();
         window.Close();
@@ -198,6 +204,47 @@ public sealed class ViewSmokeTests : IDisposable
     }
 
     /// <summary>
+    /// Verifies each notification kind renders a toast and tags it with the matching style class.
+    /// </summary>
+    /// <param name="kind">Notification kind under test.</param>
+    /// <param name="expectedClass">Style class expected on the toast root.</param>
+    [AvaloniaTheory]
+    [InlineData(NotificationKind.Success, "success")]
+    [InlineData(NotificationKind.Reminder, "reminder")]
+    [InlineData(NotificationKind.Info, "info")]
+    public void ToastWindow_Kind_AppliesMatchingClass(NotificationKind kind, string expectedClass)
+    {
+        PrepareApplication("en", "dark");
+        var window = new ToastWindow("Title", "Body", TimeSpan.FromSeconds(30), kind);
+
+        window.Show();
+        var root = window.FindControl<Border>("RootBorder")!;
+        var frame = Render(window, $"toast-{expectedClass}");
+
+        root.Classes.Should().Contain(expectedClass);
+        frame.Should().NotBeNull();
+        window.Close();
+    }
+
+    /// <summary>
+    /// Verifies the settings title-bar close button runs the cancel command.
+    /// </summary>
+    [AvaloniaFact]
+    public void SettingsWindow_TitleCloseButton_UsesCancelCommand()
+    {
+        PrepareApplication("en", "dark");
+        var settings = new SettingsService(Path.Combine(_dir, "settings.json"));
+        var viewModel = new SettingsViewModel(settings, new FakeSettingsApplier(), new FakeStartupService(), new FakeWindowService(), new FakeAppearanceService());
+        var window = new SettingsWindow { DataContext = viewModel };
+
+        window.Show();
+        var button = window.FindControl<Button>("TitleCloseButton")!;
+
+        button.Command.Should().BeSameAs(viewModel.CancelCommand);
+        window.Close();
+    }
+
+    /// <summary>
     /// Verifies the message window renders its text.
     /// </summary>
     [AvaloniaFact]
@@ -211,6 +258,70 @@ public sealed class ViewSmokeTests : IDisposable
 
         frame.Should().NotBeNull();
         window.Close();
+    }
+
+    /// <summary>
+    /// Verifies the about window renders in both themes.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData("dark")]
+    [InlineData("light")]
+    public void AboutWindow_RendersFrame(string theme)
+    {
+        PrepareApplication("en", theme);
+        var window = new AboutWindow();
+
+        window.Show();
+        var frame = Render(window, $"about-{theme}");
+
+        frame.Should().NotBeNull();
+        window.Close();
+    }
+
+    /// <summary>
+    /// Verifies the toast window renders its title and body.
+    /// </summary>
+    [AvaloniaFact]
+    public void ToastWindow_WithText_RendersFrame()
+    {
+        PrepareApplication("en", "dark");
+        var window = new ToastWindow("Title", "Body text", TimeSpan.FromSeconds(30));
+
+        window.Show();
+        var frame = Render(window, "toast-dark");
+
+        frame.Should().NotBeNull();
+        window.Close();
+    }
+
+    /// <summary>
+    /// Verifies the message window button label is localized instead of hard-coded.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData("en", "OK")]
+    [InlineData("zh-CN", "确定")]
+    public void MessageWindow_OkButton_IsLocalized(string language, string expected)
+    {
+        PrepareApplication(language, "dark");
+
+        LocalizationService.Get("Message.Ok").Should().Be(expected);
+    }
+
+    /// <summary>
+    /// Verifies the new settings section headers exist in every language.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData("en")]
+    [InlineData("zh-CN")]
+    public void Localization_SettingsSectionHeaders_Exist(string language)
+    {
+        PrepareApplication(language, "dark");
+
+        foreach (var key in new[] { "Reminders", "Widget", "General" })
+        {
+            var id = $"Settings.Section.{key}";
+            LocalizationService.Get(id).Should().NotBe(id);
+        }
     }
 
     /// <summary>
