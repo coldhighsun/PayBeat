@@ -6,10 +6,15 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Padding" Value="8,5"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
-                        CornerRadius="6"
+                <Border x:Name="ButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{DynamicResource RadiusSm}"
                         Padding="{TemplateBinding Padding}">
                     <ContentPresenter Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -28,6 +33,59 @@
     <Style Selector="Button:disabled">
         <Setter Property="Opacity" Value="0.4"/>
     </Style>
+    <!-- Visible keyboard focus ring -->
+    <Style Selector="Button:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+    </Style>
+
+    <!-- Primary action (Save, OK): filled with the accent color and real hover/pressed colors -->
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BaseBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="24,9"/>
+    </Style>
+    <Style Selector="Button.primary:pointerover">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource BlueHoverBrush}"/>
+    </Style>
+    <Style Selector="Button.primary:pressed">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource BluePressedBrush}"/>
+    </Style>
+    <Style Selector="Button.primary:focus-visible">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextBrush}"/>
+    </Style>
+
+    <!-- Secondary action (Cancel, Close) -->
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        <Setter Property="Padding" Value="24,9"/>
+    </Style>
+    <Style Selector="Button.secondary:pointerover">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+    </Style>
+    <Style Selector="Button.secondary:pressed">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource OverlayBrush}"/>
+    </Style>
+
+    <!-- Small icon button (close glyph) -->
+    <Style Selector="Button.icon">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style Selector="Button.icon:pointerover">
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    </Style>
 
     <!-- Link-style button used for hyperlinks in the About window -->
     <Style Selector="Button.link">
@@ -36,11 +94,14 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="FontSize" Value="12"/>
     </Style>
+    <Style Selector="Button.link:pointerover /template/ ContentPresenter">
+        <Setter Property="TextBlock.TextDecorations" Value="Underline"/>
+    </Style>
 
     <!-- Flat TextBox -->
     <Style Selector="TextBox">
         <Setter Property="FontSize" Value="13"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusSm}"/>
         <Setter Property="CaretBrush" Value="{DynamicResource BlueBrush}"/>
         <Setter Property="MinWidth" Value="0"/>
         <Setter Property="MinHeight" Value="0"/>
@@ -67,7 +128,7 @@
     <!-- ComboBox -->
     <Style Selector="ComboBox">
         <Setter Property="FontSize" Value="13"/>
-        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusSm}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="MaxDropDownHeight" Value="200"/>
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
@@ -102,7 +163,7 @@
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource OverlayBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}"/>
         <Setter Property="Padding" Value="6"/>
         <Setter Property="MaxWidth" Value="Infinity"/>
         <Setter Property="MaxHeight" Value="Infinity"/>
@@ -141,6 +202,9 @@
     <Style Selector="TabItem.settings:selected /template/ Border#TabBorder">
         <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
     </Style>
+    <Style Selector="TabItem.settings:focus-visible /template/ Border#TabBorder">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+    </Style>
     <Style Selector="TabControl.settings">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -160,6 +224,48 @@
         <Setter Property="Foreground" Value="{DynamicResource SubtextBrush}"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Settings layout: grouped cards made of fixed-height rows (label left, control right) -->
+    <Style Selector="Border.group">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}"/>
+        <Setter Property="Padding" Value="14,4"/>
+        <Setter Property="Margin" Value="0,0,0,16"/>
+    </Style>
+    <Style Selector="Grid.row">
+        <Setter Property="MinHeight" Value="44"/>
+    </Style>
+    <Style Selector="Border.divider">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource OverlayBrush}"/>
+        <Setter Property="Opacity" Value="0.6"/>
+    </Style>
+    <Style Selector="TextBlock.rowHint">
+        <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,-4,0,10"/>
+    </Style>
+    <Style Selector="TextBlock.readout">
+        <Setter Property="Foreground" Value="{DynamicResource BlueBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <!-- Inputs inside a card are one step darker than the card so they keep their outline -->
+    <Style Selector="Border.group TextBox:not(.digit)">
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Border.group TextBox:not(.capturing):not(.digit) /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource BaseBrush}"/>
+    </Style>
+    <Style Selector="Border.group ComboBox">
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{DynamicResource BaseBrush}"/>
     </Style>
 
     <!-- Settings check boxes and radio buttons -->
