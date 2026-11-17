@@ -81,7 +81,7 @@ Artifacts output to `artifacts/bin/<ProjectName>/<config>/` (SDK artifacts layou
 
 ## Tests
 
-`tests/PayBeat.App.Tests` uses xUnit v3 (required by `Avalonia.Headless.XUnit`) + AwesomeAssertions. Pure logic (earnings, settings persistence, placement/toast math, hotkey key map, view models) uses plain `[Fact]`; UI code uses `[AvaloniaFact]`/`[AvaloniaTheory]` with a headless Skia platform (`TestAppBuilder` boots the real `App`). `ViewSmokeTests` renders every window; set the `PAYBEAT_TEST_SHOTS` environment variable to a directory to also save the rendered frames as PNGs for visual inspection. Tests never touch the real settings file: `SettingsService` takes an optional file path.
+`tests/PayBeat.App.Tests` uses xUnit v3 (required by `Avalonia.Headless.XUnit`) + AwesomeAssertions. Pure logic (earnings, settings persistence, placement/toast math, hotkey key map, view models) uses plain `[Fact]`; UI code uses `[AvaloniaFact]`/`[AvaloniaTheory]` with a headless Skia platform (`TestAppBuilder` boots the real `App`). `ViewSmokeTests` renders every window; set the `PAYBEAT_TEST_SHOTS` environment variable to a directory to also save the rendered frames as PNGs for visual inspection. `ReadmeScreenshotTests` regenerates the README screenshots (`docs/screenshots/<lang>/`) when `PAYBEAT_README_SHOTS` points at `docs/screenshots`; it is a no-op otherwise. (`Resources/Screenshots/` is separate: those three images are the in-app display-mode previews in the Settings window.) Tests never touch the real settings file: `SettingsService` takes an optional file path.
 
 ## CI / Release
 

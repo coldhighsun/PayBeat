@@ -48,7 +48,17 @@ PayBeat is a borderless, always-on-top desktop widget (Windows and macOS) that s
 
 | Flex | Normal | Mini |
 |------|--------|------|
-| ![Flex](src/PayBeat.App/Resources/Screenshots/flex.png) | ![Normal](src/PayBeat.App/Resources/Screenshots/normal.png) | ![Mini](src/PayBeat.App/Resources/Screenshots/mini.png) |
+| ![Flex](docs/screenshots/en/flex.png) | ![Normal](docs/screenshots/en/normal.png)<br>![Normal light](docs/screenshots/en/normal-light.png) | ![Mini](docs/screenshots/en/mini.png)<br>![Mini light](docs/screenshots/en/mini-light.png) |
+
+Settings window (dark theme shown; the light theme follows the OS):
+
+| Salary | Notifications | Display | System |
+|---|---|---|---|
+| ![](docs/screenshots/en/settings-salary.png) | ![](docs/screenshots/en/settings-notifications.png) | ![](docs/screenshots/en/settings-display.png) | ![](docs/screenshots/en/settings-system.png) |
+
+| About | Toast notification |
+|---|---|
+| ![](docs/screenshots/en/about.png) | ![](docs/screenshots/en/toast.png) |
 
 ## Requirements
 

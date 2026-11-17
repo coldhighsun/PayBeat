@@ -49,7 +49,17 @@ PayBeat 是一款桌面悬浮组件（支持 Windows 和 macOS），以秒为单
 
 | Flex | Normal | Mini |
 |------|--------|------|
-| ![Flex](src/PayBeat.App/Resources/Screenshots/flex.png) | ![Normal](src/PayBeat.App/Resources/Screenshots/normal.png) | ![Mini](src/PayBeat.App/Resources/Screenshots/mini.png) |
+| ![Flex](docs/screenshots/zh-CN/flex.png) | ![Normal](docs/screenshots/zh-CN/normal.png)<br>![Normal light](docs/screenshots/zh-CN/normal-light.png) | ![Mini](docs/screenshots/zh-CN/mini.png)<br>![Mini light](docs/screenshots/zh-CN/mini-light.png) |
+
+设置窗口（以下为深色主题，浅色主题随系统切换）：
+
+| 薪资计算 | 提醒 | 显示 | 系统 |
+|---|---|---|---|
+| ![](docs/screenshots/zh-CN/settings-salary.png) | ![](docs/screenshots/zh-CN/settings-notifications.png) | ![](docs/screenshots/zh-CN/settings-display.png) | ![](docs/screenshots/zh-CN/settings-system.png) |
+
+| 关于 | 弹窗通知 |
+|---|---|
+| ![](docs/screenshots/zh-CN/about.png) | ![](docs/screenshots/zh-CN/toast.png) |
 
 ## 系统要求
 
