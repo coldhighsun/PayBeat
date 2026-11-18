@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using GitHubReleaseUpdater.Versioning;
 using PayBeat.App.Helpers;
 using PayBeat.App.Models;
 using PayBeat.App.Platform;
@@ -90,6 +91,11 @@ public partial class App : Application
     private bool _windowsHidden;
 
     /// <summary>
+    /// Looks for newer releases and installs them.
+    /// </summary>
+    private UpdateService? _updateService;
+
+    /// <summary>
     /// Whether the window position was already persisted during this shutdown.
     /// </summary>
     private bool _positionSaved;
@@ -137,8 +143,8 @@ public partial class App : Application
         }
 
         _trayIconService = new TrayIconService(_mainVm!, ActivateMainWindow);
-        _toastService = new ToastService(_mainVm!, ExternalLauncher.Open);
-        CheckForUpdatesOnStartup();
+        _toastService = new ToastService(_mainVm!, OpenToastUrl);
+        StartUpdateService();
     }
 
     /// <summary>
@@ -148,6 +154,7 @@ public partial class App : Application
     {
         SavePositionOnce(captureNow: false);
 
+        _updateService?.Dispose();
         _toastService?.Dispose();
         _trayIconService?.Dispose();
         _hotkeyService?.Dispose();
@@ -249,19 +256,54 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Fires a best-effort, fire-and-forget update check, throttled to once per 24 hours via
-    /// <see cref="SettingsLastCheckStore"/>.
+    /// Creates the update service and starts its automatic checks (official builds only, throttled to once per 24 hours).
+    /// A newer release is announced with a toast.
     /// </summary>
-    private void CheckForUpdatesOnStartup()
+    private void StartUpdateService()
     {
-        _ = Task.Run(async () =>
+        var assembly = typeof(App).Assembly;
+        _updateService = new UpdateService(
+            new SettingsLastCheckStore(_settingsService!),
+            SemanticVersion.TryFromAssembly(assembly, out var version) ? version : null,
+            UpdateService.ReadOfficialBuild(assembly),
+            UpdateService.DefaultDownloadDirectory(),
+            useSetup: OperatingSystem.IsWindows() && UpdateService.IsSetupInstall())
         {
-            var info = await new UpdateCheckService(_settingsService!).GetLatestReleaseAsync();
-            if (info != null)
+            PrepareForInstallAsync = SavePositionBeforeInstallAsync,
+        };
+        _windowService!.UpdateService = _updateService;
+        _updateService.UpdateFound += (_, _) => Dispatcher.UIThread.Post(
+            () => _mainVm!.NotifyUpdateAvailable(_updateService.LatestVersionText ?? string.Empty, _updateService.ReleaseUrl));
+        _updateService.Start();
+    }
+
+    /// <summary>
+    /// Persists the widget position without marking the shutdown save as done, because the setup program ends the app
+    /// without a shutdown of its own (and may fail, leaving the app running).
+    /// </summary>
+    private Task SavePositionBeforeInstallAsync() =>
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            // The window can only be read on the UI thread, and the updater does not promise to call the hook there.
+            if (_mainWindow?.CapturePosition() is { } pos)
             {
-                Dispatcher.UIThread.Post(() => _mainVm!.NotifyUpdateAvailable(info.Version, info.HtmlUrl));
+                SaveWindowPosition(pos);
             }
-        });
+        }).GetTask();
+
+    /// <summary>
+    /// Handles a toast click: the update toast opens the about window, where the update can be installed, when this
+    /// platform installs updates; any other address opens in the browser.
+    /// </summary>
+    private void OpenToastUrl(string url)
+    {
+        if (_updateService is { CanInstallPackages: true } updates && url == updates.ReleaseUrl)
+        {
+            _windowService?.OpenAbout();
+            return;
+        }
+
+        ExternalLauncher.Open(url);
     }
 
     /// <summary>
@@ -367,16 +409,15 @@ public partial class App : Application
             return;
         }
 
-        var settings = _settingsService.Load();
-        var updated = _mainVm.DisplayMode switch
+        var mode = _mainVm.DisplayMode;
+        _settingsService.Update(settings => mode switch
         {
             DisplayMode.Normal => settings with { NormalPosition = pos },
             DisplayMode.Mini => settings with { MiniPosition = pos },
             DisplayMode.None => settings,
             DisplayMode.Flex => settings with { FlexPosition = pos },
             _ => settings
-        };
-        _settingsService.Save(updated);
+        });
     }
 
     /// <summary>

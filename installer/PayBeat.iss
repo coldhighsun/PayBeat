@@ -37,6 +37,9 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 LicenseFile=..\LICENSE
 WizardStyle=modern
+; Lets a silent update (run by the in-app updater) close the running PayBeat itself.
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -53,16 +56,31 @@ Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
+[InstallDelete]
+Type: files; Name: "{app}\*.dll"
+
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+; A silent update started by the in-app updater passes /RELAUNCH=1 to start the app again.
+Filename: "{app}\{#AppExeName}"; Flags: nowait runasoriginaluser; Check: ShouldRelaunch
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{userappdata}\{#AppName}"
 
 [Code]
+function ShouldRelaunch: Boolean;
+begin
+  Result := ExpandConstant('{param:RELAUNCH|0}') = '1';
+end;
+
 function InitializeSetup(): Boolean;
 begin
   Result := True;
+  // A silent run (the in-app updater) must not block on a dialog; CloseApplications closes the app instead.
+  if WizardSilent then
+  begin
+    Exit;
+  end;
   while CheckForMutexes('PayBeat_SingleInstance') do
   begin
     if MsgBox('{#AppName} is currently running. Please close it before continuing setup.', mbError, MB_RETRYCANCEL) = IDCANCEL then

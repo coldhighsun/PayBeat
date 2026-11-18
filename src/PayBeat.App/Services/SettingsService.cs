@@ -47,11 +47,29 @@ public class SettingsService
     private SalarySettings? _cache;
 
     /// <summary>
+    /// Serializes access to <see cref="_cache"/> and the settings file, because the update check can save from a
+    /// background thread while the UI thread saves too.
+    /// </summary>
+    private readonly object _gate = new();
+
+    /// <summary>
     /// Returns the current settings, reading them from disk only once per process (subsequent
     /// calls return the cached instance kept in sync by <see cref="Save"/>). Returns a default
     /// <see cref="SalarySettings"/> instance if the file does not exist or cannot be deserialized.
     /// </summary>
     public SalarySettings Load()
+    {
+        lock (_gate)
+        {
+            return LoadCore();
+        }
+    }
+
+    /// <summary>
+    /// Reads the settings without taking the lock; callers hold <see cref="_gate"/>.
+    /// </summary>
+    /// <returns>The cached settings, or the ones read from disk, or defaults.</returns>
+    private SalarySettings LoadCore()
     {
         if (_cache is { } cached)
         {
@@ -104,6 +122,33 @@ public class SettingsService
     /// disk or permission error prevented it (the app doesn't crash, but callers should surface
     /// the failure instead of assuming the settings were persisted).</returns>
     public bool Save(SalarySettings settings)
+    {
+        lock (_gate)
+        {
+            return SaveCore(settings);
+        }
+    }
+
+    /// <summary>
+    /// Applies <paramref name="change"/> to the current settings and saves the result as one step, so that a concurrent
+    /// save cannot be overwritten by a stale copy.
+    /// </summary>
+    /// <param name="change">Computes the new settings from the current ones.</param>
+    /// <returns><see langword="true"/> if the write succeeded; see <see cref="Save"/>.</returns>
+    public bool Update(Func<SalarySettings, SalarySettings> change)
+    {
+        lock (_gate)
+        {
+            return SaveCore(change(LoadCore()));
+        }
+    }
+
+    /// <summary>
+    /// Writes the settings without taking the lock; callers hold <see cref="_gate"/>.
+    /// </summary>
+    /// <param name="settings">Settings to persist.</param>
+    /// <returns><see langword="true"/> if the write succeeded.</returns>
+    private bool SaveCore(SalarySettings settings)
     {
         try
         {

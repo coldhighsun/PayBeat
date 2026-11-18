@@ -86,6 +86,11 @@
     <x:String x:Key="About.Update.Checking">Checking for updates...</x:String>
     <x:String x:Key="About.Update.UpToDate">You're up to date</x:String>
     <x:String x:Key="About.Update.Available">Update available: v{0}</x:String>
+    <x:String x:Key="About.Update.Downloading">Downloading update... {0}</x:String>
+    <x:String x:Key="About.Update.Downloaded">Update downloaded and verified</x:String>
+    <x:String x:Key="About.Update.Installing">Installing... PayBeat will restart when done</x:String>
+    <x:String x:Key="About.Update.Failed">Update failed. Please try again later</x:String>
+    <x:String x:Key="About.Update.UpdateNow">Update now</x:String>
 
     <!-- Validation errors -->
     <x:String x:Key="Error.SalaryPositive">Daily salary must be greater than 0</x:String>
@@ -107,6 +112,6 @@
     <x:String x:Key="Notification.EndOfDayTitle">Almost Done</x:String>
     <x:String x:Key="Notification.EndOfDayBody">Work ends in {0} minutes.</x:String>
     <x:String x:Key="Notification.UpdateAvailableTitle">Update Available</x:String>
-    <x:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} is available. Open About to download it.</x:String>
+    <x:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} is available. Open About to update.</x:String>
 
 </ResourceDictionary>

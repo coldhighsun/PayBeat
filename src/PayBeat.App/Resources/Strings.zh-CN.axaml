@@ -86,6 +86,11 @@
     <x:String x:Key="About.Update.Checking">正在检查更新...</x:String>
     <x:String x:Key="About.Update.UpToDate">已是最新版本</x:String>
     <x:String x:Key="About.Update.Available">发现新版本：v{0}</x:String>
+    <x:String x:Key="About.Update.Downloading">正在下载更新... {0}</x:String>
+    <x:String x:Key="About.Update.Downloaded">更新已下载并校验</x:String>
+    <x:String x:Key="About.Update.Installing">正在安装... 完成后 PayBeat 将自动重启</x:String>
+    <x:String x:Key="About.Update.Failed">更新失败，请稍后重试</x:String>
+    <x:String x:Key="About.Update.UpdateNow">立即更新</x:String>
 
     <!-- Validation errors -->
     <x:String x:Key="Error.SalaryPositive">日薪须大于 0</x:String>
@@ -107,6 +112,6 @@
     <x:String x:Key="Notification.EndOfDayTitle">快下班了</x:String>
     <x:String x:Key="Notification.EndOfDayBody">还有 {0} 分钟下班。</x:String>
     <x:String x:Key="Notification.UpdateAvailableTitle">发现新版本</x:String>
-    <x:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} 已发布，打开"关于"窗口下载。</x:String>
+    <x:String x:Key="Notification.UpdateAvailableBody">PayBeat v{0} 已发布，打开"关于"窗口更新。</x:String>
 
 </ResourceDictionary>

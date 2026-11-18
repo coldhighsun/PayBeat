@@ -23,7 +23,7 @@ public sealed class SettingsLastCheckStore(SettingsService settingsService) : IL
     /// <inheritdoc />
     public Task SetLastCheckedAtAsync(DateTimeOffset checkedAt, CancellationToken cancellationToken = default)
     {
-        settingsService.Save(settingsService.Load() with { LastUpdateCheckUtc = checkedAt });
+        settingsService.Update(settings => settings with { LastUpdateCheckUtc = checkedAt });
         return Task.CompletedTask;
     }
 

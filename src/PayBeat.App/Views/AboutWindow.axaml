@@ -54,6 +54,14 @@
                             HorizontalAlignment="Left"
                             Margin="0,4,0,0"
                             Click="UpdateLink_Click"/>
+                    <Button x:Name="UpdateNowButton"
+                            Classes="primary"
+                            IsVisible="False"
+                            FontSize="11"
+                            HorizontalAlignment="Left"
+                            Margin="0,6,0,0"
+                            Content="{DynamicResource About.Update.UpdateNow}"
+                            Click="UpdateNowButton_Click"/>
                 </StackPanel>
             </Grid>
 
