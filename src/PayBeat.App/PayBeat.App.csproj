@@ -7,7 +7,17 @@
     <AssemblyName>PayBeat</AssemblyName>
     <RootNamespace>PayBeat.App</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <!-- The release workflow sets this. Only official builds look for updates by themselves: the version of any other
+         build, such as one from a commit after the last tag, is below every release. -->
+    <OfficialBuild Condition="'$(OfficialBuild)' == ''">false</OfficialBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>OfficialBuild</_Parameter1>
+      <_Parameter2>$(OfficialBuild)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Resources\Icons\PayBeat.ico" />

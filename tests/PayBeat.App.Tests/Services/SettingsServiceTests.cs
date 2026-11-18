@@ -131,4 +131,55 @@ public sealed class SettingsServiceTests : IDisposable
         loaded.HotkeyModifiers.Should().Be(6);
         loaded.HotkeyVirtualKey.Should().Be(112);
     }
+
+    /// <summary>
+    /// Verifies <see cref="SettingsService.Update"/> applies the change to the current settings and persists it.
+    /// </summary>
+    [Fact]
+    public void Update_Change_IsAppliedAndPersisted()
+    {
+        var service = new SettingsService(FilePath);
+
+        var saved = service.Update(settings => settings with { Currency = "$" });
+
+        saved.Should().BeTrue();
+        service.Load().Currency.Should().Be("$");
+        new SettingsService(FilePath).Load().Currency.Should().Be("$");
+    }
+
+    /// <summary>
+    /// Verifies concurrent updates from several threads do not overwrite each other.
+    /// </summary>
+    [Fact]
+    public async Task Update_Concurrent_DoesNotLoseChanges()
+    {
+        var service = new SettingsService(FilePath);
+        var start = service.Load().DailySalary;
+        const int Count = 50;
+
+        await Task.WhenAll(Enumerable.Range(0, Count).Select(_ =>
+            Task.Run(() => service.Update(settings => settings with { DailySalary = settings.DailySalary + 1 }),
+                TestContext.Current.CancellationToken)));
+
+        service.Load().DailySalary.Should().Be(start + Count);
+        new SettingsService(FilePath).Load().DailySalary.Should().Be(start + Count);
+    }
+
+    /// <summary>
+    /// Verifies the last-check store keeps the other settings when it records a check time.
+    /// </summary>
+    [Fact]
+    public async Task SetLastCheckedAtAsync_OtherSettings_AreKept()
+    {
+        var service = new SettingsService(FilePath);
+        service.Save(service.Load() with { Currency = "€" });
+        var store = new SettingsLastCheckStore(service);
+        var checkedAt = DateTimeOffset.UtcNow;
+
+        await store.SetLastCheckedAtAsync(checkedAt, TestContext.Current.CancellationToken);
+
+        var loaded = new SettingsService(FilePath).Load();
+        loaded.Currency.Should().Be("€");
+        loaded.LastUpdateCheckUtc.Should().Be(checkedAt);
+    }
 }

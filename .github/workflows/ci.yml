@@ -75,14 +75,14 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Publish (single file)
-        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -o publish/
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --no-self-contained -p:PublishSingleFile=true -p:OfficialBuild=true -o publish/
 
       - name: Publish (self-contained, single file)
-        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish-standalone/
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:OfficialBuild=true -o publish-standalone/
 
       # The installer packages a regular (multi-file) self-contained publish, not a single file.
       - name: Publish (self-contained, for installer)
-        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -o publish-selfcontained/
+        run: dotnet publish src/PayBeat.App/PayBeat.App.csproj -c Release -r win-x64 --self-contained -p:OfficialBuild=true -o publish-selfcontained/
 
       - name: Zip artifact
         shell: pwsh
@@ -112,6 +112,14 @@ jobs:
           $setupName = Get-ChildItem "installer-output\*.exe" | Select-Object -First 1 -ExpandProperty Name
           echo "SETUP_NAME=installer-output/$setupName" >> $env:GITHUB_ENV
 
+      # The in-app updater (RequireChecksum) verifies the downloaded installer against this file.
+      - name: Generate checksums
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "installer-output\*-setup-*.exe" | Select-Object -First 1
+          $hash = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $($setup.Name)" | Out-File -FilePath SHA256SUMS.txt -Encoding ascii
+
       - name: Download macOS packages
         uses: actions/download-artifact@v8
         with:
@@ -127,6 +135,7 @@ jobs:
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME_SELFCONTAINED }}
             ${{ env.SETUP_NAME }}
+            SHA256SUMS.txt
             macos-packages/*.dmg
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-') }}

@@ -36,6 +36,14 @@ public sealed class AppWindowService(
         get; set;
     }
 
+    /// <summary>
+    /// Gets or sets the update service shared with the about window; set once the app has created it.
+    /// </summary>
+    public UpdateService? UpdateService
+    {
+        get; set;
+    }
+
     /// <inheritdoc/>
     public bool IsHotkeySupported => hotkeyService.IsSupported;
 
@@ -54,7 +62,7 @@ public sealed class AppWindowService(
             return;
         }
 
-        ShowOwned(new AboutWindow(settingsService));
+        ShowOwned(UpdateService is { } updates ? new AboutWindow(updates) : new AboutWindow());
     }
 
     /// <inheritdoc/>

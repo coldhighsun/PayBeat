@@ -37,8 +37,8 @@ PayBeat is a borderless, always-on-top desktop widget (Windows and macOS) that s
 - System tray icon with a context menu (display mode, Settings, About, Exit); left-click brings the widget to the front with a brief scale-up flash
 - Global hotkey to show / hide all windows (default `Ctrl+Alt+X`, Windows only)
 - Optional lunch break deduction and weekend earnings
-- Tray balloon notifications for an end-of-day reminder, earnings milestones, and available updates — clicking an update notification opens its release page
-- Checks GitHub Releases for updates on startup (throttled to once per day)
+- Tray balloon notifications for an end-of-day reminder, earnings milestones, and available updates — clicking an update notification opens the About window
+- Checks GitHub Releases for updates on startup (throttled to once per day). On Windows the installed build can download, verify (SHA-256) and install an update from the About window, then restarts itself; portable copies (and macOS) only show the new version with a link to the release page
 - English and Simplified Chinese UI, auto-detected from the OS locale
 - Light and dark themes, auto-detected from the OS appearance setting
 - Configurable opacity, refresh interval, and currency symbol; numbers follow your system region format (decimal/thousands separators)
